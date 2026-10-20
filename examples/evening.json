@@ -1,0 +1,20 @@
+{
+ "title": "Evening",
+ "key": "F",
+ "mode": "major",
+ "meter": "4/4",
+ "tempo": 84,
+ "genre": "pop",
+ "form": [
+  {"label": "A", "bars": 8, "cadence": "half"},
+  {"label": "A", "bars": 8, "cadence": "authentic"},
+  {"label": "B", "bars": 8, "cadence": "half"},
+  {"label": "A", "bars": 8, "cadence": "authentic"}
+ ],
+ "requests": [
+  {"bars": [21, 22], "register": "higher", "climax": true},
+  {"bars": [17, 20], "rhythm": "busier"},
+  {"bars": [24, 24], "rhythm": "held"}
+ ],
+ "seed": 1
+}
