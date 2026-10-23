@@ -1,0 +1,46 @@
+[
+  {
+    "piece": "after_rain",
+    "title": "비 갠 밤",
+    "url": "after_rain/",
+    "versions": [
+      {
+        "version": "v001",
+        "url": "after_rain/v001.html"
+      }
+    ]
+  },
+  {
+    "piece": "winter_morning",
+    "title": "겨울 아침",
+    "url": "winter_morning/",
+    "versions": [
+      {
+        "version": "v001",
+        "url": "winter_morning/v001.html"
+      }
+    ]
+  },
+  {
+    "piece": "sunny_alley",
+    "title": "햇살 골목",
+    "url": "sunny_alley/",
+    "versions": [
+      {
+        "version": "v001",
+        "url": "sunny_alley/v001.html"
+      }
+    ]
+  },
+  {
+    "piece": "corner_cafe",
+    "title": "모퉁이 카페",
+    "url": "corner_cafe/",
+    "versions": [
+      {
+        "version": "v001",
+        "url": "corner_cafe/v001.html"
+      }
+    ]
+  }
+]

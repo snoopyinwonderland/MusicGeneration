@@ -33,16 +33,20 @@ def main() -> None:
     p.add_argument("work", help="work folder with design.json and score.json")
     p.add_argument("--out", required=True, help="the piece's output folder; versions v001, v002 ... go inside")
     p.add_argument("--reason", default="", help="what this version answers (the listener's words)")
+    p.add_argument("--feedback", default="", help="사용자 피드백 원문")
+    p.add_argument("--interpretation", default="", help="작곡자의 변경 해석")
     p.add_argument("--preserve", nargs="*", default=[], help="kept from the last version: bars:1-8 rh:1-8 lh:1-8 motif:a")
     p = sub.add_parser("listen", help="one HTML page to see and hear built pieces (every version, newest first)")
     p.add_argument("roots", nargs="+", help="piece output folders (with v001, v002 ...)")
     p.add_argument("--out", required=True)
     p.add_argument("--latest", action="store_true", help="only the newest version of each piece")
+    p.add_argument("--piano-samples", action="store_true", help="출처를 표시한 FluidR3 피아노 샘플 포함")
+    p.add_argument("--individual-pages", action="store_true", help="곡별·버전별 URL 경로와 catalog.json 생성")
     p.add_argument("--embed-verovio", help="path to verovio-toolkit-wasm.js to embed (offline page, about 7 MB)")
     a = ap.parse_args()
     if a.cmd == "listen":
         from musigen.listen import build_page
-        print(build_page([Path(r) for r in a.roots], Path(a.out), a.latest, a.embed_verovio))
+        print(build_page([Path(r) for r in a.roots], Path(a.out), a.latest, a.embed_verovio, a.piano_samples, a.individual_pages))
         return
     if a.cmd == "design":
         from musigen.design import summary_ko, validate
@@ -57,7 +61,7 @@ def main() -> None:
         if score is None:
             sys.exit(f"{a.work}: score.json not found")
         validate(design)
-        info = save(Path(a.out), design, score, a.reason, a.preserve)
+        info = save(Path(a.out), design, score, a.reason, a.preserve, a.feedback, a.interpretation)
         print(json.dumps(info, ensure_ascii=False, indent=1))
         print((Path(a.out) / info["version"] / "checks.json").resolve())
         return

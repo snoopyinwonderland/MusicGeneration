@@ -37,7 +37,7 @@ from fractions import Fraction as F
 from musicomp.theory import Key, name_to_tpc, spell
 
 from musigen import accomp
-from musigen.design import bar_len, beat, qpm, total_bars
+from musigen.design import bar_len, beat, qpm, total_bars, pickup
 from musigen.motif import apply, realise
 from musigen.notation import Ev, NotationError, length, parse
 
@@ -59,6 +59,8 @@ class Note:
     hand: str                              # rh | lh
     voice: int                             # 1, 2 within the hand's staff
     src: str                               # provenance (musigen/notation.py Ev.src)
+    art: str | None = None
+    slur: str | None = None
 
 
 @dataclass
@@ -72,15 +74,27 @@ class Piece:
     directions: list[tuple[F, str, str | None]] = field(default_factory=list)  # (onset, text, dynamic)
     chords: list[tuple[F, accomp.Chord]] = field(default_factory=list)
 
+    pickup: F = F(0)
+    expression: list[dict] = field(default_factory=list)
+    bar_keys: dict[int, Key] = field(default_factory=dict)
+    motifs: dict[str, list[Ev]] = field(default_factory=dict)
+    analysis_chords: list = field(default_factory=list)
+
+    def bar_start(self, bar: int) -> F:
+        return F(0) if bar == 0 else self.pickup + (bar - 1) * self.bar_len
+
+    def bar_end(self, bar: int) -> F:
+        return self.pickup if bar == 0 else self.pickup + bar * self.bar_len
+
     @property
     def bar_len(self) -> F:
         return bar_len(self.meter)
 
     def bar_of(self, onset: F) -> int:
-        return int(onset // self.bar_len) + 1
+        return 0 if onset < self.pickup else int((onset - self.pickup) // self.bar_len) + 1
 
     def in_bars(self, a: int, z: int, hand: str | None = None) -> list[Note]:
-        lo, hi = (a - 1) * self.bar_len, z * self.bar_len
+        lo, hi = self.bar_start(a), self.bar_end(z)
         return [n for n in self.notes if lo <= n.onset < hi and (hand is None or n.hand == hand)]
 
 
@@ -114,7 +128,23 @@ def _material(item, motifs: dict, key: Key, blen: F, bt: F, where: str, chords_o
         mid = item["motif"]
         if mid not in motifs:
             raise ScoreError(f"{where}: unknown motif {mid!r}")
-        return realise(motifs[mid], list(item.get("ops", [])), key, item.get("pitches"), item.get("durs"), mid)
+        result = realise(motifs[mid], list(item.get("ops", [])), key, item.get("pitches"), item.get("durs"), mid)
+        if "seq" not in item:
+            return result
+        seq = item["seq"]
+        times, step = seq.get("times"), seq.get("step", 1)
+        if type(times) is not int or not 1 <= times <= 128:
+            raise ScoreError("seq.times는 1–128 정수여야 합니다")
+        shifts = step if isinstance(step, list) else [k*step for k in range(times)] if type(step) is int else []
+        if len(shifts) != times or any(type(x) is not int for x in shifts):
+            raise ScoreError("seq.step은 정수 또는 times와 길이가 같은 정수 목록이어야 합니다")
+        if "semi" in seq and type(seq["semi"]) is not bool:
+            raise ScoreError("seq.semi는 true/false여야 합니다")
+        out = []
+        for k, shift in enumerate(shifts):
+            changed = apply(result, f"{'semi' if seq.get('semi') else 'step'}:{shift}", key) if shift else result
+            out += [replace(e, src=f"{e.src}|seq:{k}") for e in changed]
+        return out
     if "pattern" in item:
         cs = accomp.parse_chords(item.get("chords", ""), blen, bt, start % blen)
         chords_out += [(start + off, ch) for off, _, ch in cs]
@@ -145,10 +175,12 @@ def _place(timeline: list[tuple[F, Ev, Key]], hand: str, voice: int) -> list[Not
         if not e.rest:
             if tie_open and out and tuple(m for m, _ in out[-1].pitches) == e.pitches and out[-1].onset + out[-1].dur == on:
                 out[-1].dur += e.dur
+                if e.slur in ("stop", "both"):
+                    out[-1].slur = "both" if out[-1].slur in ("start", "both") else "stop"
             else:
                 tp = e.tpcs or (None,) * len(e.pitches)
                 ps = tuple((m, t if t is not None else spell(m, key)) for m, t in zip(e.pitches, tp))
-                out.append(Note(on, e.dur, ps, hand, voice, e.src))
+                out.append(Note(on, e.dur, ps, hand, voice, e.src, e.art, e.slur))
         tie_open = e.tie
     return out
 
@@ -166,22 +198,28 @@ def build(design: dict, score: dict) -> Piece:
         except NotationError as e:
             raise ScoreError(f"motif {mid}: {e}") from e
     piece = Piece(design.get("title", "Untitled"), key, meter, qpm(b), n_bars)
+    piece.pickup = pickup(b)
+    piece.motifs = motifs
     timeline: dict[str, list[tuple[F, Ev, Key]]] = {v: [] for v in VOICES}
-    nxt = 1
-    for bi, blk in enumerate(score.get("blocks") or []):
-        a, z = _bars(blk.get("bars"), n_bars)
+    blocks = list(score.get("blocks") or [])
+    if piece.pickup and (not blocks or str(blocks[0].get("bars")) != "0"):
+        blocks.insert(0, {"bars": "0"})
+    nxt = 0 if piece.pickup else 1
+    for bi, blk in enumerate(blocks):
+        a, z = (0, 0) if piece.pickup and str(blk.get("bars")) == "0" else _bars(blk.get("bars"), n_bars)
         where = f"block {bi} (bars {blk.get('bars')})"
         if a != nxt:
             raise ScoreError(f"{where}: expected to start at bar {nxt}")
         nxt = z + 1
         lkey = parse_key(blk["key"]) if blk.get("key") else key
-        t0, need = (a - 1) * blen, (z - a + 1) * blen
+        t0, need = piece.bar_start(a), piece.bar_end(z) - piece.bar_start(a)
+        piece.bar_keys.update({i: lkey for i in range(a, z+1)})
         src0 = None
         if blk.get("copy"):
             ca, cz = _bars(blk["copy"], n_bars)
             if cz >= a or cz - ca != z - a:
                 raise ScoreError(f"{where}: copy {blk['copy']} must be earlier bars, as many as the block")
-            src0 = (ca - 1) * blen
+            src0 = piece.bar_start(ca)
         for v, (hand, _) in VOICES.items():
             if v in blk:
                 chords: list = []
@@ -211,6 +249,10 @@ def build(design: dict, score: dict) -> Piece:
                 piece.chords += [(t0 + off, ch) for off, _, ch in accomp.parse_chords(blk["chords"], blen, bt)]
             except NotationError as e:
                 raise ScoreError(f"{where} chords: {e}") from e
+        # An explicitly written block without chord material has unknown harmony.
+        # Do not silently carry the preceding block's chord into its final cadence.
+        if not any(t0 <= on < t0 + need for on, _ in piece.chords):
+            piece.analysis_chords.append((t0, None))
         if blk.get("dyn"):
             if blk["dyn"] not in DYNAMICS:
                 raise ScoreError(f"{where}: dyn one of {sorted(DYNAMICS)}")
@@ -221,6 +263,9 @@ def build(design: dict, score: dict) -> Piece:
         raise ScoreError(f"blocks end at bar {nxt - 1}, the design has {n_bars} bars")
     for v, (hand, vn) in VOICES.items():
         piece.notes += _place(timeline[v], hand, vn)
+    from musigen.expression import compile_expression
+    piece.expression = compile_expression(piece, score.get("expression", []))
     piece.notes.sort(key=lambda n: (n.onset, n.voice))
+    piece.analysis_chords = sorted(piece.chords + piece.analysis_chords, key=lambda c: c[0])
     piece.chords = sorted(piece.chords, key=lambda c: c[0]) if score.get("show_chords", True) else []
     return piece

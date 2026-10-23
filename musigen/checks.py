@@ -111,7 +111,15 @@ def check(piece: Piece, design: dict) -> dict:
         warnings.append("마지막 마디 왼손 베이스가 으뜸음이 아닙니다.")
     if rh_last and (max(m for m, _ in rh_last[-1].pitches) - tonic) % 12 not in (0, 3, 4, 7):
         warnings.append("마지막 오른손 윗음이 으뜸화음 음이 아닙니다.")
-    return {"errors": errors, "warnings": warnings,
+    from musigen.theme_metrics import measure
+    recognition = measure(piece, design)
+    notes = [f"{r['bar']}마디 {_hand(r['hand'])}: 동기 {r['motif']} 점수 {r['score']:.2f}, 알아듣기 어려울 수 있음(잠정)"
+             for r in recognition["occurrences"] if r["score"] is not None and r["score"] < .5]
+    from musigen.musical_checks import evaluate
+    musical = evaluate(piece, design)
+    warnings += musical["warnings"]
+    notes += musical["notes"]
+    return {"errors": errors, "warnings": warnings, "notes": notes, "recognition": recognition, "musical": musical,
             "stats": {"bars": piece.bars, "seconds": round(secs, 2), "notes_rh": len(rh),
                       "notes_lh": sum(1 for n in piece.notes if n.hand == "lh"), "climax": climax},
             "sections": sections, "motifs": dict(usage)}
@@ -144,6 +152,8 @@ def summary_ko(result: dict) -> str:
         lines.append(f"- 오류: {e}")
     for w in result["warnings"]:
         lines.append(f"- 주의: {w}")
+    for n in result.get("notes", []):
+        lines.append(f"- 참고: {n}")
     if not result["errors"] and not result["warnings"]:
         lines.append("- 자동 검사에서 걸린 것이 없습니다.")
     return "\n".join(lines) + "\n"

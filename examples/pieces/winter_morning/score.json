@@ -1,0 +1,249 @@
+{
+  "motifs": {
+    "a": "(G4/e B4/e A4/e D5/q.)",
+    "b": "(B4/q. A4/e G4/q)"
+  },
+  "blocks": [
+    {
+      "bars": "0",
+      "rh": "D4/e_",
+      "dyn": "p"
+    },
+    {
+      "bars": "1",
+      "rh": {
+        "motif": "a"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "G"
+      }
+    },
+    {
+      "bars": "2",
+      "rh": {
+        "motif": "b"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "C"
+      }
+    },
+    {
+      "bars": "3",
+      "rh": {
+        "motif": "a"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "Am"
+      }
+    },
+    {
+      "bars": "4",
+      "rh": {
+        "motif": "b"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "D7"
+      },
+      "dyn": "mp"
+    },
+    {
+      "bars": "5",
+      "rh": {
+        "motif": "a"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "G"
+      }
+    },
+    {
+      "bars": "6",
+      "rh": {
+        "motif": "b"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "C"
+      }
+    },
+    {
+      "bars": "7",
+      "rh": "(A4/e C5/e B4/e A4/q.)",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D7"
+      }
+    },
+    {
+      "bars": "8",
+      "rh": "G4/h.",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G"
+      }
+    },
+    {
+      "bars": "9-11",
+      "lh": {
+        "motif": "a",
+        "ops": [
+          "at:G3"
+        ],
+        "seq": {
+          "times": 3,
+          "step": 1
+        }
+      },
+      "rh": {
+        "pattern": "bass",
+        "chords": "G Am Bm",
+        "bass_range": [
+          67,
+          71
+        ]
+      },
+      "dyn": "mp"
+    },
+    {
+      "bars": "12",
+      "rh": {
+        "motif": "b",
+        "ops": [
+          "at:E5"
+        ]
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "C"
+      }
+    },
+    {
+      "bars": "13",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "at:C5"
+        ]
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "Am"
+      }
+    },
+    {
+      "bars": "14",
+      "rh": "(G5/q. D5/e B4/q)",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G"
+      },
+      "dyn": "mf"
+    },
+    {
+      "bars": "15",
+      "rh": {
+        "motif": "b"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "C"
+      }
+    },
+    {
+      "bars": "16",
+      "rh": "(A4/q. F#4/q.)",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D7"
+      }
+    },
+    {
+      "bars": "17-20",
+      "copy": "1-4",
+      "dyn": "p"
+    },
+    {
+      "bars": "21",
+      "rh": {
+        "motif": "a"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "C"
+      }
+    },
+    {
+      "bars": "22",
+      "rh": {
+        "motif": "b"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "Am"
+      }
+    },
+    {
+      "bars": "23",
+      "rh": "(A4/q. F#4/q.)",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D7"
+      }
+    },
+    {
+      "bars": "24",
+      "rh": "[G4,B4,D5]/h._",
+      "lh": {
+        "pattern": "bass",
+        "chords": "G"
+      },
+      "dyn": "pp"
+    }
+  ],
+  "expression": [
+    {
+      "bars": "1-8",
+      "pedal": "bar"
+    },
+    {
+      "bars": "9-12",
+      "pedal": "chord"
+    },
+    {
+      "bars": "13-16",
+      "pedal": "bar"
+    },
+    {
+      "bars": "17-23",
+      "pedal": "bar"
+    },
+    {
+      "bars": "24",
+      "pedal": "held"
+    },
+    {
+      "bars": "1-3",
+      "hairpin": "cresc"
+    },
+    {
+      "bars": "5-8",
+      "hairpin": "dim"
+    },
+    {
+      "bars": "9-13",
+      "hairpin": "cresc"
+    },
+    {
+      "bars": "14-16",
+      "hairpin": "dim"
+    },
+    {
+      "bars": "21-24",
+      "hairpin": "dim"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from fractions import Fraction as F
 
 from musicomp.core.score import Measure
 from musicomp.realize.musicxml import Direction, HarmonySymbol, OutNote, OutPart, write_score
@@ -18,9 +19,29 @@ def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
     part = OutPart("P1", "Piano", "Pno.", 1, [("G", 2), ("F", 4)])
     for n in piece.notes:
         part.notes.append(OutNote(n.onset, n.dur, list(n.pitches), voice=n.voice, staff=1 if n.hand == "rh" else 2,
-                                  meta={"src": n.src}))
+                                  meta={"src": n.src}, articulation=n.art,
+                                  **({"slur": n.slur} if n.slur else {})))
     for on, text, dyn in piece.directions:
         part.directions.append(Direction(on, text, 1, "below" if dyn else "above", dyn))
+    for e in piece.expression:
+        if e["kind"] == "pedal":
+            for on, value in [(e["start"], "start")] + [(t, "change") for t in e["changes"]] + [(e["end"], "stop")]:
+                part.directions.append(Direction(on, "", 2, "below", pedal=value))
+        else:
+            part.directions.append(Direction(e["start"], "", 1, "below",
+                                             wedge="crescendo" if e["mode"] == "cresc" else "diminuendo"))
+            part.directions.append(Direction(e["end"], "", 1, "below", wedge="stop"))
+    # Adjacent explicit pedal spans share a change, not simultaneous stop/start.
+    pedal_at = {}
+    for direction in part.directions:
+        if getattr(direction, "pedal", None):
+            pedal_at.setdefault(direction.onset, []).append(direction)
+    for group in pedal_at.values():
+        if {d.pedal for d in group} == {"start", "stop"}:
+            for d in group:
+                part.directions.remove(d)
+            part.directions.append(Direction(group[0].onset, "", 2, "below", pedal="change"))
+    part.directions.sort(key=lambda d: d.onset)
     prev, prev_on = None, None
     for on, ch in piece.chords:
         # the same chord running on (A7 at the end of one bar and through the next) is written once; after a gap
@@ -33,7 +54,8 @@ def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
         suffix = re.sub(r"^[A-G][#b]?", "", ch.symbol).split("/")[0]
         part.harmonies.append(HarmonySymbol(on, ch.root_tpc, ch.kind, ch.bass_tpc, suffix))
     blen = piece.bar_len
-    measures = [Measure(i, str(i + 1), i * blen, blen, blen) for i in range(piece.bars)]
+    measures = ([Measure(0, "0", F(0), piece.pickup, blen)] if piece.pickup else [])
+    measures += [Measure(i + len(measures), str(i + 1), piece.pickup + i * blen, blen, blen) for i in range(piece.bars)]
     beats, beat_type = (int(x) for x in piece.meter.split("/"))
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -45,11 +67,11 @@ def write_midi(musicxml: Path, path: Path) -> Path | None:
     """MIDI through music21 (for listening without a notation program); None when music21 cannot convert."""
     try:
         from music21 import converter
-        converter.parse(str(musicxml)).write("midi", fp=str(path))
+        converter.parse(str(musicxml), forceSource=True).write("midi", fp=str(path))
         return Path(path)
     except Exception:  # noqa: BLE001 - listening copy only; the MusicXML is the result
         return None
 
 
 def seconds(piece: Piece) -> float:
-    return float(piece.bars * piece.bar_len) * 60 / piece.qpm
+    return float(piece.pickup + piece.bars * piece.bar_len) * 60 / piece.qpm

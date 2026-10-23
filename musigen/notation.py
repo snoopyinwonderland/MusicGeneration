@@ -39,6 +39,9 @@ class Ev:
     tie: bool = False                         # tied into the next event
     src: str = ""                             # provenance: "lit", "a", "a|step:+1", "copy:1-4", "lh:broken(Dm)" ...
 
+    art: str | None = None
+    slur: str | None = None
+
     @property
     def rest(self) -> bool:
         return not self.pitches
@@ -67,16 +70,36 @@ def parse(text: str, bar_len: F | None = None, src: str = "lit", start: F = F(0)
     out: list[Ev] = []
     prev = F(1)
     pos = start
+    slur_open = False
     for tok in text.split():
         if tok == "|":
             if bar_len and pos % bar_len:
                 raise NotationError(f"bar check '|' after {_fmt(pos - start)} quarters: not on a barline "
                                     f"(bar = {_fmt(bar_len)}), text: {text!r}")
             continue
-        m = TOKEN_RE.match(tok)
+        starts, stops = tok.startswith("("), tok.endswith(")")
+        core = tok[1:] if starts else tok
+        core = core[:-1] if stops else core
+        art = {">": "accent", "'": "staccato", "_": "tenuto"}.get(core[-1:] or "")
+        if art:
+            core = core[:-1]
+        if starts and slur_open:
+            raise NotationError("이음줄을 겹쳐 열 수 없습니다")
+        if starts:
+            slur_open = True
+        if stops and not slur_open:
+            raise NotationError("열리지 않은 이음줄을 닫았습니다")
+        if stops:
+            slur_open = False
+        slur = "both" if starts and stops else "start" if starts else "stop" if stops else None
+        m = TOKEN_RE.match(core)
         if not m:
             raise NotationError(f"bad token {tok!r} (form PITCH/DUR, e.g. A4/q. or [D3,F3]/h or r/e)")
         head, code, trip, dots, tie = m.groups()
+        if art and (tie or (out and out[-1].tie)):
+            raise NotationError("붙임줄 음에는 아티큘레이션을 덧붙일 수 없습니다")
+        if head == "r" and (art or slur or tie):
+            raise NotationError("쉼표에는 아티큘레이션·이음줄·붙임줄을 붙일 수 없습니다")
         d = duration(code, trip, dots) if code else prev
         prev = d
         if head == "r":
@@ -85,8 +108,10 @@ def parse(text: str, bar_len: F | None = None, src: str = "lit", start: F = F(0)
             names = head[1:-1].split(",") if head.startswith("[") else [head]
             ps = [parse_pitch(n) for n in names]
             ps.sort()
-            out.append(Ev(d, tuple(p for p, _ in ps), tuple(t for _, t in ps), bool(tie), src))
+            out.append(Ev(d, tuple(p for p, _ in ps), tuple(t for _, t in ps), bool(tie), src, art, slur))
         pos += d
+    if slur_open:
+        raise NotationError("한 재료 안에서 이음줄을 닫아야 합니다")
     return out
 
 

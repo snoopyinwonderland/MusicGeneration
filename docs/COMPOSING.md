@@ -116,3 +116,25 @@ python -m musigen piece examples\pieces\after_rain --out output\after_rain --rea
   - 대신 버전마다 `output\<곡>\listen.html`이 생깁니다. Verovio로 악보를 그리고 브라우저 합성음으로 재생합니다(`musigen/listen.py`).
   - 소리는 실제 피아노 음색이 아니고, 셈여림과 페달도 반영하지 않습니다.
 - 문장에서 설계로 가는 자동 변환이 없습니다. 지금은 작곡자가 직접 씁니다.
+
+## 2026-10-23 P1 추가
+
+`basics.pickup`은 4분음표 단위(숫자 또는 `"1/2"`). 여린내기는 0마디, form은 1마디부터이며 마지막 마디는 온마디다.
+음표 뒤 `'` 스타카토, `>` 악센트, `_` 테누토를 하나만 쓴다. 붙임줄 음과의 조합은 거절한다.
+`(C4/q D4/q E4/q)`처럼 한 재료 안에서 이음줄을 닫는다. retro와 frag에도 끝점이 보존된다.
+score 최상위 `expression`은 `{"bars":"1-8","pedal":"bar","hairpin":"cresc"}` 형식이다.
+페달은 bar/half/chord/held, 증감은 cresc/dim. 3/4의 half는 마디마다 갱신한다.
+표현 기호 출력에는 musicomp `codex/xml-expression` 변경이 필요하다(병합 전 MUSICOMP_ROOT 지정).
+위 '지금 없는 것' 목록 중 여린내기·표현 기보·브라우저 표현 재생은 P1에서 추가됐다.
+
+## 주제 반복과 인식 (P2)
+
+`{"motif":"a","ops":["at:C5"],"seq":{"times":3,"step":1}}`은 변형 후 세 차례 반복합니다. step 목록은 각 반복의 이동량, semi:true는 반음 단위입니다. delay:e는 앞에 쉼을 넣고 마지막 음을 줄이며, extend:q는 마지막 음을 늘리고, tail:C5,D5는 마지막 두 음만 바꿉니다. 블록의 길이는 정확히 맞아야 합니다. checks.recognition의 점수와 임계값은 잠정적인 악보 유사도이며 청취 인식률이 아닙니다.
+
+## 음악 검사 (P3)
+
+form의 선택 필드 cadence는 authentic/half/plagal/deceptive/none입니다. errors는 연주 불가, warnings는 설계 위반·분명한 검사 조건 위반, notes는 해석이 필요한 관찰입니다. 강박은 박자 단위 박 시작이며 6/8은 점4분음표 두 박을 검사합니다. 리듬 4마디, 구간 대비 2반음/15%는 잠정값입니다. 화음 기호가 없는 직접 기보 블록은 화성 검사를 미평가로 표시합니다.
+
+## 피드백과 비교 (P4)
+
+`piece --feedback "원문" --interpretation "작곡자가 바꾼 내용" --preserve bars:1-8 motif:a`로 변경 이력을 남깁니다. feedback 미지정 때 reason을 사용합니다. 바뀐 마디의 앞뒤 한 마디를 함께 듣는 비교 버튼은 부모가 포함된 듣기 페이지에서 동작합니다. --latest로 부모를 제외하면 비교할 수 없습니다.
