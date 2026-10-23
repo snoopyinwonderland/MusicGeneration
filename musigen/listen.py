@@ -19,7 +19,10 @@ VEROVIO_CDN = "https://cdn.jsdelivr.net/npm/verovio@6.3.0/dist/verovio-toolkit-w
 
 def _entry(vdir: Path) -> dict:
     read = lambda name: json.loads((vdir / name).read_text(encoding="utf-8"))
-    return {"piece": vdir.parent.name, "xml": (vdir / "piece.musicxml").read_text(encoding="utf-8"),
+    from musigen.piece import build
+    from musigen.expression import playback
+    performance = playback(build(read("design.json"), read("score.json")))
+    return {"performance": performance, "piece": vdir.parent.name, "xml": (vdir / "piece.musicxml").read_text(encoding="utf-8"),
             "design": read("design.json"), "checks": read("checks.json"), "info": read("version.json")}
 
 

@@ -55,9 +55,19 @@ def total_bars(d: dict) -> int:
     return d["form"][-1]["bars"][1]
 
 
+def pickup(basics: dict) -> F:
+    try:
+        value = F(str(basics.get("pickup", 0)))
+    except (ValueError, ZeroDivisionError):
+        raise DesignError("여린내기 길이는 4분음표 단위 숫자나 분수여야 합니다") from None
+    if not 0 <= value < bar_len(basics["meter"]):
+        raise DesignError("여린내기 길이는 0 이상, 한 마디보다 짧아야 합니다")
+    return value
+
+
 def seconds(d: dict) -> float:
     b = d["basics"]
-    return float(total_bars(d) * bar_len(b["meter"])) * 60 / qpm(b)
+    return float(pickup(b) + total_bars(d) * bar_len(b["meter"])) * 60 / qpm(b)
 
 
 def validate(d: dict) -> list[str]:
@@ -71,6 +81,7 @@ def validate(d: dict) -> list[str]:
             raise DesignError(f"basics.{k} missing")
     if b["meter"] not in METERS:
         raise DesignError(f"basics.meter one of {sorted(METERS)}")
+    pickup(b)
     if b["mode"] not in ("major", "minor"):
         raise DesignError("basics.mode major | minor")
     if not b["key"] or b["key"][0] not in "ABCDEFG" or any(c not in "#b" for c in b["key"][1:]):
@@ -149,6 +160,8 @@ def summary_ko(d: dict) -> str:
         if imp.get(k):
             row(name, imp[k], f"impression.{k}")
     row("박자", b["meter"], "basics.meter")
+    if pickup(b):
+        row("여린내기", f"0마디, {pickup(b)} (4분음표 단위)", "basics.pickup")
     row("빠르기", f"{b['tempo']} (박/분)", "basics.tempo")
     row("조성", f"{b['key']} {MODE_KO[b['mode']]}", "basics.key")
     row("길이", f"{total_bars(d)}마디, 약 {seconds(d):.0f}초", "basics.length_sec")

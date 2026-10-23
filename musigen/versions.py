@@ -29,7 +29,7 @@ def bar_signature(piece: Piece) -> dict[str, dict[str, list]]:
     out: dict[str, dict[str, list]] = {"rh": {}, "lh": {}}
     for n in piece.notes:
         bar = piece.bar_of(n.onset)
-        off = n.onset - (bar - 1) * piece.bar_len
+        off = n.onset - piece.bar_start(bar)
         out[n.hand].setdefault(str(bar), []).append([str(off), str(n.dur), [m for m, _ in n.pitches]])
     for h in out.values():
         for v in h.values():
@@ -38,7 +38,7 @@ def bar_signature(piece: Piece) -> dict[str, dict[str, list]]:
 
 
 def _changed(old: dict, new: dict, bars: int) -> dict[str, list[int]]:
-    return {h: [b for b in range(1, bars + 1) if old.get(h, {}).get(str(b)) != new.get(h, {}).get(str(b))]
+    return {h: [b for b in range(0 if any("0" in s.get(h, {}) for s in (old,new) for h in ("rh","lh")) else 1, bars + 1) if old.get(h, {}).get(str(b)) != new.get(h, {}).get(str(b))]
             for h in ("rh", "lh")}
 
 

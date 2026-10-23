@@ -1,0 +1,97 @@
+{
+  "title": "겨울 아침",
+  "request": "겨울 아침, 창밖을 보며 차를 마시는 느낌. 잔잔하고 따뜻하게. 중간에 왼손이 주제를 이어받았으면 좋겠어요.",
+  "given": [
+    "impression.scene",
+    "impression.mood",
+    "form.1.plan"
+  ],
+  "impression": {
+    "scene": "겨울 아침 창밖을 보며 차를 마심",
+    "mood": "잔잔하고 따뜻하게",
+    "arc": "작은 인사 → 낮은 목소리의 응답 → 밝은 회상 → 조용한 마침"
+  },
+  "basics": {
+    "meter": "6/8",
+    "tempo": 44,
+    "pickup": "1/2",
+    "key": "G",
+    "mode": "major",
+    "grade": 6,
+    "length_sec": 66
+  },
+  "theme": {
+    "idea": "세 개의 작은 8분음과 긴 도착음으로 호흡을 만들고, 응답은 순차 하행한다.",
+    "motifs": {
+      "a": {
+        "describe": "상행3도 뒤 한 걸음 내려서 도약하는 인사",
+        "hand": "rh"
+      },
+      "b": {
+        "describe": "긴 음에서 두 걸음 내려오는 응답",
+        "hand": "rh"
+      }
+    }
+  },
+  "form": [
+    {
+      "label": "A",
+      "bars": [
+        1,
+        8
+      ],
+      "function": "statement",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "두 번의 질문과 응답, 8마디에서 쉼.",
+      "harmony": "G–C–Am–D7, G 종결",
+      "texture": "넓지 않은 펼침화음",
+      "register": "G4–D5",
+      "dynamics": "p"
+    },
+    {
+      "label": "B",
+      "bars": [
+        9,
+        16
+      ],
+      "function": "development",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "중간에 왼손이 주제를 이어받는다.",
+      "harmony": "G–Am–Bm–C, D7로 복귀 준비",
+      "texture": "오른손 긴 화음과 왼손 주제",
+      "register": "G3–G5",
+      "dynamics": "mp → mf → p"
+    },
+    {
+      "label": "A′",
+      "bars": [
+        17,
+        24
+      ],
+      "function": "return",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "처음 주제를 되찾아 음 수를 줄이며 닫는다.",
+      "harmony": "G–C–Am–D7–G",
+      "texture": "펼침화음에서 긴 종결 화음으로",
+      "register": "처음 음역",
+      "dynamics": "p → pp"
+    }
+  ],
+  "climax": {
+    "bar": 14,
+    "how": "G5의 밝은 도착을 짧게 두고 바로 이완한다."
+  },
+  "ending": {
+    "how": "마지막 G장조를 길게 유지하고 페달을 끝에서 뗀다."
+  },
+  "notes": "작곡자 제안: G장조는 손에 편한 따뜻한 음역을 위해, 6/8과 44는 두 박의 느린 호흡을 위해, 24마디는 약 66초 안의 재현을 위해 선택. 6급과 여린내기는 개발 명세 조건이며 가상 요청 원문과 구분한다."
+}

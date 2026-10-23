@@ -62,6 +62,7 @@ const FUNCTIONS = {intro:'도입',statement:'제시',development:'발전',contra
 const MODE = {major:'장조', minor:'단조'};
 const $ = id => document.getElementById(id);
 let tk = null, cur = null, notes = [], staffOf = new Map();
+let timeMap = [], measureIds = new Map();
 let ctx = null, playing = null, raf = 0, lastHl = [], paused = 0;
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -127,23 +128,69 @@ function prepare(){
   staffOf = new Map();
   for(const st of mei.getElementsByTagName('staff'))
     for(const nt of st.getElementsByTagName('note')) staffOf.set(nt.getAttribute('xml:id'), st.getAttribute('n'));
+  measureIds = new Map();
+  for(const m of mei.getElementsByTagName('measure')) measureIds.set(+m.getAttribute('n'),m.getAttribute('xml:id'));
+  timeMap = tk.renderToTimemap();
   const tieNext = new Map(), tieEnds = new Set();
   for(const t of mei.getElementsByTagName('tie')){
     const a = (t.getAttribute('startid') || '').replace('#', ''), b = (t.getAttribute('endid') || '').replace('#', '');
     if(a && b){ tieNext.set(a, b); tieEnds.add(b); }
   }
   notes = [];
-  for(const e of tk.renderToTimemap()){
+  for(const e of timeMap){
     for(const id of (e.on || [])){
       if(tieEnds.has(id)) continue;
       const v = tk.getMIDIValuesForElement(id);
       if(!v || !(v.pitch > 0) || !(v.duration > 0)) continue;
       let end = v.time + v.duration, x = id, guard = 0;
       while(tieNext.has(x) && guard++ < 64){ x = tieNext.get(x); const u = tk.getMIDIValuesForElement(x); if(u && u.duration > 0) end = Math.max(end, u.time + u.duration); }
-      notes.push({id, t: v.time, d: end - v.time, p: v.pitch, lh: staffOf.get(id) === '2'});
+      notes.push({id, t: v.time, d: end - v.time, p: v.pitch, lh: staffOf.get(id) === '2', q: e.qstamp, level: 1});
     }
   }
   notes.sort((a, b) => a.t - b.t);
+  applyPerformance();
+}
+
+// Quarter positions are mapped using Verovio, including pickup and tempo changes.
+function qMs(q){
+  const pts = timeMap.filter(x => Number.isFinite(x.qstamp) && Number.isFinite(x.tstamp));
+  if(!pts.length) return 0;
+  let a=pts[0], b=pts[pts.length-1];
+  for(const p of pts){ if(p.qstamp <= q) a=p; if(p.qstamp >= q){ b=p; break; } }
+  if(b.qstamp===a.qstamp) return a.tstamp;
+  return a.tstamp + (q-a.qstamp)/(b.qstamp-a.qstamp)*(b.tstamp-a.tstamp);
+}
+function applyPerformance(){
+  const pf = cur.performance || {}, ds=pf.dynamics || [], ex=pf.expression || [];
+  const baseAt = q => ds.filter(d=>d.q<=q).at(-1)?.level ?? .8;
+  const ladder=[.25,.35,.5,.65,.8,.95,1.1,1.25]; // ROUND1 provisional loudness, not calibrated audio.
+  for(const n of notes){
+    let level=baseAt(n.q), release=n.t+n.d*.95;
+    const hp=ex.find(e=>e.kind==='hairpin' && e.start<=n.q && n.q<e.end);
+    if(hp){
+      const from=baseAt(hp.start), next=ds.find(d=>d.q>hp.start && d.q<=hp.end);
+      const i=ladder.indexOf(from), to=next?.level ?? ladder[Math.max(0,Math.min(ladder.length-1,(i<0?4:i)+(hp.mode==='cresc'?1:-1)))];
+      level=from+(to-from)*(n.q-hp.start)/(hp.end-hp.start);
+    } else {
+      // A completed hairpin keeps its target until a later explicit dynamic.
+      const last=ex.filter(e=>e.kind==='hairpin' && e.end<=n.q).sort((a,b)=>a.end-b.end).at(-1);
+      if(last && !ds.some(d=>d.q>last.start && d.q<=n.q)){
+        const from=baseAt(last.start), i=ladder.indexOf(from);
+        level=ladder[Math.max(0,Math.min(ladder.length-1,(i<0?4:i)+(last.mode==='cresc'?1:-1)))];
+      }
+    }
+    const art=(pf.articulations||[]).find(a=>Math.abs(a.q-n.q)<1e-7 && (a.hand==='lh')===n.lh && a.pitches.includes(n.p))?.art;
+    if(art==='accent') level*=1.3;
+    if(art==='staccato') release=n.t+n.d*.5;
+    if(art==='tenuto') release=n.t+n.d;
+    // Sustain affects the acoustic release, not notation/highlight. tone() retains its decay.
+    for(const ped of ex.filter(e=>e.kind==='pedal')){
+      const boundaries=[ped.start,...ped.changes,ped.end];
+      for(let i=0;i<boundaries.length-1;i++)
+        if(qMs(boundaries[i])<=release && release<qMs(boundaries[i+1])) release=qMs(boundaries[i+1]);
+    }
+    n.d=Math.max(0,release-n.t); n.level=level;
+  }
 }
 
 function open(i){
@@ -187,7 +234,7 @@ function play(fromMs = 0){
   for(const n of notes){
     if(n.t + n.d <= fromMs || (n.lh ? !lh : !rh)) continue;
     const start = Math.max(0, n.t - fromMs), dur = n.d - Math.max(0, fromMs - n.t);
-    oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, n.lh ? .045 : .085));
+    oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, (n.lh ? .045 : .085) * n.level));
   }
   playing = {oscs, t0, fromMs, k};
   $('play').textContent = '❚❚ 일시정지';

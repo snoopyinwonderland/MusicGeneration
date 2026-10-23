@@ -116,3 +116,13 @@ python -m musigen piece examples\pieces\after_rain --out output\after_rain --rea
   - 대신 버전마다 `output\<곡>\listen.html`이 생깁니다. Verovio로 악보를 그리고 브라우저 합성음으로 재생합니다(`musigen/listen.py`).
   - 소리는 실제 피아노 음색이 아니고, 셈여림과 페달도 반영하지 않습니다.
 - 문장에서 설계로 가는 자동 변환이 없습니다. 지금은 작곡자가 직접 씁니다.
+
+## 2026-10-23 P1 추가
+
+`basics.pickup`은 4분음표 단위(숫자 또는 `"1/2"`). 여린내기는 0마디, form은 1마디부터이며 마지막 마디는 온마디다.
+음표 뒤 `'` 스타카토, `>` 악센트, `_` 테누토를 하나만 쓴다. 붙임줄 음과의 조합은 거절한다.
+`(C4/q D4/q E4/q)`처럼 한 재료 안에서 이음줄을 닫는다. retro와 frag에도 끝점이 보존된다.
+score 최상위 `expression`은 `{"bars":"1-8","pedal":"bar","hairpin":"cresc"}` 형식이다.
+페달은 bar/half/chord/held, 증감은 cresc/dim. 3/4의 half는 마디마다 갱신한다.
+표현 기호 출력에는 musicomp `codex/xml-expression` 변경이 필요하다(병합 전 MUSICOMP_ROOT 지정).
+위 '지금 없는 것' 목록 중 여린내기·표현 기보·브라우저 표현 재생은 P1에서 추가됐다.

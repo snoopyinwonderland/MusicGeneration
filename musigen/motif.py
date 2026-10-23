@@ -72,13 +72,28 @@ def apply(evs: list[Ev], op: str, key: Key) -> list[Ev]:
         axis = _index(lad, f)
         return _map(evs, lambda p: lad[max(0, min(len(lad) - 1, 2 * axis - _index(lad, p)))])
     if name == "retro":
-        return [replace(e, tie=False) for e in reversed(evs)]
+        return [replace(e, tie=False, slur={"start": "stop", "stop": "start"}.get(e.slur, e.slur)) for e in reversed(evs)]
     if name in ("aug", "dim"):
         k = F(arg) if arg else F(2)
         return [replace(e, dur=e.dur * k if name == "aug" else e.dur / k) for e in evs]
     if name == "frag":
         a, _, b = arg.partition(":")
-        return evs[int(a) if a else None:int(b) if b else None]
+        start, stop, _ = slice(int(a) if a else None, int(b) if b else None).indices(len(evs))
+        result = [replace(e, slur=None) for e in evs[start:stop]]
+        opened = None
+        for i, e in enumerate(evs):
+            if e.slur in ("start", "both"):
+                opened = i
+            if e.slur in ("stop", "both") and opened is not None:
+                lo, hi = max(start, opened), min(stop - 1, i)
+                if lo <= hi:
+                    result[lo-start] = replace(result[lo-start], slur="both" if lo == hi else "start")
+                    if lo != hi:
+                        result[hi-start] = replace(result[hi-start], slur="stop")
+                opened = None
+        if result:
+            result[-1] = replace(result[-1], tie=False)
+        return result
     if name in ("last", "first"):
         target, tpc = parse_pitch(arg)
         idx = [i for i, e in enumerate(evs) if not e.rest]
