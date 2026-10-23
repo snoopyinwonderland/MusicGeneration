@@ -44,6 +44,16 @@ const $ = id => document.getElementById(id);
 let tk = null, cur = null, notes = [], staffOf = new Map();
 let timeMap = [], measureIds = new Map();
 let harmonyMode='symbols', harmonyOriginal=new Map(), sourceMei='';
+// The viewer's last harmony choices (chord symbols / Roman numerals, placement) carry over to the next piece and
+// the next visit (user request 2026-10-23: "직전에 눌렀던 상태를 기억하게"). Per-browser only; defaults without storage.
+const HARMONY_PREF = {mode: 'musicanote-harmony-mode', place: 'musicanote-harmony-place'};
+try{
+  const mode = localStorage.getItem(HARMONY_PREF.mode);
+  if(mode === 'symbols' || mode === 'roman') harmonyMode = mode;
+  const place = localStorage.getItem(HARMONY_PREF.place);
+  if(place && [...$('harmonyPlacement').options].some(o => o.value === place)) $('harmonyPlacement').value = place;
+}catch{}
+function saveHarmonyPref(key, value){ try{ localStorage.setItem(key, value); }catch{} }
 let compareQueue = [], compareTimer = 0, compareLabel = "";
 let ctx = null, playing = null, raf = 0, lastHl = [], paused = 0;
 
@@ -160,6 +170,7 @@ function positionHarmony(){
   tk.loadData(new XMLSerializer().serializeToString(mei));
 }
 $('harmonyPlacement').addEventListener('change', () => {
+  saveHarmonyPref(HARMONY_PREF.place, $('harmonyPlacement').value);
   if(!cur) return;
   const position = playing ? nowMs() : null;
   cancelComparison();
@@ -198,7 +209,7 @@ function applyHarmonyLabels(){
   $('romanAnalysis').setAttribute('aria-pressed',String(harmonyMode==='roman'&&compatible));
 }
 for(const [id,mode] of [['chordSymbols','symbols'],['romanAnalysis','roman']]){
-  $(id).addEventListener('click',()=>{harmonyMode=mode;applyHarmonyLabels();});
+  $(id).addEventListener('click',()=>{harmonyMode=mode;saveHarmonyPref(HARMONY_PREF.mode,mode);applyHarmonyLabels();});
 }
 $('about').addEventListener('click',event=>{
   const button=event.target.closest('[data-phrase-start]');
