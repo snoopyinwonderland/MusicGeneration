@@ -35,7 +35,7 @@ python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마�
 
 ### 듣기 페이지
 
-[docs/listen/index.html](docs/listen/index.html)은 시험곡 "비 갠 밤"을 담은 페이지입니다.
+[docs/listen/index.html](docs/listen/index.html)은 시험곡 "햇살 골목"(G장조, 당김음, 구간마다 다른 반주)과 "비 갠 밤"(D단조)을 담은 페이지입니다. 위쪽 메뉴에서 곡을 고릅니다.
 
 - 악보를 보면서 재생할 수 있습니다. 음표를 누르면 그 위치부터 재생합니다.
 - 빠르기를 바꾸거나 한 손만 들을 수 있습니다.

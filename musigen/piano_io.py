@@ -21,11 +21,14 @@ def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
                                   meta={"src": n.src}))
     for on, text, dyn in piece.directions:
         part.directions.append(Direction(on, text, 1, "below" if dyn else "above", dyn))
-    prev = None
+    prev, prev_on = None, None
     for on, ch in piece.chords:
-        if ch.symbol == prev:  # the same chord again (A7 at the end of one bar and through the next): written once
+        # the same chord running on (A7 at the end of one bar and through the next) is written once; after a gap
+        # (written notes without symbols) it is written again (햇살 골목 v001 lost the G of bar 17 after bar 8's G)
+        same = ch.symbol == prev and on - prev_on <= piece.bar_len
+        prev, prev_on = ch.symbol, on
+        if same:
             continue
-        prev = ch.symbol
         # <kind text> is the suffix only - the reader prints the root and the /bass itself ('DDm', 'F/A/A' otherwise)
         suffix = re.sub(r"^[A-G][#b]?", "", ch.symbol).split("/")[0]
         part.harmonies.append(HarmonySymbol(on, ch.root_tpc, ch.kind, ch.bass_tpc, suffix))
