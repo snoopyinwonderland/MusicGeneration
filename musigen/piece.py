@@ -194,7 +194,11 @@ def build(design: dict, score: dict) -> Piece:
     motifs: dict[str, list[Ev]] = {}
     for mid, m in (score.get("motifs") or {}).items():
         try:
-            motifs[mid] = [replace(e, src=mid) for e in parse(m if isinstance(m, str) else m["notes"])]
+            if isinstance(m, dict) and m.get("format") == "musicanote-motif":
+                from musigen.motif_clip import read_events
+                motifs[mid] = read_events(m, mid)
+            else:
+                motifs[mid] = [replace(e, src=mid) for e in parse(m if isinstance(m, str) else m["notes"])]
         except NotationError as e:
             raise ScoreError(f"motif {mid}: {e}") from e
     piece = Piece(design.get("title", "Untitled"), key, meter, qpm(b), n_bars)
