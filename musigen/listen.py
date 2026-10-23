@@ -55,6 +55,9 @@ def _relative(path, out):
 
 def _write_page(entries, out, embed_verovio, piano_samples, individual_pages=False, assets=None):
     page = TEMPLATE.read_text(encoding="utf-8")
+    # tab icon inline, so a single shared HTML file keeps it (and browsers stop asking the server for /favicon.ico)
+    icon = TEMPLATE.with_name("assets").joinpath("favicon.svg").read_text(encoding="utf-8").strip()
+    page = page.replace("/*FAVICON*/", "data:image/svg+xml," + quote(icon))
     instruments = {"piano"} if piano_samples else set()
     if piano_samples and any(e["info"].get("ensemble") == "violin_piano" for e in entries):
         instruments.add("violin")
