@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "default_enabled": false,
+  "basis": "인수인계: 장르당 30개 직접 감사, 경계 일치 70% 이상. 미판정은 일치로 세지 않음.",
+  "genres": {
+    "pop": {
+      "sampled": 30,
+      "reviewed": 30,
+      "boundary_matches": 18,
+      "denominator": 30,
+      "boundary_rate": 0.6,
+      "accuracy_gate_passed": false,
+      "ranking_eligible": false,
+      "classification_audit_complete": false,
+      "status": "boundary_below_70_percent",
+      "license_references": [
+        "K:/Music Analysis/docs/harmony/HUMAN_CHORD_SOURCE_LICENSES.json: local_musicxml; work-specific rights not provided"
+      ]
+    },
+    "jazz": {
+      "sampled": 30,
+      "reviewed": 30,
+      "boundary_matches": 20,
+      "denominator": 30,
+      "boundary_rate": 0.6666666666666666,
+      "accuracy_gate_passed": false,
+      "ranking_eligible": false,
+      "classification_audit_complete": false,
+      "status": "boundary_below_70_percent",
+      "license_references": [
+        "K:/MusicSearch/data/jazz-corpora/charlie-parker-50-solos/LICENSE (software MIT; score rights unconfirmed)"
+      ]
+    },
+    "classical": {
+      "sampled": 30,
+      "reviewed": 30,
+      "boundary_matches": 13,
+      "denominator": 30,
+      "boundary_rate": 0.43333333333333335,
+      "accuracy_gate_passed": false,
+      "ranking_eligible": false,
+      "classification_audit_complete": false,
+      "status": "boundary_below_70_percent",
+      "license_references": [
+        "K:/Music Analysis/docs/harmony/HUMAN_CHORD_SOURCE_LICENSES.json: local_musicxml; work-specific rights not provided"
+      ]
+    }
+  },
+  "unsupported": [
+    "automatic_sentence_period_type",
+    "inversion",
+    "fragment",
+    "continuation_function"
+  ],
+  "audit_method": "Codex가 로컬 음표 사건의 앞뒤 맥락을 직접 읽은 1차 경계 감사. 청취·인간 전문가 정답 아님. 전체 악구의 시작과 닫힘을 명확히 확인한 경우만 true; 애매한 내부 호흡은 미확인(false). 선택된 경계만 보므로 recall/F1이 아닌 확인 비율. 유형·변형 분류는 경계 게이트 실패로 후속 검증 중단.",
+  "source_work_counts": {
+    "pop": 10,
+    "jazz": 11,
+    "classical": 10
+  },
+  "stop_reason": "모든 장르에서 30개 표본의 경계 확인 비율이 70% 미만. 분포 산출·P2 순위 적용 중단. 계수 조정 없음.",
+  "publication": "원음·마디·곡별 판정표는 로컬 output에만 보존. 이 JSON은 감사 집계와 라이선스 근거만 포함."
+}
