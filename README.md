@@ -171,3 +171,20 @@ python -m musigen motif a.motif.json --out output/motif_study --key D --mode maj
 결과는 `motif.json`, `design.json`, `score.json`, `piece.musicxml`, `piece.mid`입니다. 기존 폴더를 덮어쓰지 않습니다. 이 명령은 모티프 변형의 미리보기이며 완성곡 자동 작곡은 아닙니다. 원본 모티프 JSON과 ‘이 주제로 조용히 시작해서 중간에 확대해 주세요’ 같은 요청을 대화로 주면, 작곡 설계에서 원형·변형·반주·종지를 구성합니다. `score.json`의 `motifs.a`에 복사한 객체를 그대로 넣어 기존 `motif`/`ops`/`seq` 문법으로 발전시킬 수도 있습니다.
 
 화성 표시의 ‘위치’는 기본 **보표 아래**이며 피아노 낮은 보표 밑에 놓습니다. 코드 심벌·로마자 모두 적용하고 ‘원래 위치’로 돌아갈 수 있습니다. 이것은 화면 배치 설정이며 다운로드하는 MusicXML/PDF 원본은 바꾸지 않습니다.
+
+
+## 비올라·첼로 음원과 선택 듀엣
+
+피아노·바이올린에 비올라·첼로 FluidR3 샘플을 추가했습니다. `--piano-samples`는 호환성을 위해 유지하는 옵션 이름이며 악보에 쓰인 지원 악기의 샘플만 포함합니다. 화면에서 악기별 음소거를 할 수 있고 WAV에도 반영됩니다. 피아노 페달은 현악기에 적용하지 않습니다. 샘플의 활 표현은 약식 루프입니다.
+
+```powershell
+python -m musigen duet output/my_solo/v001 --out output/my_viola --instrument viola
+python -m musigen duet output/my_solo/v001 --out output/my_cello --instrument cello --lead-octaves -1
+python -m musigen listen output/my_viola output/my_cello --out output/strings/index.html --latest --individual-pages --piano-samples
+```
+
+기본 `duet`은 이전처럼 바이올린이며, 새 편성은 명시적으로 선택합니다. 비올라는 가온음자리표, 첼로는 낮은음자리표로 출력합니다. `--lead-octaves`는 현악기 선율만 이동하고 피아노 음역은 유지합니다. 지정하지 않으면 0이며 자동으로 음을 옮기지 않습니다. 검수용 제한 음역은 바이올린 G3–A6, 비올라 C3–E6, 첼로 C2–G5입니다. 범위를 넘으면 오류로 알립니다. 이는 운지·활 배분의 연주 가능성 판정은 아닙니다.
+
+재생은 MusicXML의 파트·보표·GM 악기 번호를 읽어 연결합니다. 듀엣 생성 명령은 여전히 현악기 한 대와 피아노를 대상으로 하며, 여러 현악기 성부를 새로 배치하는 실내악 편곡은 별도 작업입니다.
+
+새 음원 출처: [비올라](musigen/assets/viola/ATTRIBUTION.md), [첼로](musigen/assets/cello/ATTRIBUTION.md). 원본 버전·해시와 전 샘플 PCM 무음 검사 결과는 각 폴더의 manifest.json에 있습니다. 브라우저 검수는 `node scripts/check_strings.cjs <catalog.json이 있는 감상 폴더> <결과 폴더>`로 실행합니다. 샘플을 넣은 페이지가 필요합니다.

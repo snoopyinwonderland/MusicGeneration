@@ -1,0 +1,149 @@
+{
+  "format": "musicanote-sample-manifest-v1",
+  "sourceRevision": "044fab8e1456bfafc5776e86dfd6bb8697149aef",
+  "sourceRepository": "https://github.com/gleitz/midi-js-soundfonts",
+  "license": "CC-BY-3.0-US",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0/us/",
+  "readmeSha256": "e42378ee860c7f866f6e6d3f60ba80a19e99ed218b5e292d2431d94a5dd5b8f4",
+  "adaptation": "Selected every third semitone covering the supported audition range; original MP3 bytes retained",
+  "instruments": {
+    "viola": {
+      "file": "viola.json",
+      "sha256": "3be5d2e298eec6521941576cdc97d2b62446b0b4ee88e856a04a217d544498e8",
+      "notes": [
+        48,
+        51,
+        54,
+        57,
+        60,
+        63,
+        66,
+        69,
+        72,
+        75,
+        78,
+        81,
+        84,
+        87,
+        90
+      ],
+      "sampleSha256": {
+        "48": "a68b1038f94d5f9f865d4c4094248b11404987af936d8fea059a83f82b1f95f6",
+        "51": "77366c57c63cb37baa89c7f51d0ba322d0891d48e8d9bc021b805978760f6f41",
+        "54": "7ada1994591190da71e1e3ff89334fea68175ab1158c787e8e729eab6f368542",
+        "57": "8b3b3f5a128f5e27dfbe8787909a25d90ffdb8aceffa42d3e2c307e72117d239",
+        "60": "ac0654b37c0d8cc0f4bdc11f67c0f2941cf3cd82af3bc3fdd1816747b4d1df40",
+        "63": "8fbbe855e6ef52bae0f9a4c4c9e8a87c0251fe60da2f768018fcc9a6e2d0fc3f",
+        "66": "adbc30966e1ce570777cc0a9e48522080dc841f6a323400b467d58baa0cfbfe1",
+        "69": "2fcc12c5f4452c2b715f0c3ecf81a5d988685c4fb7a1f56896c45e1e9bcbf7b8",
+        "72": "007f9aaf23a305758b5199c3a1402fa8671f65a640bb10f50fa302a42d11c812",
+        "75": "51b6b5395b1b771a4c2dc34446bf2c54923ffa08d9e803e9521de7655bc3ac7b",
+        "78": "f9f25bec48d87cd655f6cf0c250c65addb2c5ac8038930f03d6456fae95dfa05",
+        "81": "a4d0bbe1e252d1dbd4d9a2763742a2b0c8aa24151dfc4b11228a13808ca75816",
+        "84": "afb7392b744d552642d07955471b0ebea0102bea2cfa78e33214906b2dcb722a",
+        "87": "505f6b13d6269bacda8fe294ee61bb46984ef3db9ed202b9cc3b89b838b0d74c",
+        "90": "7328df410284da9d407a558f11ac48a7e196a8d24a73067857bf915dbc4f1a3a"
+      },
+      "playbackRange": [
+        48,
+        88
+      ],
+      "maxEdgePitchShift": 1,
+      "sourceUrl": "https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/044fab8e1456bfafc5776e86dfd6bb8697149aef/FluidR3_GM/viola-mp3.js",
+      "sourceSha256": "0aabb7733ddb5852cb41a5e4881ca2a96781009243ba31d62e3e114c642d9051",
+      "audioAudit": [
+        {
+          "midi": 48,
+          "peak": 0.11533258110284805,
+          "rms": 0.03836139613110863,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 51,
+          "peak": 0.11843085289001465,
+          "rms": 0.03681508579217476,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 54,
+          "peak": 0.11836560815572739,
+          "rms": 0.034876025581830845,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 57,
+          "peak": 0.11896122246980667,
+          "rms": 0.03885279753447982,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 60,
+          "peak": 0.11386951059103012,
+          "rms": 0.040675070760177824,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 63,
+          "peak": 0.11540491878986359,
+          "rms": 0.03011665645300021,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 66,
+          "peak": 0.11806091666221619,
+          "rms": 0.03235361974365792,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 69,
+          "peak": 0.11773139983415604,
+          "rms": 0.03432670867949058,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 72,
+          "peak": 0.11674602329730988,
+          "rms": 0.035413575910763224,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 75,
+          "peak": 0.12181107699871063,
+          "rms": 0.040236665916595055,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 78,
+          "peak": 0.11376839131116867,
+          "rms": 0.039651509660841244,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 81,
+          "peak": 0.11630801111459732,
+          "rms": 0.030359122423888642,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 84,
+          "peak": 0.11913242191076279,
+          "rms": 0.0348178546788728,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 87,
+          "peak": 0.11792099475860596,
+          "rms": 0.03441510863118171,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 90,
+          "peak": 0.11789180338382721,
+          "rms": 0.03710373855171273,
+          "seconds": 3.128888888888889
+        }
+      ],
+      "audioAuditEngine": "Chromium Web Audio decodeAudioData, 44100 Hz PCM"
+    }
+  }
+}
