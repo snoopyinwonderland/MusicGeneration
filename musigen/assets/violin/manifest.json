@@ -5,7 +5,7 @@
   "license": "CC-BY-3.0-US",
   "licenseUrl": "https://creativecommons.org/licenses/by/3.0/us/",
   "readmeSha256": "e42378ee860c7f866f6e6d3f60ba80a19e99ed218b5e292d2431d94a5dd5b8f4",
-  "adaptation": "Selected every third semitone and excluded seven audited silent source notes; JSON envelope only; retained MP3 bytes unchanged",
+  "adaptation": "Selected every third semitone and excluded three audited silent violin notes (102/105/108); JSON envelope only; retained MP3 bytes unchanged",
   "instruments": {
     "violin": {
       "file": "violin.json",
@@ -75,10 +75,10 @@
         99
       ],
       "playbackRange": [
-        21,
-        108
+        55,
+        93
       ],
-      "maxEdgePitchShift": 9,
+      "maxEdgePitchShift": 1,
       "excludedSilentSourceSha256": {
         "102": "cd20893f17b39244b0141ce4be12243d1d4d57904f430e332adc32307921562d",
         "105": "cd20893f17b39244b0141ce4be12243d1d4d57904f430e332adc32307921562d",
