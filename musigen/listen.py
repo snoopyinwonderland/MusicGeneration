@@ -18,9 +18,12 @@ def _entry(vdir: Path) -> dict:
     from musigen.expression import playback
     read = lambda name: json.loads((vdir / name).read_text(encoding="utf-8"))
     design, score, info = read("design.json"), read("score.json"), read("version.json")
-    performance = playback(build(design, score))
+    piece = build(design, score)
+    performance = playback(piece)
+    from musigen.harmony_labels import analyze
+    harmony = analyze(piece)
     pdf = vdir / "piece.pdf"
-    return {"performance":performance, "piece":vdir.parent.name,
+    return {"harmony":harmony, "performance":performance, "piece":vdir.parent.name,
             "xml":(vdir / "piece.musicxml").read_text(encoding="utf-8"),
             "design":design, "checks":read("checks.json"), "info":info,
             "_pdf":str(pdf) if pdf.exists() else None}

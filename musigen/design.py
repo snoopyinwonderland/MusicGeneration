@@ -30,7 +30,7 @@ from fractions import Fraction as F
 FUNCTIONS = {"intro": "도입", "statement": "제시", "development": "발전", "contrast": "대조", "transition": "연결",
              "return": "재현", "coda": "종결"}
 METERS = {"2/4", "3/4", "4/4", "6/8", "9/8", "12/8"}
-TOP = {"title", "request", "given", "impression", "basics", "theme", "form", "climax", "ending", "notes", "credits"}
+TOP = {"title", "request", "given", "impression", "basics", "theme", "form", "climax", "ending", "notes", "credits", "analysis", "phrase_plan"}
 
 
 class DesignError(ValueError):
@@ -104,6 +104,21 @@ def validate(d: dict) -> list[str]:
         if s.get("cadence", "none") not in ("authentic", "half", "plagal", "deceptive", "none"):
             raise DesignError(f"{a}–{z}마디: cadence는 authentic/half/plagal/deceptive/none 중 하나여야 합니다")
         nxt = z + 1
+    analysis = d.get("analysis", {})
+    if not isinstance(analysis, dict) or set(analysis) - {"phrases"} or type(analysis.get("phrases", False)) is not bool:
+        raise DesignError("analysis.phrases는 true/false여야 합니다")
+    phrase_plan = d.get("phrase_plan", [])
+    if not isinstance(phrase_plan, list):
+        raise DesignError("phrase_plan은 프레이즈 목록이어야 합니다")
+    previous_end = 0
+    for row in phrase_plan:
+        span = row.get("bars") if isinstance(row, dict) else None
+        if (not isinstance(span, list) or len(span) != 2 or any(type(x) is not int for x in span)
+                or not previous_end < span[0] <= span[1] < nxt):
+            raise DesignError("phrase_plan.bars는 겹치지 않는 곡 안의 마디 범위여야 합니다")
+        if not isinstance(row.get("role", ""), str) or not isinstance(row.get("plan", ""), str):
+            raise DesignError("프레이즈 역할과 설명은 문자열이어야 합니다")
+        previous_end = span[1]
     motifs = (d.get("theme") or {}).get("motifs") or {}
     for i, s in enumerate(form):
         for m in s.get("motifs", []):

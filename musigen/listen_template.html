@@ -12,6 +12,7 @@ main{max-width:1468px;margin:auto;padding:0 24px 40px}.hero{display:flex;justify
 .player{position:sticky;top:0;z-index:5;background:rgba(255,254,250,.97);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:0 4px 20px #273a3210;margin-bottom:22px}.transport,.controls{display:flex;flex-wrap:wrap;align-items:center;gap:9px}.transport{padding-bottom:9px;border-bottom:1px solid #eceee5}.controls{padding-top:9px;font-size:12px}.controls label{display:inline-flex;align-items:center;gap:5px;color:var(--muted)}input[type=range]{width:100px;accent-color:var(--accent)}input[type=checkbox]{accent-color:var(--accent)}#status{font-variant-numeric:tabular-nums;font-size:12px;min-width:100px;color:var(--muted);margin-left:6px}.downloads{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}.downloads button{font-size:12px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 294px;gap:22px;align-items:start}.score-heading{display:flex;align-items:center;justify-content:space-between;padding:2px 3px 12px}.score-heading h2{font-size:12px;letter-spacing:.1em;margin:0}.score-heading a{font-size:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px}.card h2{font-size:15px;margin:0 0 12px}.card h3{font-size:12px;margin:16px 0 6px}blockquote{margin:8px 0 14px;padding:6px 12px;border-left:2px solid var(--gold);font-size:12px;color:var(--muted)}details{border-top:1px solid var(--line);padding:12px 0}details summary{cursor:pointer;color:var(--accent);font-size:12px}details[open]{overflow-wrap:anywhere}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:11px}td,th{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted);font-weight:normal}.src{font-size:9px;padding:1px 4px;border-radius:4px;white-space:nowrap}.src.req{background:#e5eee4;color:var(--accent)}.src.sug{background:#f0ece3;color:var(--muted)}ul.checks{padding-left:16px;font-size:11px}.err{color:#b00020}.warn{color:var(--warn)}.muted{color:var(--muted);font-size:12px}#score .page{background:white;border:1px solid var(--line);border-radius:5px;padding:12px;margin-bottom:18px;box-shadow:0 5px 22px #1a33270a}#score svg{width:100%;height:auto;display:block}#score g.note{cursor:pointer}#score g.note.playing,#score g.note.playing *{fill:var(--hl)!important;stroke:var(--hl)!important}.page-footer{margin:24px 0 0;border-top:1px solid var(--line);padding:15px 0;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:12px}[hidden]{display:none!important}
 @media(max-width:980px){.workspace{grid-template-columns:1fr}.card{order:2}.hero-art{display:none}.downloads{margin-left:0}.masthead{padding:18px 22px}.library span{display:none}.library select{max-width:240px}.hero h1{font-size:32px}}
 @media(max-width:560px){main{padding:0 12px 28px}.masthead{padding:16px;flex-wrap:wrap;gap:14px}.library{width:100%}.library select{width:100%;max-width:100%}.brand-name{font-size:16px}.hero{padding:25px 6px}.hero h1{font-size:28px}.hero p{font-size:12px}.player{padding:10px;position:relative}.downloads{width:100%;gap:5px}.downloads button{flex:1;padding:8px}.controls{gap:9px 12px}#score .page{padding:3px}.page-footer{display:block}.card{padding:16px}}
+.harmony-switch{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:12px}.harmony-switch button{font-size:11px;padding:7px 10px}.harmony-switch button[aria-pressed=true]{background:var(--accent);color:white;border-color:var(--accent)}.harmony-switch small{color:var(--muted);font-size:10px}.phrase-list{display:grid;gap:7px}.phrase-list button{white-space:normal;text-align:left;width:100%;font-size:11px;padding:8px}.phrase-list b{display:block;color:var(--accent)}.rna-table{max-height:280px;overflow:auto}
 </style>
 </head>
 <body>
@@ -25,7 +26,7 @@ main{max-width:1468px;margin:auto;padding:0 24px 40px}.hero{display:flex;justify
     <div class="transport"><button id="play" class="primary" disabled>▶ 재생</button><button id="stop" disabled>■ 처음으로</button><button id="compare" disabled>바뀐 곳 비교</button><span id="status" aria-live="polite">준비 중…</span><div class="downloads"><button id="downloadXml" disabled>MusicXML 받기</button><button id="downloadPdf" class="primary" disabled>PDF 받기</button><button id="downloadAudio" disabled>샘플 WAV 받기</button></div></div>
     <div class="controls"><label>재생 음원 <select id="timbre"><option value="piano">피아노 샘플</option><option value="synth">합성음</option></select></label><label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"><span id="speedv">100%</span></label><label id="violinControl" hidden><input id="violin" type="checkbox" checked>바이올린</label><label><input id="rh" type="checkbox" checked><span id="rhLabel">오른손</span></label><label><input id="lh" type="checkbox" checked><span id="lhLabel">왼손</span></label><label><input id="follow" type="checkbox" checked>악보 따라가기</label></div>
   </section>
-  <div class="workspace"><section><div class="score-heading"><h2>악보</h2><a id="permalink" href="#">이 악보 주소</a></div><div id="score"><p class="muted">악보를 준비하고 있습니다.</p></div></section><aside class="card" id="about"></aside></div>
+  <div class="workspace"><section><div class="score-heading"><h2>악보</h2><a id="permalink" href="#">이 악보 주소</a></div><div class="harmony-switch" role="group" aria-label="화성 표기"><button id="chordSymbols" aria-pressed="true">Chord Symbols · 코드 심벌</button><button id="romanAnalysis" aria-pressed="false">Roman Numeral Analysis</button><small id="harmonyHint">화성 표기 전환은 화면에 적용됩니다. 다운로드는 원본 악보입니다.</small></div><div id="score"><p class="muted">악보를 준비하고 있습니다.</p></div></section><aside class="card" id="about"></aside></div>
   <footer class="page-footer"><span>MUSICANOTE Virtual Composer</span><span>작곡의 생각을 악보와 소리로.</span></footer>
 </main>
 <script src="/*VEROVIO_SRC*/"></script>
@@ -41,6 +42,7 @@ const MODE = {major:'장조', minor:'단조'};
 const $ = id => document.getElementById(id);
 let tk = null, cur = null, notes = [], staffOf = new Map();
 let timeMap = [], measureIds = new Map();
+let harmonyMode='symbols', harmonyOriginal=new Map();
 let compareQueue = [], compareTimer = 0, compareLabel = "";
 let ctx = null, playing = null, raf = 0, lastHl = [], paused = 0;
 
@@ -77,6 +79,24 @@ function about(p){
     }
     for(const x of v.preserve_broken || []) h += `<li class="warn">보존 약속: ${esc(x)}</li>`;
     h += `</ul>`;
+  }
+  if(d.phrase_plan?.length){
+    h += '<h3>프레이즈와 주제</h3><div class="phrase-list">';
+    for(const row of d.phrase_plan) h+=`<button data-phrase-start="${row.bars[0]}" data-phrase-end="${row.bars[1]}"><b>▶ ${row.bars[0]}–${row.bars[1]}마디 · ${esc(row.role)}</b>${esc(row.plan)}</button>`;
+    h += '</div>';
+  }
+  const phrasing=c.phrasing;
+  if(phrasing){
+    h += '<details><summary>프레이즈 분석 결과</summary>';
+    h += `<p class="muted">선율 첫 성부의 실제 쉼 ${phrasing.rests.length}곳. 자동 경계: ${phrasing.phrases.map(x=>x.bars.join('–')+'마디').join(', ') || esc(phrasing.reason || '없음')}.</p>`;
+    const matched=phrasing.plan.filter(x=>x.detected_end).length;
+    if(phrasing.plan.length) h+=`<p class="muted">설계한 끝마디와 일치 ${matched}/${phrasing.plan.length}. musicomp의 기본 선율 분석 결과이며 주제가 잘 들린다는 청취 판정은 아닙니다.</p>`;
+    h += '</details>';
+  }
+  if(p.harmony?.length){
+    h += '<details><summary>로마자 분석 근거</summary><p class="muted">기보 화음과 국소 조성, 화음 시작 시 실제 최저음을 사용합니다. 경과음까지 새 화음으로 인식한 결과는 아닙니다. add6는 첨가6음, ⁶은 제1전위입니다.</p><div class="rna-table"><table><tr><th>마디</th><th>조성</th><th>코드</th><th>분석</th></tr>';
+    for(const row of p.harmony) h+=`<tr><td>${row.bar}</td><td>${esc(row.key)}</td><td>${esc(row.symbol)}</td><td title="${esc(row.note || '저음 '+row.bass)}">${esc(row.display)}</td></tr>`;
+    h+='</table></div></details>';
   }
   h += `<details><summary>작곡 설계 보기</summary>`;
   const rows = [];
@@ -119,7 +139,48 @@ function render(){
   let html = '';
   for(let p = 1; p <= tk.getPageCount(); p++) html += `<div class="page">${tk.renderToSVG(p)}</div>`;
   $('score').innerHTML = html;
+  harmonyOriginal.clear();
+  applyHarmonyLabels();
 }
+
+function applyHarmonyLabels(){
+  const groups=[...$('score').querySelectorAll('g.harm')];
+  const rows=cur?.harmony || [];
+  // Preserve original SVG nodes. Switching labels must not reload notes or alter audio timing.
+  const compatible=groups.length===rows.length && rows.length>0;
+  $('romanAnalysis').disabled=!compatible;
+  for(let i=0;i<groups.length;i++){
+    const g=groups[i];
+    if(!harmonyOriginal.has(g.id)) harmonyOriginal.set(g.id,g.innerHTML);
+    g.innerHTML=harmonyOriginal.get(g.id);
+    if(harmonyMode!=='roman' || !compatible) continue;
+    const texts=[...g.querySelectorAll('text')], text=texts[0];
+    if(!text) continue;
+    const original=text.querySelector('tspan[font-size]');
+    const size=original?.getAttribute('font-size');
+    text.textContent=rows[i].display;
+    text.setAttribute('font-family','Times New Roman, serif');
+    if(size) text.setAttribute('font-size',size);
+    for(const other of texts.slice(1)) other.remove();
+    const title=document.createElementNS('http://www.w3.org/2000/svg','title');
+    title.textContent=`${rows[i].key}: ${rows[i].symbol} → ${rows[i].display}; 저음 ${rows[i].bass}`;
+    g.append(title);
+  }
+  $('chordSymbols').setAttribute('aria-pressed',String(harmonyMode==='symbols'||!compatible));
+  $('romanAnalysis').setAttribute('aria-pressed',String(harmonyMode==='roman'&&compatible));
+}
+for(const [id,mode] of [['chordSymbols','symbols'],['romanAnalysis','roman']]){
+  $(id).addEventListener('click',()=>{harmonyMode=mode;applyHarmonyLabels();});
+}
+$('about').addEventListener('click',event=>{
+  const button=event.target.closest('[data-phrase-start]');
+  if(!button || !cur || !tk) return;
+  const a=+button.dataset.phraseStart,z=+button.dataset.phraseEnd;
+  const bars=cur.performance.bars.filter(b=>a<=b.bar&&b.bar<=z);
+  if(!bars.length) return;
+  cancelComparison();paused=0;
+  play(qMs(bars[0].start),qMs(bars.at(-1).end));
+});
 
 function prepare(){
   const mei = new DOMParser().parseFromString(tk.getMEI(), 'application/xml');
