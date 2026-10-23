@@ -45,6 +45,7 @@ ul.checks li.warn{color:var(--warn)}
   <select id="pick" aria-label="곡과 버전"></select>
   <button id="play" class="primary" disabled>▶ 재생</button>
   <button id="stop" disabled>■ 처음으로</button>
+  <button id="compare" disabled>바뀐 곳 비교</button>
   <span id="status">불러오는 중…</span>
   <label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"> <span id="speedv">100%</span></label>
   <label><input id="rh" type="checkbox" checked> 오른손</label>
@@ -63,6 +64,7 @@ const MODE = {major:'장조', minor:'단조'};
 const $ = id => document.getElementById(id);
 let tk = null, cur = null, notes = [], staffOf = new Map();
 let timeMap = [], measureIds = new Map();
+let compareQueue = [], compareTimer = 0, compareLabel = "";
 let ctx = null, playing = null, raf = 0, lastHl = [], paused = 0;
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -81,9 +83,10 @@ function about(p){
   if(d.request) h += `<blockquote>${esc(d.request)}</blockquote>`;
   h += `<div>${esc(b.key)} ${MODE[b.mode] || ''} · ${esc(b.meter)} · 빠르기 ${b.tempo} · ${last}마디(약 ${Math.round(c.stats.seconds)}초) · ${b.grade || 6}급</div>`;
   if(imp.arc) h += `<div class="muted">흐름: ${esc(imp.arc)}</div>`;
-  if(v.reason || v.parent){
+  if(v.feedback || v.reason || v.parent){
     h += `<h3>이 버전</h3><ul class="checks">`;
-    if(v.reason) h += `<li>요청: ${esc(v.reason)}</li>`;
+    if(v.feedback || v.reason) h += `<li>요청 원문: ${esc(v.feedback || v.reason)}</li>`;
+    if(v.interpretation) h += `<li>작곡 해석: ${esc(v.interpretation)}</li>`;
     if(v.parent && v.changed_bars){
       const both = [...new Set([...v.changed_bars.rh, ...v.changed_bars.lh])].sort((a, b) => a - b);
       h += `<li>${esc(v.parent)}에서 바뀐 마디: ${both.length ? ranges(both) : '없음'}</li>`;
@@ -199,12 +202,15 @@ function applyPerformance(){
   }
 }
 
-function open(i){
+function open(i, comparison = false){
+  if(!comparison) cancelComparison();
   stop(); paused = 0;
   cur = PIECES[i];
   about(cur);
   if(!tk.loadData(cur.xml)){ $('score').textContent = '악보를 읽지 못했습니다.'; return; }
-  render(); prepare();
+  render(); prepare(); colorChanges();
+  $('pick').value = String(i);
+  $('compare').disabled = !cur.info.joins?.length || !PIECES.some(p=>p.piece===cur.piece && p.info.version===cur.info.parent);
   $('play').disabled = $('stop').disabled = false;
   $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`;
   try{ localStorage.setItem('musigen-listen', `${cur.piece}/${cur.info.version}`); }catch{}
@@ -231,18 +237,18 @@ function tone(when, dur, pitch, level){
   return parts;
 }
 
-function play(fromMs = 0){
+function play(fromMs = 0, untilMs = endMs(), done = null){
   stop();
   ctx = ctx || new (window.AudioContext || window.webkitAudioContext)({latencyHint: 'interactive'});
   ctx.resume();
   const k = 100 / +$('speed').value, t0 = ctx.currentTime + .08, oscs = [];
   const rh = $('rh').checked, lh = $('lh').checked;
   for(const n of notes){
-    if(n.t + n.d <= fromMs || (n.lh ? !lh : !rh)) continue;
-    const start = Math.max(0, n.t - fromMs), dur = n.d - Math.max(0, fromMs - n.t);
+    if(n.t >= untilMs || n.t + n.d <= fromMs || (n.lh ? !lh : !rh)) continue;
+    const start = Math.max(0, n.t - fromMs), dur = Math.min(n.t+n.d,untilMs)-Math.max(fromMs,n.t);
     oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, (n.lh ? .045 : .085) * n.level));
   }
-  playing = {oscs, t0, fromMs, k};
+  playing = {oscs, t0, fromMs, k, untilMs, done};
   $('play').textContent = '❚❚ 일시정지';
   tick();
 }
@@ -261,9 +267,9 @@ function highlight(ids){
 }
 function tick(){
   if(!playing) return;
-  const ms = nowMs(), end = endMs();
-  $('status').textContent = `${fmt(ms)} / ${fmt(end)}`;
-  if(ms > end + 400){ stop(); paused = 0; return; }
+  const ms = nowMs(), end = playing.untilMs;
+  $('status').textContent = `${compareLabel}${fmt(ms)} / ${fmt(end)}`;
+  if(ms >= end){ const done=playing.done; stop(); paused = 0; if(done) done(); return; }
   const at = tk.getElementsAtTime(Math.max(0, Math.round(ms)));
   highlight(at && at.notes ? at.notes : []);
   if($('follow').checked && lastHl.length){
@@ -273,17 +279,49 @@ function tick(){
   raf = requestAnimationFrame(tick);
 }
 
-$('play').addEventListener('click', () => { if(playing) paused = stop(true); else { play(paused); paused = 0; } });
-$('stop').addEventListener('click', () => { paused = 0; stop(); $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`; });
-$('speed').addEventListener('input', () => { $('speedv').textContent = $('speed').value + '%'; if(playing) play(nowMs()); });
-for(const id of ['rh', 'lh']) $(id).addEventListener('change', () => { if(playing) play(nowMs()); });
+function colorChanges(){
+  const changed=new Set([...(cur.info.changed_bars?.rh||[]),...(cur.info.changed_bars?.lh||[])]);
+  for(const bar of changed){
+    const el=document.getElementById(measureIds.get(bar)); if(!el) continue;
+    const b=el.getBBox(), rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',b.x); rect.setAttribute('y',b.y); rect.setAttribute('width',b.width); rect.setAttribute('height',b.height);
+    rect.setAttribute('fill','#ffe6a1'); rect.setAttribute('opacity','.45'); rect.setAttribute('class','changed-bar');
+    el.prepend(rect);
+  }
+}
+function cancelComparison(){ clearTimeout(compareTimer); compareQueue=[]; compareLabel=''; }
+function runComparison(){
+  const item=compareQueue.shift();
+  if(!item){ compareLabel=''; return; }
+  open(item.index,true);
+  compareLabel=`${cur.info.version} ${item.a}–${item.z}마디 · `;
+  const bars=cur.performance.bars.filter(b=>item.a<=b.bar && b.bar<=item.z);
+  if(!bars.length){ runComparison(); return; }
+  play(qMs(bars[0].start),qMs(bars.at(-1).end),()=>{
+    compareTimer=setTimeout(runComparison,item.gap);
+  });
+}
+$('compare').addEventListener('click',()=>{
+  cancelComparison(); stop();
+  const current=PIECES.indexOf(cur), parent=PIECES.findIndex(p=>p.piece===cur.piece && p.info.version===cur.info.parent);
+  if(parent<0) return;
+  for(const j of cur.info.joins||[]){
+    const a=j.before ?? j.changed[0], z=j.after ?? j.changed[1];
+    compareQueue.push({index:parent,a,z,gap:0},{index:current,a,z,gap:1000});
+  }
+  runComparison();
+});
+$('play').addEventListener('click', () => { cancelComparison(); if(playing) paused = stop(true); else { play(paused); paused = 0; } });
+$('stop').addEventListener('click', () => { cancelComparison(); paused = 0; stop(); $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`; });
+$('speed').addEventListener('input', () => { $('speedv').textContent = $('speed').value + '%'; if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
+for(const id of ['rh', 'lh']) $(id).addEventListener('change', () => { if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
 $('pick').addEventListener('change', () => open(+$('pick').value));
 $('score').addEventListener('click', e => {
   const g = e.target.closest('g.note'); if(!g || !tk) return;
-  const v = tk.getMIDIValuesForElement(g.id); if(v && v.time >= 0){ paused = 0; play(v.time); }
+  const v = tk.getMIDIValuesForElement(g.id); if(v && v.time >= 0){ cancelComparison(); paused = 0; play(v.time); }
 });
 let rt = 0;
-window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if(cur){ const p = playing ? nowMs() : null; stop(); render(); prepare(); if(p != null) play(p); } }, 300); });
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if(cur){ const p = playing ? nowMs() : null; cancelComparison(); stop(); render(); prepare(); colorChanges(); if(p != null) play(p); } }, 300); });
 
 $('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.title || p.piece)} · ${esc(p.info.version)}${p.info.reason ? ' · ' + esc(p.info.reason) : ''}</option>`).join('');
 verovio.module.onRuntimeInitialized = () => {
