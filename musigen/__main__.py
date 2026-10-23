@@ -17,7 +17,7 @@ def _load_work(folder: Path) -> tuple[dict, dict | None]:
 
 def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")
-    ap = argparse.ArgumentParser(prog="musigen")
+    ap = argparse.ArgumentParser(prog="MUSICANOTE Virtual Composer")
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("compose", "text"):
         p = sub.add_parser(name, help="lead sheet from a spec (baseline tune) -> musicomp arrangement")
@@ -40,13 +40,21 @@ def main() -> None:
     p.add_argument("roots", nargs="+", help="piece output folders (with v001, v002 ...)")
     p.add_argument("--out", required=True)
     p.add_argument("--latest", action="store_true", help="only the newest version of each piece")
+    p.add_argument("--shared-assets", action="store_true", help="공개 페이지의 샘플·PDF를 공통 assets 폴더에서 읽기")
     p.add_argument("--piano-samples", action="store_true", help="출처를 표시한 FluidR3 피아노 샘플 포함")
     p.add_argument("--individual-pages", action="store_true", help="곡별·버전별 URL 경로와 catalog.json 생성")
     p.add_argument("--embed-verovio", help="path to verovio-toolkit-wasm.js to embed (offline page, about 7 MB)")
+    p = sub.add_parser("duet", help="피아노 솔로 버전을 바이올린–피아노 듀엣으로 확장")
+    p.add_argument("source", help="솔로 v001 등 버전 폴더")
+    p.add_argument("--out", required=True)
     a = ap.parse_args()
+    if a.cmd == "duet":
+        from musigen.duet import save_duet
+        print(json.dumps(save_duet(Path(a.source),Path(a.out)),ensure_ascii=False,indent=2))
+        return
     if a.cmd == "listen":
         from musigen.listen import build_page
-        print(build_page([Path(r) for r in a.roots], Path(a.out), a.latest, a.embed_verovio, a.piano_samples, a.individual_pages))
+        print(build_page([Path(r) for r in a.roots], Path(a.out), a.latest, a.embed_verovio, a.piano_samples, a.individual_pages, a.shared_assets))
         return
     if a.cmd == "design":
         from musigen.design import summary_ko, validate

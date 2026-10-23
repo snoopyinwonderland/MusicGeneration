@@ -1,0 +1,469 @@
+{
+  "motifs": {
+    "a": "(F#4/q A4/q B4/q)",
+    "b": "(A4/h F#4/q)"
+  },
+  "blocks": [
+    {
+      "bars": "1",
+      "rh": {
+        "motif": "a"
+      },
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D6",
+        "bass_range": [
+          33,
+          43
+        ]
+      },
+      "dyn": "p",
+      "text": "Andante · con pedale"
+    },
+    {
+      "bars": "2",
+      "rh": {
+        "motif": "b"
+      },
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "Bm7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "3",
+      "rh": "(B4/q A4/q G4/q)",
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "4",
+      "rh": "(E4/h C#4/q)",
+      "rh2": "r/q A3/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "A7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "5",
+      "rh": "(F#4/q A4/q D5/q)",
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D",
+        "bass_range": [
+          33,
+          43
+        ]
+      },
+      "dyn": "mp"
+    },
+    {
+      "bars": "6",
+      "rh": "(B4/h A4/q)",
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "7",
+      "rh": "(G4/q F#4/q E4/q)",
+      "rh2": "r/q B3/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "Em7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "8",
+      "rh": "(E4/h C#4/q)",
+      "rh2": "r/q A3/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "A7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "9",
+      "rh": "(F#4/q D5/q C#5/q)",
+      "rh2": "r/q F#4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "Bm",
+        "bass_range": [
+          33,
+          43
+        ]
+      },
+      "dyn": "mp"
+    },
+    {
+      "bars": "10",
+      "rh": "(B4/h A4/q)",
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "11",
+      "rh": "(G4/q B4/q D5/q)",
+      "rh2": "r/q E4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "Em7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "12",
+      "rh": "(C#5/h E5/q)",
+      "rh2": "r/q A4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "A7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "13",
+      "rh": "(F#5/h E5/q)",
+      "rh2": "r/q A4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D",
+        "bass_range": [
+          33,
+          43
+        ]
+      },
+      "dyn": "mf"
+    },
+    {
+      "bars": "14",
+      "rh": "(D5/q B4/q A4/q)",
+      "rh2": "r/q G4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "15",
+      "rh": "(G4/q F#4/q E4/q)",
+      "rh2": "r/q B3/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "Em7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "16",
+      "rh": "(E4/h C#4/q)",
+      "rh2": "r/q A3/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "A7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "17",
+      "rh": {
+        "motif": "a"
+      },
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D6",
+        "bass_range": [
+          33,
+          43
+        ]
+      },
+      "dyn": "p"
+    },
+    {
+      "bars": "18",
+      "rh": {
+        "motif": "b"
+      },
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "Bm7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "19",
+      "rh": "(B4/q A4/q G4/q)",
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "20",
+      "rh": "(E4/h C#4/q)",
+      "rh2": "r/q A3/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "A7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "21",
+      "rh": "(F#4/h A4/q)",
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "D",
+        "bass_range": [
+          33,
+          43
+        ]
+      },
+      "dyn": "p"
+    },
+    {
+      "bars": "22",
+      "rh": "(B4/q A4/q G4/q)",
+      "rh2": "r/q D4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "G",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "23",
+      "rh": "(E5/q D5/q C#5/q)",
+      "rh2": "r/q A4/h",
+      "lh": {
+        "pattern": "broken",
+        "chords": "A7",
+        "bass_range": [
+          33,
+          43
+        ]
+      }
+    },
+    {
+      "bars": "24",
+      "rh": "D5/h._",
+      "rh2": "[F#4,A4]/h.",
+      "lh": {
+        "pattern": "bass",
+        "chords": "D",
+        "bass_range": [
+          33,
+          43
+        ]
+      },
+      "dyn": "pp"
+    }
+  ],
+  "expression": [
+    {
+      "bars": "1",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "2",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "3",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "4",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "5",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "6",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "7",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "8",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "9",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "10",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "11",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "12",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "13",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "14",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "15",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "16",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "17",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "18",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "19",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "20",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "21",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "22",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "23",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "24",
+      "pedal": "held"
+    },
+    {
+      "bars": "9-12",
+      "hairpin": "cresc"
+    },
+    {
+      "bars": "13-16",
+      "hairpin": "dim"
+    },
+    {
+      "bars": "21-23",
+      "hairpin": "dim"
+    }
+  ]
+}

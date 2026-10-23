@@ -1,0 +1,110 @@
+{
+  "title": "빛이 머무는 자리",
+  "request": "새 피아노 솔로 한 곡을 만들고, 그 곡으로 바이올린–피아노 듀엣도 만들어 주세요. 페달을 악보에 표시해 주세요.",
+  "given": [
+    "notes"
+  ],
+  "impression": {
+    "scene": "해가 기울어도 방 안에 남아 있는 작은 빛",
+    "mood": "고요하고 따뜻함",
+    "arc": "소박한 질문 → 조금 밝아지는 응답 → 익숙한 자리로 돌아옴"
+  },
+  "basics": {
+    "meter": "3/4",
+    "tempo": 72,
+    "key": "D",
+    "mode": "major",
+    "grade": 6,
+    "length_sec": 60
+  },
+  "theme": {
+    "idea": "3도 상행 뒤 한 걸음 더 나아가는 짧은 질문과, 긴 음에서 내려오는 응답.",
+    "motifs": {
+      "a": {
+        "describe": "F#–A–B의 작은 상행 질문",
+        "hand": "rh"
+      },
+      "b": {
+        "describe": "긴 A에서 F#으로 돌아오는 응답",
+        "hand": "rh"
+      }
+    }
+  },
+  "form": [
+    {
+      "label": "A",
+      "bars": [
+        1,
+        8
+      ],
+      "function": "statement",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "피아노의 짧은 질문에 안쪽 성부가 늦게 대답한다.",
+      "harmony": "D6–Bm7–G–A7",
+      "texture": "선율·안쪽 응답·펼침화음",
+      "register": "C#4–D5",
+      "dynamics": "p → mp",
+      "cadence": "half"
+    },
+    {
+      "label": "B",
+      "bars": [
+        9,
+        16
+      ],
+      "function": "development",
+      "plan": "선율이 한 옥타브 위로 열렸다가 내려온다.",
+      "harmony": "Bm–G–Em7–A7–D–G–Em7–A7",
+      "texture": "펼침화음과 긴 응답",
+      "register": "C#4–F#5",
+      "dynamics": "mp → mf → p",
+      "cadence": "half"
+    },
+    {
+      "label": "A′",
+      "bars": [
+        17,
+        20
+      ],
+      "function": "return",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "첫 질문을 조용히 되찾는다.",
+      "harmony": "D6–Bm7–G–A7",
+      "texture": "처음의 세 성부",
+      "register": "처음 음역",
+      "dynamics": "p"
+    },
+    {
+      "label": "Coda",
+      "bars": [
+        21,
+        24
+      ],
+      "function": "coda",
+      "plan": "두 음씩 숨을 넓히고 으뜸화음 위에 여운을 남긴다.",
+      "harmony": "D–G–A7–D",
+      "texture": "마지막은 양손의 긴 화음",
+      "register": "D4–E5",
+      "dynamics": "p → pp",
+      "cadence": "authentic"
+    }
+  ],
+  "climax": {
+    "bar": 13,
+    "how": "F#5를 길게 두어 밝아지는 순간을 만든다."
+  },
+  "ending": {
+    "how": "마지막 D장조에 페달을 유지하고 악보 끝에서 뗀다."
+  },
+  "notes": "사용자 지정: 새 피아노 솔로에서 바이올린–피아노 듀엣으로 확장, 페달 기보. 작곡: Codex. 제목·장면·조성·박자·형식·음은 이번 요청을 위해 새로 제안했다. 약 1분의 초안이며 청취 승인 전이다.",
+  "credits": {
+    "composer": "Codex",
+    "note": "사용자 요청을 바탕으로 새로 만든 초안 · 청취 검수 전"
+  }
+}

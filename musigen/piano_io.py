@@ -15,7 +15,7 @@ from musicomp.realize.musicxml import Direction, HarmonySymbol, OutNote, OutPart
 from musigen.piece import Piece
 
 
-def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
+def piano_part(piece: Piece) -> OutPart:
     part = OutPart("P1", "Piano", "Pno.", 1, [("G", 2), ("F", 4)])
     for n in piece.notes:
         part.notes.append(OutNote(n.onset, n.dur, list(n.pitches), voice=n.voice, staff=1 if n.hand == "rh" else 2,
@@ -53,6 +53,11 @@ def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
         # <kind text> is the suffix only - the reader prints the root and the /bass itself ('DDm', 'F/A/A' otherwise)
         suffix = re.sub(r"^[A-G][#b]?", "", ch.symbol).split("/")[0]
         part.harmonies.append(HarmonySymbol(on, ch.root_tpc, ch.kind, ch.bass_tpc, suffix))
+    return part
+
+
+def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
+    part = piano_part(piece)
     blen = piece.bar_len
     measures = ([Measure(0, "0", F(0), piece.pickup, blen)] if piece.pickup else [])
     measures += [Measure(i + len(measures), str(i + 1), piece.pickup + i * blen, blen, blen) for i in range(piece.bars)]

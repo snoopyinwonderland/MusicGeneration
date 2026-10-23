@@ -3,66 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>musigen 듣기</title>
+<title>MUSICANOTE Virtual Composer</title>
 <style>
-:root{--bg:#f6f5f2;--panel:#fff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e2e0db;--accent:#0b63c5;--hl:#d9480f;--warn:#8a5a00}
-*{box-sizing:border-box}
-body{margin:0;font:14px/1.55 "Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
-header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
-header h1{font-size:16px;margin:0 6px 0 0}
-select,button,input{font:inherit}
-button{border:1px solid var(--line);background:#fafafa;border-radius:6px;padding:4px 12px;cursor:pointer}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button:disabled{opacity:.5;cursor:default}
-label{display:inline-flex;align-items:center;gap:4px;color:var(--muted)}
-#status{color:var(--muted);min-width:84px;font-variant-numeric:tabular-nums}
-main{max-width:1200px;margin:0 auto;padding:12px 16px 40px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:12px}
-.card h2{font-size:15px;margin:0 0 6px}
-.card h3{font-size:14px;margin:10px 0 4px}
-blockquote{margin:4px 0 8px;padding:4px 10px;border-left:3px solid var(--line);color:var(--muted)}
-details summary{cursor:pointer;color:var(--accent)}
-.tablewrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13px}
-th,td{border-top:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
-th{color:var(--muted);font-weight:normal;white-space:nowrap}
-.src{font-size:11px;padding:0 5px;border-radius:8px;white-space:nowrap}
-.src.req{background:#e6eefb;color:var(--accent)}
-.src.sug{background:#f1efe9;color:var(--muted)}
-ul.checks{margin:4px 0;padding-left:18px}
-ul.checks li.err{color:#b00020}
-ul.checks li.warn{color:var(--warn)}
-#score .page{background:#fff;border:1px solid var(--line);border-radius:6px;margin:0 0 12px;padding:4px}
-#score svg{width:100%;height:auto;display:block}
-#score g.note.playing, #score g.note.playing *{fill:var(--hl)!important;stroke:var(--hl)!important}
-#score g.note{cursor:pointer}
-.muted{color:var(--muted)}
+:root{--bg:#f3f1eb;--panel:#fffefa;--ink:#203334;--muted:#6e7c78;--line:#dcded3;--accent:#28675e;--hl:#b45b30;--warn:#8a5a00;--gold:#c2a46c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 "Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif}button,select,input{font:inherit}button{border:1px solid var(--line);border-radius:7px;padding:9px 14px;background:var(--panel);color:var(--ink);cursor:pointer;white-space:nowrap}button:hover:not(:disabled){border-color:var(--accent);background:#edf3ee}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--accent);border-color:var(--accent);color:white}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:3px}a{color:var(--accent);text-underline-offset:4px}select{max-width:100%;min-height:40px;border:1px solid var(--line);border-radius:5px;padding:5px 8px;background:var(--panel);color:var(--ink)}
+.masthead{background:#1c3334;color:#f3efdf;padding:20px max(24px,calc((100vw - 1420px)/2));display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}.brand-mark{display:grid;place-items:center;width:42px;height:48px;border:1px solid #8fa19a;color:var(--gold);font:30px Georgia,serif}.brand-name{font-size:18px;letter-spacing:.14em;line-height:1.2}.brand-sub{font:11px/2 Georgia,serif;letter-spacing:.12em;color:#bbc9bf}.library{display:flex;align-items:center;gap:12px;min-width:0}.library span{font-size:11px;color:#bbc9bf;white-space:nowrap}.library select{max-width:340px;background:#284243;color:#fff;border-color:#526562}
+main{max-width:1468px;margin:auto;padding:0 24px 40px}.hero{display:flex;justify-content:space-between;align-items:center;gap:32px;padding:38px 4px 30px}.eyebrow{font-size:10px;letter-spacing:.17em;color:var(--accent);font-weight:bold}.hero h1{font:38px/1.35 Georgia,"Batang",serif;letter-spacing:-.03em;margin:9px 0 12px}.hero p{max-width:680px;color:var(--muted);margin:0}.hero-art{width:180px;min-width:180px;height:112px;background:repeating-linear-gradient(transparent 0 17px,#c4cbbc 17px 18px,transparent 18px 23px);position:relative;opacity:.7}.hero-art:before{content:'♪';position:absolute;font:110px Georgia;color:var(--accent);top:-24px;left:54px}.hero-art:after{content:'MUSICANOTE';position:absolute;bottom:-14px;right:0;font-size:9px;letter-spacing:.25em}.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}.meta span{border:1px solid #d5dbce;padding:2px 9px;border-radius:20px;font-size:11px;background:#e9ede3}
+.player{position:sticky;top:0;z-index:5;background:rgba(255,254,250,.97);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:0 4px 20px #273a3210;margin-bottom:22px}.transport,.controls{display:flex;flex-wrap:wrap;align-items:center;gap:9px}.transport{padding-bottom:9px;border-bottom:1px solid #eceee5}.controls{padding-top:9px;font-size:12px}.controls label{display:inline-flex;align-items:center;gap:5px;color:var(--muted)}input[type=range]{width:100px;accent-color:var(--accent)}input[type=checkbox]{accent-color:var(--accent)}#status{font-variant-numeric:tabular-nums;font-size:12px;min-width:100px;color:var(--muted);margin-left:6px}.downloads{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}.downloads button{font-size:12px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 294px;gap:22px;align-items:start}.score-heading{display:flex;align-items:center;justify-content:space-between;padding:2px 3px 12px}.score-heading h2{font-size:12px;letter-spacing:.1em;margin:0}.score-heading a{font-size:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px}.card h2{font-size:15px;margin:0 0 12px}.card h3{font-size:12px;margin:16px 0 6px}blockquote{margin:8px 0 14px;padding:6px 12px;border-left:2px solid var(--gold);font-size:12px;color:var(--muted)}details{border-top:1px solid var(--line);padding:12px 0}details summary{cursor:pointer;color:var(--accent);font-size:12px}details[open]{overflow-wrap:anywhere}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:11px}td,th{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted);font-weight:normal}.src{font-size:9px;padding:1px 4px;border-radius:4px;white-space:nowrap}.src.req{background:#e5eee4;color:var(--accent)}.src.sug{background:#f0ece3;color:var(--muted)}ul.checks{padding-left:16px;font-size:11px}.err{color:#b00020}.warn{color:var(--warn)}.muted{color:var(--muted);font-size:12px}#score .page{background:white;border:1px solid var(--line);border-radius:5px;padding:12px;margin-bottom:18px;box-shadow:0 5px 22px #1a33270a}#score svg{width:100%;height:auto;display:block}#score g.note{cursor:pointer}#score g.note.playing,#score g.note.playing *{fill:var(--hl)!important;stroke:var(--hl)!important}.page-footer{margin:24px 0 0;border-top:1px solid var(--line);padding:15px 0;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:12px}[hidden]{display:none!important}
+@media(max-width:980px){.workspace{grid-template-columns:1fr}.card{order:2}.hero-art{display:none}.downloads{margin-left:0}.masthead{padding:18px 22px}.library span{display:none}.library select{max-width:240px}.hero h1{font-size:32px}}
+@media(max-width:560px){main{padding:0 12px 28px}.masthead{padding:16px;flex-wrap:wrap;gap:14px}.library{width:100%}.library select{width:100%;max-width:100%}.brand-name{font-size:16px}.hero{padding:25px 6px}.hero h1{font-size:28px}.hero p{font-size:12px}.player{padding:10px;position:relative}.downloads{width:100%;gap:5px}.downloads button{flex:1;padding:8px}.controls{gap:9px 12px}#score .page{padding:3px}.page-footer{display:block}.card{padding:16px}}
 </style>
 </head>
 <body>
-<header>
-  <h1>musigen 듣기</h1>
-  <select id="pick" aria-label="곡과 버전"></select>
-  <button id="play" class="primary" disabled>▶ 재생</button>
-  <button id="stop" disabled>■ 처음으로</button>
-  <button id="compare" disabled>바뀐 곳 비교</button>
-  <label>음색 <select id="timbre"><option value="piano">피아노</option><option value="synth">합성음</option></select></label>
-  <button id="downloadAudio" disabled>피아노 WAV 저장</button>
-  <a id="permalink" href="#">이 악보 주소</a>
-  <span id="status">불러오는 중…</span>
-  <label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"> <span id="speedv">100%</span></label>
-  <label><input id="rh" type="checkbox" checked> 오른손</label>
-  <label><input id="lh" type="checkbox" checked> 왼손</label>
-  <label><input id="follow" type="checkbox" checked> 따라가기</label>
+<header class="masthead">
+  <a class="brand" href="#"><span class="brand-mark" aria-hidden="true">M</span><span><span class="brand-name">MUSICANOTE</span><br><span class="brand-sub">Virtual Composer</span></span></a>
+  <label class="library"><span>작품 라이브러리</span><select id="pick" aria-label="곡과 편성, 버전"></select></label>
 </header>
 <main>
-  <div class="card" id="about"></div>
-  <div id="score"><p class="muted">악보를 그리는 중…</p></div>
+  <section class="hero"><div><div class="eyebrow">MUSICANOTE · 작곡과 감상</div><h1 id="workTitle">새로운 음악의 자리</h1><p id="workScene">악보를 읽고, 소리로 만나 보세요.</p><div class="meta" id="workMeta"></div></div><div class="hero-art" aria-hidden="true"></div></section>
+  <section class="player" aria-label="재생과 악보 받기">
+    <div class="transport"><button id="play" class="primary" disabled>▶ 재생</button><button id="stop" disabled>■ 처음으로</button><button id="compare" disabled>바뀐 곳 비교</button><span id="status" aria-live="polite">준비 중…</span><div class="downloads"><button id="downloadXml" disabled>MusicXML 받기</button><button id="downloadPdf" class="primary" disabled>PDF 받기</button><button id="downloadAudio" disabled>샘플 WAV 받기</button></div></div>
+    <div class="controls"><label>재생 음원 <select id="timbre"><option value="piano">피아노 샘플</option><option value="synth">합성음</option></select></label><label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"><span id="speedv">100%</span></label><label id="violinControl" hidden><input id="violin" type="checkbox" checked>바이올린</label><label><input id="rh" type="checkbox" checked><span id="rhLabel">오른손</span></label><label><input id="lh" type="checkbox" checked><span id="lhLabel">왼손</span></label><label><input id="follow" type="checkbox" checked>악보 따라가기</label></div>
+  </section>
+  <div class="workspace"><section><div class="score-heading"><h2>악보</h2><a id="permalink" href="#">이 악보 주소</a></div><div id="score"><p class="muted">악보를 준비하고 있습니다.</p></div></section><aside class="card" id="about"></aside></div>
+  <footer class="page-footer"><span>MUSICANOTE Virtual Composer</span><span>작곡의 생각을 악보와 소리로.</span></footer>
 </main>
 <script src="/*VEROVIO_SRC*/"></script>
 <script>
 const PIECES = /*PIECES*/;
 const PIANO_BANK = /*PIANO_SAMPLES*/;
+const VIOLIN_BANK = /*VIOLIN_SAMPLES*/;
+const violinBuffers = new Map();
 const pianoBuffers = new Map();
 let pianoReady = false;
 const FUNCTIONS = {intro:'도입',statement:'제시',development:'발전',contrast:'대조',transition:'연결',return:'재현',coda:'종결'};
@@ -85,7 +56,14 @@ function ranges(bars){
 function about(p){
   const d = p.design, b = d.basics, imp = d.impression || {}, th = d.theme || {}, c = p.checks, v = p.info;
   const last = d.form[d.form.length - 1].bars[1];
-  let h = `<h2>${esc(d.title || p.piece)} <span class="muted">· ${esc(v.version)}</span></h2>`;
+  const duet = v.ensemble==='violin_piano';
+  $('workTitle').textContent=d.title || p.piece;
+  $('workScene').textContent=imp.arc || imp.scene || '악보를 읽고, 소리로 만나 보세요.';
+  $('workMeta').innerHTML=[duet?'바이올린 · 피아노':'피아노 솔로',`${b.key} ${MODE[b.mode]}`,b.meter,`약 ${Math.round(c.stats.seconds)}초`,v.version].map(x=>`<span>${esc(x)}</span>`).join('');
+  document.title=`${d.title} · ${duet?'듀엣':'피아노 솔로'} | MUSICANOTE Virtual Composer`;
+  let h = `<h2>작곡 노트</h2>`;
+  if(d.credits?.composer) h += `<p class="muted">작곡: ${esc(d.credits.composer)}<br>${esc(d.credits.note || '')}</p>`;
+  if(duet) h += '<p class="muted">피아노 솔로의 주선율을 바이올린이 이어받습니다. 피아노는 안쪽 응답과 베이스를 연주합니다.</p>';
   if(d.request) h += `<blockquote>${esc(d.request)}</blockquote>`;
   h += `<div>${esc(b.key)} ${MODE[b.mode] || ''} · ${esc(b.meter)} · 빠르기 ${b.tempo} · ${last}마디(약 ${Math.round(c.stats.seconds)}초) · ${b.grade || 6}급${b.swing ? ' · 스윙(8분음 2:1로 재생)' : ''}</div>`;
   if(imp.arc) h += `<div class="muted">흐름: ${esc(imp.arc)}</div>`;
@@ -124,10 +102,10 @@ function about(p){
   }
   if(!c.errors.length && !c.warnings.length) h += `<li>자동 검사에서 걸린 것이 없습니다.</li>`;
   h += `</ul></details><div class="muted" style="margin-top:6px">음표를 누르면 그 위치부터 재생합니다. ${PIANO_BANK ? "피아노는 녹음 샘플을 사용하며, 실제 연주자의 표현을 재현한 것은 아닙니다." : "합성음 미리듣기입니다. 피아노 샘플은 이 페이지에 포함하지 않았습니다."}</div>`;
-  if(PIANO_BANK) h += `<details><summary>피아노 음원 출처</summary>FluidR3_GM — Frank Wen 및 기여자(© 2000–2002, 2008), MP3 패키징 Benjamin Gleitzman.
+  if(PIANO_BANK) h += `<details><summary>재생 음원 출처</summary>FluidR3_GM — Frank Wen 및 기여자(© 2000–2002, 2008), MP3 패키징 Benjamin Gleitzman.
     <a href="https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef">원본</a> ·
     <a href="https://creativecommons.org/licenses/by/3.0/us/">CC BY 3.0 US</a>.
-    MIDI 21–108에서 3반음마다 선택, JSON/MIME 변환; MP3 바이트 유지. 샘플별 최대 진폭을 맞추고, 근접 음을 최대 1반음 이동하여 음량·음 길이·페달을 적용합니다.
+    피아노 MIDI 21–108, 바이올린 21–99에서 3반음마다 선택, JSON/MIME 변환; MP3 바이트 유지. 샘플별 진폭과 가까운 음의 높이를 조절합니다. 피아노에는 악보의 페달을, 바이올린에는 약식 지속 루프를 적용합니다. 실제 연주자의 터치와 활은 재현하지 않습니다.
     WAV 저장 시 함께 받는 출처 파일을 보관해 주세요.</details>`;
   $('about').innerHTML = h;
 }
@@ -172,7 +150,8 @@ function prepare(){
         if(Math.abs(frac-.5)<1e-3){ t+=late; d=Math.max(quarter/8,d-late); }
         else if(frac<1e-3 && Math.abs(d-quarter/2)<quarter/20) d+=late;
       }
-      notes.push({id,t,d,p:v.pitch,lh:staffOf.get(id)==='2',q:e.qstamp,level:1});
+      const staff=staffOf.get(id), duet=cur.info.ensemble==='violin_piano';
+      notes.push({id,t,d,p:v.pitch,lh:staff===(duet?'3':'2'),instrument:duet&&staff==='1'?'violin':'piano',q:e.qstamp,level:1});
     }
   }
   notes.sort((a, b) => a.t - b.t);
@@ -212,10 +191,14 @@ function applyPerformance(){
     if(art==='staccato') release=n.t+n.d*.5;
     if(art==='tenuto') release=n.t+n.d;
     // Sustain affects the acoustic release, not notation/highlight. tone() retains its decay.
-    for(const ped of ex.filter(e=>e.kind==='pedal')){
-      const boundaries=[ped.start,...ped.changes,ped.end];
-      for(let i=0;i<boundaries.length-1;i++)
-        if(qMs(boundaries[i])<=release && release<qMs(boundaries[i+1])) release=qMs(boundaries[i+1]);
+    if(n.instrument!=='violin'){
+      const keyRelease=release;
+      const ped=ex.find(e=>e.kind==='pedal' && qMs(e.start)<=keyRelease && keyRelease<qMs(e.end));
+      if(ped){
+        // Test the original key release once: a pedal refresh damps the old sound.
+        // Re-testing an extended release would carry it through every later refresh.
+        release=qMs([...ped.changes,ped.end].find(q=>qMs(q)>keyRelease));
+      }
     }
     n.d=Math.max(0,release-n.t); n.level=level;
   }
@@ -233,6 +216,12 @@ function open(i, comparison = false){
   $('play').disabled = $('timbre').value==='piano' && !pianoReady;
   $('stop').disabled = false;
   $('downloadAudio').disabled = !pianoReady;
+  $('downloadXml').disabled=false; $('downloadPdf').disabled=!cur.pdf;
+  const duet=cur.info.ensemble==='violin_piano';
+  $('violinControl').hidden=!duet;
+  $('rhLabel').textContent=duet?'피아노 오른손':'오른손';
+  $('lhLabel').textContent=duet?'피아노 왼손':'왼손';
+  $('timbre').options[0].textContent=duet?'바이올린·피아노 샘플':'피아노 샘플';
   $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`;
   const fragment = `piece=${encodeURIComponent(cur.piece)}&version=${encodeURIComponent(cur.info.version)}`;
   if(!comparison){ try{ history.replaceState(null,'','#'+fragment); }catch{} }
@@ -257,30 +246,53 @@ function pianoTone(audio, when, dur, pitch, level){
   gain.gain.exponentialRampToValueAtTime(.00001,end+.16);
   src.start(when); src.stop(end+.18); return [src];
 }
+async function decodeBank(source, buffers){
+  if(!source) return;
+  const bank=source.url ? await fetch(source.url).then(r=>{if(!r.ok)throw Error('음원 다운로드 실패');return r.json();}) : source;
+  const decoder=new OfflineAudioContext(1,1,44100);
+  await Promise.all(Object.entries(bank.notes).map(async([key,url])=>{
+    const bytes=Uint8Array.from(atob(url.split(',')[1]),c=>c.charCodeAt(0));
+    const buffer=await decoder.decodeAudioData(bytes.buffer);
+    let peak=0;
+    for(let c=0;c<buffer.numberOfChannels;c++) for(const x of buffer.getChannelData(c)) peak=Math.max(peak,Math.abs(x));
+    if(!peak) throw Error('무음 샘플: '+key);
+    for(let c=0;c<buffer.numberOfChannels;c++){
+      const channel=buffer.getChannelData(c);
+      for(let i=0;i<channel.length;i++) channel[i]*=.8/peak;
+    }
+    buffers.set(+key,buffer);
+  }));
+}
 async function preparePiano(){
   if(!PIANO_BANK){ $('timbre').value='synth'; $('timbre').options[0].disabled=true; return; }
-  $('status').textContent='피아노 음원 준비 중…';
+  $('status').textContent='음원 준비 중…';
   try{
-    const decoder=new OfflineAudioContext(1,1,44100);
-    await Promise.all(Object.entries(PIANO_BANK.notes).map(async([key,url])=>{
-      const raw=atob(url.split(',')[1]), bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
-      const buffer=await decoder.decodeAudioData(bytes.buffer);
-      // One recorded velocity layer: normalize each sample peak for consistent preview level.
-      let peak=0;
-      for(let c=0;c<buffer.numberOfChannels;c++) for(const x of buffer.getChannelData(c)) peak=Math.max(peak,Math.abs(x));
-      if(!peak) throw Error('무음 피아노 샘플: '+key);
-      for(let c=0;c<buffer.numberOfChannels;c++){
-        const channel=buffer.getChannelData(c); for(let i=0;i<channel.length;i++) channel[i]*=.8/peak;
-      }
-      pianoBuffers.set(+key,buffer);
-    }));
+    await Promise.all([decodeBank(PIANO_BANK,pianoBuffers),decodeBank(VIOLIN_BANK,violinBuffers)]);
     pianoReady=true;
     $('play').disabled=!cur; $('downloadAudio').disabled=!cur;
-    $('status').textContent='피아노 준비됨';
-  }catch(e){ $('status').textContent='피아노 음원을 읽지 못했습니다. 합성음을 선택할 수 있습니다.'; console.error(e); }
+    $('status').textContent='재생 준비됨';
+  }catch(e){ $('status').textContent='음원을 불러오지 못했습니다. 합성음을 선택할 수 있습니다.'; console.error(e); }
 }
-function tone(when, dur, pitch, level){
-  if($('timbre').value==='piano') return pianoTone(ctx,when,dur,pitch,level);
+function violinTone(audio,when,dur,pitch,level){
+  const keys=[...violinBuffers.keys()], key=keys.reduce((a,b)=>Math.abs(b-pitch)<Math.abs(a-pitch)?b:a);
+  const source=audio.createBufferSource(), gain=audio.createGain();
+  source.buffer=violinBuffers.get(key); source.playbackRate.value=2**((pitch-key)/12);
+  source.loop=true;
+  source.loopStart=Math.min(.35,source.buffer.duration*.25);
+  source.loopEnd=Math.min(1.4,source.buffer.duration-.15);
+  source.connect(gain).connect(audio.destination);
+  gain.gain.setValueAtTime(.00001,when);
+  gain.gain.linearRampToValueAtTime(level*2,when+.025);
+  gain.gain.setValueAtTime(level*2,when+Math.max(.03,dur));
+  gain.gain.exponentialRampToValueAtTime(.00001,when+dur+.12);
+  source.start(when); source.stop(when+dur+.15); return [source];
+}
+const audible=n=>n.instrument==='violin'?$('violin').checked:(n.lh?$('lh').checked:$('rh').checked);
+function sampleTone(audio,when,dur,n){
+  return n.instrument==='violin'?violinTone(audio,when,dur,n.p,.075*n.level):pianoTone(audio,when,dur,n.p,(n.lh?.045:.085)*n.level);
+}
+function tone(when, dur, pitch, level, instrument="piano"){
+  if($('timbre').value==='piano') return instrument==='violin'?violinTone(ctx,when,dur,pitch,level):pianoTone(ctx,when,dur,pitch,level);
   const f = 440 * 2 ** ((pitch - 69) / 12), g = ctx.createGain(), lp = ctx.createBiquadFilter();
   lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * 6);
   const parts = [[1, 1, 'triangle'], [2, .35, 'sine'], [3, .12, 'sine']].map(([h, a, type]) => {
@@ -303,11 +315,10 @@ function play(fromMs = 0, untilMs = endMs(), done = null){
   ctx = ctx || new (window.AudioContext || window.webkitAudioContext)({latencyHint: 'interactive'});
   ctx.resume();
   const k = 100 / +$('speed').value, t0 = ctx.currentTime + .08, oscs = [];
-  const rh = $('rh').checked, lh = $('lh').checked;
   for(const n of notes){
-    if(n.t >= untilMs || n.t + n.d <= fromMs || (n.lh ? !lh : !rh)) continue;
+    if(n.t >= untilMs || n.t + n.d <= fromMs || !audible(n)) continue;
     const start = Math.max(0, n.t - fromMs), dur = Math.min(n.t+n.d,untilMs)-Math.max(fromMs,n.t);
-    oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, (n.lh ? .045 : .085) * n.level));
+    oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, (n.instrument==='violin'?.075:n.lh?.045:.085) * n.level, n.instrument));
   }
   playing = {oscs, t0, fromMs, k, untilMs, done};
   $('play').textContent = '❚❚ 일시정지';
@@ -398,20 +409,39 @@ function wavBlob(buffer){
   for(let i=0;i<pcm.length;i++) v.setInt16(44+i*2,Math.round(Math.max(-1,Math.min(1,pcm[i]*scale))*32767),true);
   return new Blob([bytes],{type:'audio/wav'});
 }
+$('downloadXml').addEventListener('click',()=>{
+  if(cur) download(new Blob([cur.xml],{type:'application/vnd.recordare.musicxml+xml'}),`${cur.piece}-${cur.info.version}.musicxml`);
+});
+$('downloadPdf').addEventListener('click',async()=>{
+  if(!cur?.pdf) return;
+  const selected=cur, button=$('downloadPdf'); button.disabled=true;
+  try{
+    let blob;
+    if(selected.pdf.url){
+      const response=await fetch(selected.pdf.url);
+      if(!response.ok) throw Error('PDF 다운로드 실패');
+      blob=await response.blob();
+    }else{
+      blob=new Blob([Uint8Array.from(atob(selected.pdf.base64),c=>c.charCodeAt(0))],{type:'application/pdf'});
+    }
+    download(blob,`${selected.piece}-${selected.info.version}.pdf`);
+  }catch(e){ $('status').textContent=e.message; }
+  finally{ button.disabled=!cur?.pdf; }
+});
 $('downloadAudio').addEventListener('click',async()=>{
   if(!pianoReady) return;
   const button=$('downloadAudio'); button.disabled=true; button.textContent='음원 만드는 중…';
-  const selected=cur, seq=notes.slice(), k=100/+$('speed').value, rh=$('rh').checked, lh=$('lh').checked;
+  const selected=cur, seq=notes.map(n=>({...n,audible:audible(n)})), k=100/+$('speed').value;
   try{
     const audio=new OfflineAudioContext(1,Math.ceil((endMs()*k/1000+.5)*44100),44100);
-    for(const n of seq) if(n.lh?lh:rh) pianoTone(audio,n.t*k/1000,n.d*k/1000,n.p,(n.lh?.045:.085)*n.level);
+    for(const n of seq) if(n.audible) sampleTone(audio,n.t*k/1000,n.d*k/1000,n);
     const rendered=await audio.startRendering();
-    const base=`${selected.piece}-${selected.info.version}-piano`;
+    const base=`${selected.piece}-${selected.info.version}`;
     download(wavBlob(rendered),base+'.wav');
-    const notice=`${selected.design.title} · ${selected.info.version}\n피아노: FluidR3_GM — Frank Wen 및 기여자 (© 2000–2002, 2008). MP3 패키징 Benjamin Gleitzman.\nCC BY 3.0 US https://creativecommons.org/licenses/by/3.0/us/\n원본 https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef\n3반음 간격 샘플을 선택해 JSON으로 변환, MP3 유지. 샘플별 최대 진폭 정규화, 근접 음 이동·음량·길이·페달을 적용한 렌더링.\n이 샘플 출처는 악보 자체의 권리와 별개입니다.\n`;
+    const notice=`${selected.design.title} · ${selected.info.version}\n악기 샘플: FluidR3_GM — Frank Wen 및 기여자 (© 2000–2002, 2008). MP3 패키징 Benjamin Gleitzman.\nCC BY 3.0 US https://creativecommons.org/licenses/by/3.0/us/\n원본 https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef\n3반음 간격 샘플을 선택해 JSON으로 변환, MP3 유지. 샘플별 진폭 정규화와 음 이동·길이 조절. 피아노는 페달, 바이올린은 약식 지속 루프를 적용한 렌더링.\n이 샘플 출처는 악보 자체의 권리와 별개입니다.\n`;
     download(new Blob([notice],{type:'text/plain;charset=utf-8'}),base+'-출처.txt');
   }catch(e){ $('status').textContent='음원 저장 실패: '+e.message; }
-  finally{ button.disabled=false; button.textContent='피아노 WAV 저장'; }
+  finally{ button.disabled=false; button.textContent='샘플 WAV 받기'; }
 });
 window.addEventListener('hashchange',()=>{
   const q=new URLSearchParams(location.hash.slice(1));
@@ -421,7 +451,7 @@ window.addEventListener('hashchange',()=>{
 $('play').addEventListener('click', () => { cancelComparison(); if(playing) paused = stop(true); else { play(paused); paused = 0; } });
 $('stop').addEventListener('click', () => { cancelComparison(); paused = 0; stop(); $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`; });
 $('speed').addEventListener('input', () => { $('speedv').textContent = $('speed').value + '%'; if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
-for(const id of ['rh', 'lh']) $(id).addEventListener('change', () => { if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
+for(const id of ['rh', 'lh', 'violin']) $(id).addEventListener('change', () => { if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
 $('pick').addEventListener('change', () => open(+$('pick').value));
 $('score').addEventListener('click', e => {
   const g = e.target.closest('g.note'); if(!g || !tk) return;
@@ -430,7 +460,7 @@ $('score').addEventListener('click', e => {
 let rt = 0;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if(cur){ const p = playing ? nowMs() : null; cancelComparison(); stop(); render(); prepare(); colorChanges(); if(p != null) play(p); } }, 300); });
 
-$('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.title || p.piece)} · ${esc(p.info.version)}${p.info.reason ? ' · ' + esc(p.info.reason) : ''}</option>`).join('');
+$('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.title || p.piece)} · ${p.info.ensemble==='violin_piano'?'듀엣':'피아노 솔로'} · ${esc(p.info.version)}</option>`).join('');
 function initializeScore(){
   if(tk) return;
   // The embedded sample bank can finish downloading after WASM is already ready.
