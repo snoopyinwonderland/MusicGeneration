@@ -1,0 +1,20 @@
+{
+  "title": "서정적인 세 박자",
+  "basics": {
+    "key": "F",
+    "mode": "major",
+    "meter": "3/4",
+    "tempo": 72,
+    "grade": 6
+  },
+  "impression": {
+    "mood": "서정적이고 차분하게"
+  },
+  "theme": {
+    "constraints": {
+      "bars": 1,
+      "range": "C4-A5",
+      "rhythm": "lyrical"
+    }
+  }
+}
