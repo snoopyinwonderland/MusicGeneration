@@ -126,7 +126,11 @@ def check(piece: Piece, design: dict) -> dict:
             phrase_report = analyze(piece, design.get("phrase_plan", []))
         except ValueError as exc:
             phrase_report = {"status":"미평가", "reason":str(exc), "phrases":[], "rests":[], "plan":[]}
-    return {"phrasing": phrase_report, "errors": errors, "warnings": warnings, "notes": notes, "recognition": recognition, "musical": musical,
+    formal = None
+    if piece.phrase_plans:
+        from musigen.phrase_grammar import observations
+        formal = observations(piece, design)
+    return {"phrase_functions": formal, "phrasing": phrase_report, "errors": errors, "warnings": warnings, "notes": notes, "recognition": recognition, "musical": musical,
             "stats": {"bars": piece.bars, "seconds": round(secs, 2), "notes_rh": len(rh),
                       "notes_lh": sum(1 for n in piece.notes if n.hand == "lh"), "climax": climax},
             "sections": sections, "motifs": dict(usage)}

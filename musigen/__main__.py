@@ -63,15 +63,21 @@ def main() -> None:
     p.add_argument("--count", type=int, default=8)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--include", nargs="+", action="extend", default=[], help="작곡자/작업실 모티프 JSON")
+    p = sub.add_parser("phrases", help="선택 모티프로 8마디 프레이즈 후보 비교")
+    p.add_argument("work")
+    p.add_argument("--count", type=int, default=4)
     p = sub.add_parser("choose", help="후보 선택 JSON 또는 id를 기록하고 다음 단계 입력 만들기")
     p.add_argument("work")
     p.add_argument("selection")
     a = ap.parse_args()
-    if a.cmd in ("motifs", "choose"):
+    if a.cmd in ("motifs", "phrases", "choose"):
         try:
             if a.cmd == "motifs":
                 from musigen.motif_candidates import run
                 result = run(a.work, a.count, a.seed, a.include)
+            elif a.cmd == "phrases":
+                from musigen.phrase_candidates import run
+                result = run(a.work, a.count)
             else:
                 from musigen.selections import choose
                 result = choose(a.work, a.selection)

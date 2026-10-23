@@ -79,6 +79,7 @@ class Piece:
     bar_keys: dict[int, Key] = field(default_factory=dict)
     motifs: dict[str, list[Ev]] = field(default_factory=dict)
     analysis_chords: list = field(default_factory=list)
+    phrase_plans: list = field(default_factory=list)
 
     def bar_start(self, bar: int) -> F:
         return F(0) if bar == 0 else self.pickup + (bar - 1) * self.bar_len
@@ -124,6 +125,9 @@ def _material(item, motifs: dict, key: Key, blen: F, bt: F, where: str, chords_o
         return parse(item, blen, "lit", start % blen)
     if not isinstance(item, dict):
         raise ScoreError(f"{where}: material is text, a motif, a pattern or a list")
+    if item.get("format") == "musicanote-motif":
+        from musigen.motif_clip import read_events
+        return read_events(item, item.get("name", "inline"))
     if "motif" in item:
         mid = item["motif"]
         if mid not in motifs:
@@ -206,6 +210,9 @@ def build(design: dict, score: dict) -> Piece:
     piece.motifs = motifs
     timeline: dict[str, list[tuple[F, Ev, Key]]] = {v: [] for v in VOICES}
     blocks = list(score.get("blocks") or [])
+    if any("phrase" in block for block in blocks):
+        from musigen.phrase_grammar import expand
+        blocks, piece.phrase_plans = expand(blocks, motifs, key, blen)
     if piece.pickup and (not blocks or str(blocks[0].get("bars")) != "0"):
         blocks.insert(0, {"bars": "0"})
     nxt = 0 if piece.pickup else 1

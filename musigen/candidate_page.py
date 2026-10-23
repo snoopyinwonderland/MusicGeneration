@@ -18,4 +18,6 @@ def write_page(data,out):
     for key,value in [('DATA',data),('BANK',bank)]:
         text=text.replace('/*'+key+'*/',json.dumps(value,ensure_ascii=False).replace('</','<\\/'))
     text=text.replace('/*VEROVIO_SRC*/',source).replace('/*PLAYER*/',(root/'candidate_player.js').read_text(encoding='utf-8'))
+    if data.get('stage') == 'phrase':
+        text=text.replace('모티프 후보 비교 · MUSICANOTE','프레이즈 후보 비교 · MUSICANOTE')
     out.write_text(text,encoding='utf-8')

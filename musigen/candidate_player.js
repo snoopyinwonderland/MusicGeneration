@@ -1,11 +1,15 @@
 // P1 has no pedal or dynamics variation: identical preview mix for fair comparisons.
 const $=id=>document.getElementById(id), buffers=new Map(), checked=new Set();
 let audio=null, ready=false, chosen=null, timer=null, nodes=[], generation=0;
-const storageKey='musicanote-motif-choice:'+DATA.set_id;
+const stage=DATA.stage||'motif',isPhrase=stage==='phrase';
+const storageKey='musicanote-'+stage+'-choice:'+DATA.set_id;
+$('stage-title').textContent=isPhrase?'2단계 · 프레이즈를 골라 주세요':'1단계 · 주제를 골라 주세요';
+$('stage-help').textContent=isPhrase?'선택한 모티프를 발전시킨 8마디 후보입니다. 구조와 쉼, 반주의 차이를 들어 보세요. 페달은 쓰지 않습니다.':'각 악보는 1마디 모티프 + 1마디 기본 응답입니다. 같은 빠르기·블록 반주·피아노 음원으로 비교합니다. 페달은 쓰지 않습니다.';
+$('meter-badge').textContent=DATA.design.basics.meter+' 박자 · '+(isPhrase?'선택 모티프 '+DATA.selected_motif:'모티프 후보');
 const rows=DATA.candidates, byId=new Map(rows.map(r=>[r.id,r]));
 const kindNames={generator:'리듬·윤곽 생성기',composer:'작곡자가 작성',import:'가져온 모티프'};
 const qpm=DATA.design.basics.tempo, seconds=q=>q*60/qpm;
-$('design').textContent=`${DATA.design.title||'모티프 설계'} · ${DATA.design.basics.key} ${DATA.design.basics.mode==='minor'?'단조':'장조'} · ${DATA.design.basics.meter} · ♩=${qpm} · ${rows.length}/${DATA.requested}개`;
+$('design').textContent=`${DATA.design.title||'모티프 설계'} · ${DATA.design.basics.key} ${DATA.design.basics.mode==='minor'?'단조':'장조'} · ${DATA.design.basics.meter} 박자 · ♩=${qpm} · 후보 ${rows.length}개 (요청 ${DATA.requested}개)`;
 if(DATA.design.impression?.mood)$('design').textContent+=' · '+DATA.design.impression.mood;
 $('diagnostics').textContent=JSON.stringify(DATA.diagnostics,null,2);
 function text(tag,value,parent){const e=document.createElement(tag);e.textContent=value;parent.append(e);return e;}
@@ -30,6 +34,7 @@ for(const row of rows){
  const label=document.createElement('label');const box=document.createElement('input');box.type='checkbox';box.dataset.id=row.id;
  box.addEventListener('change',()=>{if(box.checked&&checked.size>=2){box.checked=false;$('status').textContent='번갈아 들을 후보는 두 개만 고르세요.';return;}box.checked?checked.add(row.id):checked.delete(row.id);$('alternate').disabled=!ready||checked.size!==2;});
  label.append(box,document.createTextNode(' 비교에 넣기'));card.append(label);
+ if(row.observations){const d=document.createElement('details');card.append(d);text('summary','프레이즈 기능과 긴장 곡선',d);for(const finding of row.observations.findings)text('p',finding.message,d);text('pre',JSON.stringify(row.observations.curve,null,2),d);}
  if(row.preview.warnings.length){const d=document.createElement('details');card.append(d);text('summary','참고할 검사 관찰',d);text('p',row.preview.warnings.join(' / '),d);}
 }
 document.querySelectorAll('.play').forEach(e=>e.disabled=true);
@@ -37,9 +42,9 @@ $('reason').addEventListener('input',remember);
 try{const old=JSON.parse(localStorage.getItem(storageKey)||'null');if(old&&byId.has(old.chosen)&&DATA.status!=='stopped'){$('reason').value=typeof old.reason==='string'?old.reason.slice(0,1000):'';select(old.chosen);}}catch{}
 $('export').addEventListener('click',()=>{
  if(!chosen)return;
- const payload={format:'musicanote-selection',version:1,stage:'motif',set_id:DATA.set_id,design_sha256:DATA.design_sha256,shown:rows.map(r=>r.id),chosen,reason:$('reason').value};
+ const payload={format:'musicanote-selection',version:1,stage,set_id:DATA.set_id,design_sha256:DATA.design_sha256,shown:rows.map(r=>r.id),chosen,reason:$('reason').value};
  const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
- const a=document.createElement('a');a.href=url;a.download='motif-selection.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const a=document.createElement('a');a.href=url;a.download=stage+'-selection.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
 function stop(){generation++;clearTimeout(timer);timer=null;for(const n of nodes){try{n.stop();}catch{}}nodes=[];document.querySelectorAll('article').forEach(e=>e.removeAttribute('aria-current'));}
 async function play(ids,loop){
@@ -72,7 +77,7 @@ async function init(){
   if(Date.now()-began>20000)throw Error('악보 엔진 준비 시간 초과');await new Promise(r=>setTimeout(r,50));
  }
  for(const row of rows){
-  const tk=new verovio.toolkit();tk.setOptions({pageWidth:1500,pageHeight:900,scale:40,svgViewBox:true,breaks:'none',adjustPageHeight:true,header:'none',footer:'none',pageMarginLeft:20,pageMarginRight:20});
+  const tk=new verovio.toolkit();tk.setOptions({pageWidth:isPhrase?1000:1500,pageHeight:isPhrase?8000:900,scale:40,svgViewBox:true,breaks:isPhrase?'auto':'none',adjustPageHeight:true,header:'none',footer:'none',pageMarginLeft:20,pageMarginRight:20});
   if(!tk.loadData(row.preview.xml)||tk.getLog())throw Error(`${row.id}: ${tk.getLog()||'악보 오류'}`);
   $('score-'+row.id).innerHTML=tk.renderToSVG(1);tk.destroy();
  }

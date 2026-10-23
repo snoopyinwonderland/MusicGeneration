@@ -14,6 +14,9 @@ def identity(data):
     return digest(value)
 
 def choose(work, selection):
+    if re.fullmatch(r"p[1-9]\d*",str(selection)) or (not re.fullmatch(r"m[1-9]\d*",str(selection)) and read_json(selection).get("stage")=="phrase"):
+        from musigen.phrase_selection import choose_phrase
+        return choose_phrase(work, selection)
     work=Path(work).resolve()
     design=read_json(work/'design.json'); data=read_json(work/'stage1_motifs/candidates.json')
     if data.get('format')!='musicanote-candidates' or data.get('version')!=1 or data.get('stage')!='motif':
