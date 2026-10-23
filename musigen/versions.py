@@ -97,7 +97,7 @@ def join_notes(piece: Piece, rows: list[dict]) -> list[str]:
         a,z=row['changed']
         for left,right,flag in ((row['before'],a,row['before_changed']),(z,row['after'],row['after_changed'])):
             if left is None or right is None or flag: continue
-            for hand,vn in [('rh',1),('lh',5)]:
+            for hand,vn in [('rh',1),('lh',1)]:
                 prev=[n for n in piece.in_bars(left,left,hand) if n.voice==vn]
                 nxt=[n for n in piece.in_bars(right,right,hand) if n.voice==vn]
                 if not prev or not nxt: continue

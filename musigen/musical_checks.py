@@ -13,7 +13,7 @@ def active(notes,t): return [n for n in notes if n.onset<=t<n.onset+n.dur]
 def evaluate(p,d):
     warnings=[]; notes=[]; events=[]; sections=[]
     chords=p.analysis_chords or p.chords
-    rh=[n for n in p.notes if n.voice==1]
+    rh=[n for n in p.notes if n.hand=="rh" and n.voice==1]
     def emit(kind,bar,hand,msg,warning=False):
         text=f"{bar}마디 {hand}: {msg}"
         (warnings if warning else notes).append(text)

@@ -25,6 +25,8 @@ Every voice must fill the block exactly; the error names the block, the voice an
   "key": "F major"  the key in force for motif operations and spelling inside the block (a modulation; the key
                     signature stays the piece's)
   "dyn": "p"        a dynamic at the block's first beat; "text": "rit." a word above the staff
+  "chords": "C D7/C" chord symbols to show over the block when its hands are written as notes (same form as a
+                    pattern's chords: one per bar, or SYMBOL:BEATS)
 A tie at the end of a block ("D5/h.~") joins the next block's first note when the pitches are the same.
 """
 from __future__ import annotations
@@ -39,7 +41,9 @@ from musigen.design import bar_len, beat, qpm, total_bars, pickup
 from musigen.motif import apply, realise
 from musigen.notation import Ev, NotationError, length, parse
 
-VOICES = {"rh": ("rh", 1), "rh2": ("rh", 2), "lh": ("lh", 5), "lh2": ("lh", 6)}
+# voice numbers count per staff: musicomp's writer gives every staff a voice 1 and fills it with a whole rest when
+# empty (left hand as voice 5 drew a stray rest above the bass staff in every bar, 햇살 골목 v001)
+VOICES = {"rh": ("rh", 1), "rh2": ("rh", 2), "lh": ("lh", 1), "lh2": ("lh", 2)}
 DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fp"}
 
 
@@ -53,7 +57,7 @@ class Note:
     dur: F
     pitches: tuple[tuple[int, int], ...]   # (MIDI, tpc)
     hand: str                              # rh | lh
-    voice: int                             # 1, 2 (right hand), 5, 6 (left hand)
+    voice: int                             # 1, 2 within the hand's staff
     src: str                               # provenance (musigen/notation.py Ev.src)
     art: str | None = None
     slur: str | None = None
@@ -144,7 +148,7 @@ def _material(item, motifs: dict, key: Key, blen: F, bt: F, where: str, chords_o
     if "pattern" in item:
         cs = accomp.parse_chords(item.get("chords", ""), blen, bt, start % blen)
         chords_out += [(start + off, ch) for off, _, ch in cs]
-        return accomp.figure(item["pattern"], cs, bt, tuple(item.get("bass_range", (38, 50))))
+        return accomp.figure(item["pattern"], cs, bt, tuple(item.get("bass_range", (38, 50))), bool(item.get("push")))
     raise ScoreError(f"{where}: material item needs 'motif' or 'pattern'")
 
 
@@ -240,6 +244,11 @@ def build(design: dict, score: dict) -> Piece:
             for e in evs:
                 timeline[v].append((pos, e, lkey))
                 pos += e.dur
+        if blk.get("chords"):  # chord symbols shown over written notes (no pattern to take them from)
+            try:
+                piece.chords += [(t0 + off, ch) for off, _, ch in accomp.parse_chords(blk["chords"], blen, bt)]
+            except NotationError as e:
+                raise ScoreError(f"{where} chords: {e}") from e
         # An explicitly written block without chord material has unknown harmony.
         # Do not silently carry the preceding block's chord into its final cadence.
         if not any(t0 <= on < t0 + need for on, _ in piece.chords):

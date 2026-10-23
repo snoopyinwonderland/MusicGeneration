@@ -84,6 +84,21 @@ class AccompTest(unittest.TestCase):
         self.assertIn(name_to_tpc("C#"), [t for e in evs for t in e.tpcs])   # A7's third is C#, not Db
 
 
+class JazzFigureTest(unittest.TestCase):
+    def test_walk_approaches_next_root_by_half_step(self):
+        cs = parse_chords("Fmaj7 D7 Gm7:2 Gb7:2", F(4), F(1))
+        line = [e.pitches[0] for e in figure("walk", cs, F(1))]
+        self.assertEqual(line[:5], [41, 40, 36, 37, 38])       # F2 E2 C2 C#2 | D2: toward the next root
+        self.assertEqual(line[8:10], [43, 41])                  # Gm7 -> Gb7: approach from F, not G again
+        self.assertTrue(all(e.dur == 1 for e in figure("walk", cs, F(1))))
+
+    def test_shell_push_anticipates_by_an_eighth(self):
+        cs = parse_chords("Fmaj7 D7", F(4), F(1))
+        evs = figure("shell", cs, F(1), push=True)
+        self.assertEqual([e.dur for e in evs], [F(7, 2), F(9, 2)])
+        self.assertEqual(evs[0].pitches, (41, 52))              # F2 + E3 (the 7th)
+
+
 class BuildTest(unittest.TestCase):
     def setUp(self):
         self.design, self.score = work()

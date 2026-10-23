@@ -18,7 +18,8 @@ the checks hold the score to (musigen/checks.py).  Bars are 1-based and inclusiv
     "ending": {"how": "..."}
   }
 
-tempo counts the meter's beat (6/8: dotted quarters).  'given' entries are dotted paths; a path covers everything under
+tempo counts the meter's beat (6/8: dotted quarters).  basics.swing true: eighths are written straight and played
+long-short (the listening page); write "Swing" as the first block's text so the score says so too.  'given' entries are dotted paths; a path covers everything under
 it ("form" marks all sections as the user's, "form.1" only the second).  The notes of each motif are in the score
 (score.json), the design only describes them.
 """

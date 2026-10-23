@@ -87,7 +87,7 @@ function about(p){
   const last = d.form[d.form.length - 1].bars[1];
   let h = `<h2>${esc(d.title || p.piece)} <span class="muted">· ${esc(v.version)}</span></h2>`;
   if(d.request) h += `<blockquote>${esc(d.request)}</blockquote>`;
-  h += `<div>${esc(b.key)} ${MODE[b.mode] || ''} · ${esc(b.meter)} · 빠르기 ${b.tempo} · ${last}마디(약 ${Math.round(c.stats.seconds)}초) · ${b.grade || 6}급</div>`;
+  h += `<div>${esc(b.key)} ${MODE[b.mode] || ''} · ${esc(b.meter)} · 빠르기 ${b.tempo} · ${last}마디(약 ${Math.round(c.stats.seconds)}초) · ${b.grade || 6}급${b.swing ? ' · 스윙(8분음 2:1로 재생)' : ''}</div>`;
   if(imp.arc) h += `<div class="muted">흐름: ${esc(imp.arc)}</div>`;
   if(v.feedback || v.reason || v.parent){
     h += `<h3>이 버전</h3><ul class="checks">`;
@@ -157,6 +157,7 @@ function prepare(){
     if(a && b){ tieNext.set(a, b); tieEnds.add(b); }
   }
   notes = [];
+  const swing = !!cur.design.basics.swing;
   for(const e of timeMap){
     for(const id of (e.on || [])){
       if(tieEnds.has(id)) continue;
@@ -164,7 +165,14 @@ function prepare(){
       if(!v || !(v.pitch > 0) || !(v.duration > 0)) continue;
       let end = v.time + v.duration, x = id, guard = 0;
       while(tieNext.has(x) && guard++ < 64){ x = tieNext.get(x); const u = tk.getMIDIValuesForElement(x); if(u && u.duration > 0) end = Math.max(end, u.time + u.duration); }
-      notes.push({id, t: v.time, d: end - v.time, p: v.pitch, lh: staffOf.get(id) === '2', q: e.qstamp, level: 1});
+      let t=v.time, d=end-v.time;
+      if(swing){
+        const frac=((e.qstamp%1)+1)%1;
+        const beatStart=Math.floor(e.qstamp), quarter=qMs(beatStart+1)-qMs(beatStart), late=quarter/6;
+        if(Math.abs(frac-.5)<1e-3){ t+=late; d=Math.max(quarter/8,d-late); }
+        else if(frac<1e-3 && Math.abs(d-quarter/2)<quarter/20) d+=late;
+      }
+      notes.push({id,t,d,p:v.pitch,lh:staffOf.get(id)==='2',q:e.qstamp,level:1});
     }
   }
   notes.sort((a, b) => a.t - b.t);

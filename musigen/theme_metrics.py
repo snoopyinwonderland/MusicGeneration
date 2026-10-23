@@ -33,8 +33,8 @@ def measure(piece, design):
         count=sum(not e.rest for e in ref)
         if count<3: continue
         all_scores=[]
-        for vn in (1,2,5,6):
-            voice=[n for n in piece.notes if n.voice==vn]
+        for hand,vn in (("rh",1),("rh",2),("lh",1),("lh",2)):
+            voice=[n for n in piece.notes if n.hand==hand and n.voice==vn]
             # Explicit appearances are maximal provenance runs, chunked for a
             # directly repeated identical motif. Short fragments stay unscored.
             starts={}; i=0
@@ -74,8 +74,8 @@ def measure(piece, design):
         for ref in piece.motifs.values():
             size=sum(not e.rest for e in ref)
             if size<3: continue
-            for vn in (1,2,5,6):
-                voice=[n for n in piece.notes if n.voice==vn]
+            for hand,vn in (("rh",1),("rh",2),("lh",1),("lh",2)):
+                voice=[n for n in piece.notes if n.hand==hand and n.voice==vn]
                 for i in range(len(voice)-size+1):
                     w=voice[i:i+size]
                     if score_window(ref,w,piece,any("|invert" in n.src for n in w))["score"]>=.75:

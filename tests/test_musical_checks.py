@@ -7,7 +7,7 @@ from test_notation_expression import work
 
 def fixture(rh,lh,chords,bars=2):
     p=Piece('검사',parse_key('C major'),'4/4',60,bars)
-    for hand,vn,seq in [('rh',1,rh),('lh',5,lh)]:
+    for hand,vn,seq in [('rh',1,rh),('lh',1,lh)]:
         p.notes += [Note(F(t),F(d),((m,0),),hand,vn,src) for t,d,m,src in seq]
     p.notes.sort(key=lambda n:(n.onset,n.voice))
     p.chords=[(F(t),parse_chord(ch)) for t,ch in chords]

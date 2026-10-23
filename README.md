@@ -35,7 +35,7 @@ python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마�
 
 ### 듣기 페이지
 
-[docs/listen/index.html](docs/listen/index.html)은 시험곡 "비 갠 밤"을 담은 페이지입니다.
+[docs/listen/index.html](docs/listen/index.html)은 시험곡 "햇살 골목"(G장조, 당김음, 구간마다 다른 반주)과 "비 갠 밤"(D단조)을 담은 페이지입니다. 위쪽 메뉴에서 곡을 고릅니다.
 
 - 악보를 보면서 재생할 수 있습니다. 음표를 누르면 그 위치부터 재생합니다.
 - 빠르기를 바꾸거나 한 손만 들을 수 있습니다.
@@ -115,3 +115,5 @@ python -m musigen listen output/p3/after_rain output/p3/winter_morning --out doc
 `--piano-samples`는 선택 옵션입니다. 공개 예시에는 켰으며 일반 빌드는 기존 합성음을 유지합니다. 페이지의 ‘피아노 WAV 저장’은 선택한 손·빠르기·페달·셈여림을 적용한 음원과 출처 파일을 저장합니다. 샘플을 HTML에 포함하므로 외부 음원 서버에 접속하지 않습니다. Verovio는 기본적으로 CDN에서 읽습니다. 음원 저작자·라이선스·변경 내역은 [출처](musigen/assets/piano/ATTRIBUTION.md)에 있습니다.
 
 Claude가 검수 후 docs를 병합하면 기존 GitHub Pages에서 `/MusicGeneration/listen/after_rain/`, `/MusicGeneration/listen/winter_morning/` 경로로 열립니다. Codex는 main을 수정하거나 push하지 않습니다. 병합 전 검수는 공개 브랜치 커밋의 `raw.githack.com/snoopyinwonderland/MusicGeneration/<커밋>/docs/listen/<곡>/index.html` 주소를 사용합니다. 제3자 미리보기 서비스라 GitHub Pages 운영 주소와는 구분합니다.
+
+최종 검수판은 최신 main의 햇살 골목·모퉁이 카페도 포함합니다. 생성 루트는 `output/p5/after_rain output/p5/winter_morning output/p5/sunny_alley output/p5/corner_cafe`입니다. 최신 main의 보표별 성부 번호와 스윙을 유지하며, 1차 꾸러미와의 바이트 기준 차이는 검수서에 기록했습니다.

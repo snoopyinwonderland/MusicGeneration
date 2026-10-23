@@ -1,0 +1,3 @@
+tests/data/*.musicxml -text
+musigen/assets/piano/*.json -text
+musigen/assets/piano/UPSTREAM_README.md -text

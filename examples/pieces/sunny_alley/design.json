@@ -1,0 +1,39 @@
+{
+ "title": "햇살 골목",
+ "request": "반주 형태를 바꿔 가면서 진행하도록 조금 밝은 느낌에 syncopated rhythm을 포함해서 한 곡 만들어 볼 수 있나요.",
+ "given": ["impression.mood", "notes"],
+ "impression": {
+  "mood": "조금 밝게, 당김음 리듬",
+  "scene": "햇살 드는 골목을 가볍게 걷는 오후",
+  "arc": "경쾌한 제시 → 버금딸림 쪽으로 옮겨 리듬이 더 튀는 대조 → 처음 선율이 흐르는 반주 위로 돌아와 E6에서 정점 → 짧은 메아리와 마무리 화음"
+ },
+ "basics": {"length_sec": 65, "meter": "4/4", "tempo": 104, "key": "G", "mode": "major", "grade": 6},
+ "theme": {
+  "idea": "8분음 하나 앞당겨 들어오는 동기(a)와, 박 사이에서 미리 들어와 길게 붙는 답(b). 당김음은 두 동기의 리듬 자체에 있고, 반주가 바뀌어도 이 리듬은 유지된다.",
+  "motifs": {
+   "a": {"describe": "D–G–B로 올라가는데 G와 B가 박 사이(엇박)에서 시작해 길게 걸침, 끝은 A–G로 내려옴. 1마디", "hand": "rh"},
+   "b": {"describe": "점4분음 뒤 8분음이 다음 박을 앞당겨 붙임줄로 길게 머묾(한 음 내려옴). 1마디", "hand": "rh"}
+  }
+ },
+ "form": [
+  {"label": "A", "bars": [1, 8], "function": "statement",
+   "plan": "a–b 한 쌍을 두 번. 두 번째 쌍은 5마디에서 처음 높이로 돌아오고, 7마디 계류(G가 D7 위에 걸렸다가 F#으로)로 8마디 으뜸화음에 닫음",
+   "motifs": ["a", "b"], "harmony": "G–Em7–Am7–Dadd9, G–Em7·C–Am7·D7–G", "texture": "쿵짝 반주(베이스–화음–5음–화음)",
+   "register": "오른손 D5–B5", "dynamics": "mf"},
+  {"label": "B", "bars": [9, 16], "function": "contrast",
+   "plan": "버금딸림(C) 쪽으로. a의 리듬은 그대로 두고 음만 바꿔 낮은 음역에서 시작, 13–14마디에서 C6까지 올라감. 15마디 7마디와 같은 계류 종지형, 16마디 음계로 올라가 재현에 연결",
+   "motifs": ["a", "b"], "harmony": "C–D7/C–Bm7–Em7–C–Am7–D7sus4·D7–D7", "texture": "3+3+2 당김 반주(베이스 점4분–화음 점4분–화음 4분)",
+   "register": "오른손 B4–C6", "dynamics": "mp → mf"},
+  {"label": "A′", "bars": [17, 24], "function": "return",
+   "plan": "1–6마디 선율 그대로, 반주를 8분음 펼침화음으로 바꿔 흐르게. 23마디 새 악구로 E6 정점, 24마디 으뜸음",
+   "motifs": ["a", "b"], "harmony": "1–6마디와 같음, C·D–G", "texture": "8분음 펼침화음",
+   "register": "오른손 D5–E6", "dynamics": "f"},
+  {"label": "Coda", "bars": [25, 28], "function": "coda",
+   "plan": "a의 앞 세 음을 Cmaj7 위에서 두 번(두 번째는 한 옥타브 아래 메아리), 7마디 종지형을 낮게, 마지막은 짧게 끊는 G장조 화음",
+   "motifs": ["a"], "harmony": "Cmaj7–Cmaj7–D7sus4·D7–G", "texture": "알베르티 반주, 마지막 마디 화음",
+   "register": "오른손 D4–A5", "dynamics": "mf → p → mf"}
+ ],
+ "climax": {"bar": 23, "how": "재현 끝의 새 악구가 C 화음 위 엇박에서 E6으로 올라가 D 화음까지 걸쳐 머문다"},
+ "ending": {"how": "메아리처럼 작아졌다가 마지막 G장조 화음을 2박 길이로 짧게 끊어 밝게 닫는다"},
+ "notes": "요청 사항: 구간마다 반주 형태를 바꿀 것, 밝은 느낌, 당김음 리듬"
+}

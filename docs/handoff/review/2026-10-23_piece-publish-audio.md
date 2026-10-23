@@ -40,3 +40,16 @@ main과 GitHub Pages 설정은 변경하지 않았습니다. 제3자 브랜치 �
 ## 검수·병합 순서
 musicomp `codex/xml-expression` (`eb882fe`) → MusicGeneration `codex/piece-notation` (`4974197`) → `codex/piece-theme` (`9237695`) → `codex/piece-checks` (`f5da065`) → `codex/piece-revision` (`f3fd011`) → 이 브랜치.
 각 꾸러미 검수 요청서는 같은 폴더에 있습니다. 자동 검사 통과는 기본 적용 승인과 구분하며, main 병합은 Claude 검수 후 진행합니다.
+
+## 작업 중 main 변경 통합 (최종)
+
+최종 점검에서 Claude 작업 공간 main이 `95058ac`으로 진행된 것을 확인했습니다. `385ae68`(햇살 골목·블록 chords·보표별 성부), `95058ac`(모퉁이 카페·shell/walk/push·스윙)을 이 codex 브랜치에 병합했습니다. main에는 쓰지 않았습니다.
+
+- 공개 대상은 네 곡: after_rain, winter_morning, sunny_alley, corner_cafe. 모두 `output/p5/<곡>/v001`에서 만든 개별 URL과 피아노 페이지가 있습니다. 위 두 곡 생성 명령 대신 네 output/p5 경로를 나열하면 최종 공개판을 재현합니다.
+- 스윙은 최신 main의 2:1 동작을 유지하되 qMs 시간 대응으로 계산하고 표현 지시도 함께 적용합니다. 음원 저장에도 같은 노트 시간표를 사용합니다.
+- 인식/연결부/검사에서 성부를 손+보표 안 번호로 구분했습니다. 최신 main의 왼손 1/2 번호가 오른손과 섞이지 않습니다.
+- **원래 바이트 기준의 예외**: 최신 main의 성부 번호 수정이 왼손의 불필요한 온쉼표를 없애 XML을 바꿉니다. P1–P4의 옛 기준 파일은 보존합니다. 최종 회귀는 읽기 전용 main95058ac+musicomp main에서 직접 생성한 `tests/data/after_rain_main950_v001.musicxml`과 바이트 비교합니다. 새 표현을 사용하지 않으면 최신 main과 정확히 같습니다. 악보 음·리듬 변화는 없습니다.
+- Python 56개(최신 main의 2개 포함) 통과. 네 곡 모두 Verovio 로그 빈 문자열, 재생·정지 오류 0. 새 예시들의 기존 작곡 경고는 자동 수정하지 않았습니다.
+- `.gitattributes`로 샘플 해시와 XML 기준의 줄바꿈을 고정했습니다.
+
+추가 음원 검증: 햇살 골목 63.902초(peak 0.4367, RMS 0.0544), 모퉁이 카페는 스윙 시간표로 샘플 재생·WAV를 생성했습니다. musicomp 최종 Node 4/Python 105개 통과(MUSICOMP_PYTHON을 지정).

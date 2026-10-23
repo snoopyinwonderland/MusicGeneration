@@ -7,7 +7,12 @@
            bass     the bass alone, held
            broken   rolling eighths over an open chord: bass, 5th, octave, 10th ... up and back
            alberti  low-high-middle-high eighths on the close chord
-           waltz    bass on the first beat, the close chord on the others (4/4: bass, chord, 5th, chord)
+           waltz    bass on the first beat, the close chord on the others (4/4: bass, chord, 5th, chord; stride)
+           shell    jazz shell voicing held: the bass and the chord's 7th (6th; the 3rd for a triad), within an octave
+           walk     walking bass in quarter notes (beats of the meter): the root on the chord's first beat, chord
+                    tones after it, and a half step into the next chord's root on the last beat before it
+  "push": true      (block, shell) every chord after the figure's first is struck an eighth early and held over -
+                    the anticipation of jazz and pop comping; the chord symbol stays where it is written
   "bass_range": [lo, hi] MIDI for the bass (default 38-50, D2-D3); each bass is the chord's bass nearest the last one.
 
 The figures are deliberately plain - a starting point the composer overrides with written notes where the
@@ -36,7 +41,8 @@ QUALITY = {
 }
 SYMBOL_RE = re.compile(r"^([A-G](?:#|b)?)(" + "|".join(sorted((re.escape(q) for q in QUALITY if q), key=len, reverse=True))
                        + r")?(?:/([A-G](?:#|b)?))?$")
-PATTERNS = ("block", "bass", "broken", "alberti", "waltz")
+PATTERNS = ("block", "bass", "broken", "alberti", "waltz", "shell", "walk")
+WALK_RANGE = (31, 50)  # G1-D3, where a walking bass line sits on the piano
 
 
 @dataclass(frozen=True)
@@ -113,30 +119,78 @@ def _ev(ln: F, notes, ch: Chord, tag: str) -> Ev:
                                for i, m in enumerate(notes)), src=tag)
 
 
-def figure(pattern: str, chords: list[tuple[F, F, Chord]], beat: F, bass_range=(38, 50)) -> list[Ev]:
+def _shell(ch: Chord, b: int) -> list[int]:
+    """Bass + the 7th (or 6th) above it, or the 3rd when the chord has neither."""
+    root = (ch.root_tpc * 7) % 12
+    rel = {(pc - root) % 12 for pc, _ in ch.tones}
+    top = next((i for i in (10, 11, 9) if i in rel), None)
+    if top is None:
+        top = next((i for i in (4, 3, 5, 2) if i in rel), 7)
+    pc = (root + top) % 12
+    return [b, b + ((pc - b) % 12 or 12)]
+
+
+def _walk(ch: Chord, b: int, beats: int, nxt: int | None, lo: int, hi: int) -> list[int]:
+    """Quarter-note line over one chord: root, chord tones, then a half step into the next root."""
+    line = [b]
+    pcs = {pc for pc, _ in ch.tones}
+    up = [m for m in range(b + 1, b + 13) if m % 12 in pcs]
+    down = sorted((m for m in range(b - 12, b) if m % 12 in pcs), reverse=True)
+    # walk toward the next root (F2 -> D2 goes F E C C#, not up to C3 and a leap down - 모퉁이 카페 v001 bar 9),
+    # and down when there is no room above
+    steps = down if (nxt is not None and nxt < b and down[0] >= lo) or b + 7 > hi else up
+    while len(line) < beats - (1 if nxt is not None and beats > 1 else 0):
+        line.append(steps[(len(line) - 1) % len(steps)])
+    if nxt is not None and beats > 1:
+        # a half step into the next root, from the side not already sounding (Gm7 -> Gb7: F, not G again)
+        side = [nxt - 1, nxt + 1] if nxt > line[-1] else [nxt + 1, nxt - 1]
+        line.append(next((m for m in side if m != line[-1]), side[0]))
+    return line
+
+
+def figure(pattern: str, chords: list[tuple[F, F, Chord]], beat: F, bass_range=(38, 50), push: bool = False) -> list[Ev]:
     if pattern not in PATTERNS:
         raise NotationError(f"unknown pattern {pattern!r} ({', '.join(PATTERNS)})")
+    if pattern == "walk" and tuple(bass_range) == (38, 50):
+        bass_range = WALK_RANGE
     lo, hi = bass_range
+    lens = [ln for _, ln, _ in chords]
+    if push and pattern in ("block", "shell"):
+        for i in range(1, len(lens)):
+            if lens[i - 1] > F(1, 2):
+                lens[i - 1] -= F(1, 2)
+                lens[i] += F(1, 2)
     evs: list[Ev] = []
     prev = None
-    for _, ln, ch in chords:
-        b = _bass(ch, prev, lo, hi)
-        prev = b
+    basses = []
+    for _, _, ch in chords:
+        prev = _bass(ch, prev, lo, hi)
+        basses.append(prev)
+    for k, ((_, _, ch), ln, b) in enumerate(zip(chords, lens, basses)):
         tag = f"{pattern}({ch.symbol})"
         close = _close(ch, max(b + 7, 48))
         if pattern == "block":
             evs.append(_ev(ln, [b] + close, ch, tag))
         elif pattern == "bass":
             evs.append(_ev(ln, [b], ch, tag))
+        elif pattern == "shell":
+            evs.append(_ev(ln, _shell(ch, b), ch, tag))
+        elif pattern == "walk":
+            n = int(ln // beat)
+            nxt = basses[k + 1] if k + 1 < len(basses) else None
+            for m in _walk(ch, b, n, nxt, lo, hi):
+                evs.append(_ev(beat, [m], ch, tag))
+            if ln - n * beat:
+                evs.append(_ev(ln - n * beat, [b], ch, tag))
         elif pattern in ("broken", "alberti"):
             lad = _open(ch, b) if pattern == "broken" else close[:3]
             order = (list(range(len(lad))) + list(range(len(lad) - 2, 0, -1)) if pattern == "broken"
                      else [0, 2, 1, 2])
-            k, pos = 0, F(0)
+            j, pos = 0, F(0)
             while pos < ln:
                 d = min(F(1, 2), ln - pos)
-                evs.append(_ev(d, [lad[order[k % len(order)]]], ch, tag))
-                k += 1
+                evs.append(_ev(d, [lad[order[j % len(order)]]], ch, tag))
+                j += 1
                 pos += d
         else:  # waltz
             pos, i = F(0), 0

@@ -20,7 +20,7 @@ class ExpressionTest(unittest.TestCase):
         d,s=work()
         with tempfile.TemporaryDirectory() as tmp:
             p=write_musicxml(build(d,s),Path(tmp)/"p.xml",subtitle="v001")
-            self.assertEqual(p.read_bytes(),(ROOT/"tests/data/after_rain_v001.musicxml").read_bytes())
+            self.assertEqual(p.read_bytes(),(ROOT/"tests/data/after_rain_main950_v001.musicxml").read_bytes())
     def test_pickup(self):
         d,s=work("winter_morning"); p=build(d,s)
         self.assertEqual(p.bar_of(F(0)),0)
