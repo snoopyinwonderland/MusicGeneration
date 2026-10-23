@@ -431,8 +431,12 @@ let rt = 0;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if(cur){ const p = playing ? nowMs() : null; cancelComparison(); stop(); render(); prepare(); colorChanges(); if(p != null) play(p); } }, 300); });
 
 $('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.title || p.piece)} · ${esc(p.info.version)}${p.info.reason ? ' · ' + esc(p.info.reason) : ''}</option>`).join('');
-verovio.module.onRuntimeInitialized = () => {
-  tk = new verovio.toolkit();
+function initializeScore(){
+  if(tk) return;
+  // The embedded sample bank can finish downloading after WASM is already ready.
+  // Register the callback and also initialize an already usable runtime.
+  try{ const candidate = new verovio.toolkit(); candidate.getVersion(); tk=candidate; }
+  catch{ $('status').textContent='악보 엔진 준비 중…'; return; }
   let last = null; try{ last = localStorage.getItem('musigen-listen'); }catch{}
   const q=new URLSearchParams(location.hash.slice(1));
   const linked=PIECES.findIndex(p=>p.piece===q.get('piece') && (!q.get('version')||p.info.version===q.get('version')));
@@ -440,7 +444,12 @@ verovio.module.onRuntimeInitialized = () => {
   $('pick').value = String(i);
   $('timbre').value=PIANO_BANK?'piano':'synth';
   open(i); preparePiano();
-};
+}
+if(typeof verovio==='undefined') $('status').textContent='악보 엔진을 불러오지 못했습니다. 네트워크를 확인해 주세요.';
+else {
+  verovio.module.onRuntimeInitialized=initializeScore;
+  if(typeof verovio.module._vrvToolkit_constructor==='function') initializeScore();
+}
 </script>
 </body>
 </html>

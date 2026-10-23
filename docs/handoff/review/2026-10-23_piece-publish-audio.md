@@ -53,3 +53,5 @@ musicomp `codex/xml-expression` (`eb882fe`) → MusicGeneration `codex/piece-not
 - `.gitattributes`로 샘플 해시와 XML 기준의 줄바꿈을 고정했습니다.
 
 추가 음원 검증: 햇살 골목 63.902초(peak 0.4367, RMS 0.0544), 모퉁이 카페는 스윙 시간표로 샘플 재생·WAV를 생성했습니다. musicomp 최종 Node 4/Python 105개 통과(MUSICOMP_PYTHON을 지정).
+
+공개 환경 추가 수정: 약 1MB의 내장 샘플 HTML이 내려오는 동안 Verovio WASM이 먼저 초기화되면 onRuntimeInitialized 콜백을 놓치는 경쟁 상태를 발견했습니다. 콜백 등록과 이미 준비된 runtime 초기화를 모두 지원하도록 수정했습니다. 로컬 파일·느린 공개 다운로드에서 모두 동작하도록 한 변경입니다. raw.githack 첫 방문은 외부 콘텐츠 안내의 ‘Open the page’를 눌러야 합니다. 최신 musicomp 의존성은 `269676b`입니다. 모퉁이 카페 WAV는 57.741초, peak 0.6079/RMS 0.0641로 클리핑이 없습니다.
