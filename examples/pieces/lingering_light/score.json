@@ -1,7 +1,7 @@
 {
   "motifs": {
-    "a": "(F#4/q A4/q B4/q)",
-    "b": "(A4/h F#4/q)"
+    "a": "(F#4/q A4/e B4/e A4/q)",
+    "b": "(A4/q F#4/q D4/e) r/e"
   },
   "blocks": [
     {
@@ -9,215 +9,232 @@
       "rh": {
         "motif": "a"
       },
-      "rh2": "r/q D4/h",
       "lh": {
-        "pattern": "broken",
-        "chords": "D6",
+        "pattern": "waltz",
+        "chords": "D",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       },
       "dyn": "p",
-      "text": "Andante · con pedale"
+      "text": "주제 a · Andante"
     },
     {
       "bars": "2",
       "rh": {
         "motif": "b"
       },
-      "rh2": "r/q D4/h",
       "lh": {
-        "pattern": "broken",
-        "chords": "Bm7",
+        "pattern": "waltz",
+        "chords": "D/F#",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "3",
-      "rh": "(B4/q A4/q G4/q)",
-      "rh2": "r/q D4/h",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "step:-1"
+        ]
+      },
       "lh": {
-        "pattern": "broken",
-        "chords": "G",
+        "pattern": "waltz",
+        "chords": "Em7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "4",
-      "rh": "(E4/h C#4/q)",
-      "rh2": "r/q A3/h",
+      "rh": "E4/h r/q",
       "lh": {
-        "pattern": "broken",
+        "pattern": "waltz",
         "chords": "A7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "5",
-      "rh": "(F#4/q A4/q D5/q)",
-      "rh2": "r/q D4/h",
+      "rh": {
+        "motif": "a"
+      },
       "lh": {
         "pattern": "broken",
         "chords": "D",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       },
-      "dyn": "mp"
+      "dyn": "mp",
+      "text": "주제의 응답"
     },
     {
       "bars": "6",
-      "rh": "(B4/h A4/q)",
-      "rh2": "r/q D4/h",
+      "rh": {
+        "motif": "b",
+        "pitches": "B4 G4 D4"
+      },
       "lh": {
         "pattern": "broken",
         "chords": "G",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "7",
-      "rh": "(G4/q F#4/q E4/q)",
-      "rh2": "r/q B3/h",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "step:-1"
+        ]
+      },
       "lh": {
         "pattern": "broken",
-        "chords": "Em7",
+        "chords": "A7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "8",
-      "rh": "(E4/h C#4/q)",
-      "rh2": "r/q A3/h",
+      "rh": "D4/h r/q",
       "lh": {
         "pattern": "broken",
-        "chords": "A7",
+        "chords": "D",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "9",
-      "rh": "(F#4/q D5/q C#5/q)",
-      "rh2": "r/q F#4/h",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "at:B4"
+        ]
+      },
       "lh": {
         "pattern": "broken",
         "chords": "Bm",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       },
-      "dyn": "mp"
+      "dyn": "mp",
+      "text": "주제 a · 상행 반복"
     },
     {
       "bars": "10",
-      "rh": "(B4/h A4/q)",
-      "rh2": "r/q D4/h",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "at:C#5"
+        ]
+      },
       "lh": {
         "pattern": "broken",
-        "chords": "G",
+        "chords": "A",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "11",
-      "rh": "(G4/q B4/q D5/q)",
-      "rh2": "r/q E4/h",
-      "lh": {
-        "pattern": "broken",
-        "chords": "Em7",
-        "bass_range": [
-          33,
-          43
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "at:D5"
         ]
-      }
-    },
-    {
-      "bars": "12",
-      "rh": "(C#5/h E5/q)",
-      "rh2": "r/q A4/h",
+      },
       "lh": {
         "pattern": "broken",
-        "chords": "A7",
+        "chords": "D/F#",
         "bass_range": [
-          33,
-          43
-        ]
-      }
-    },
-    {
-      "bars": "13",
-      "rh": "(F#5/h E5/q)",
-      "rh2": "r/q A4/h",
-      "lh": {
-        "pattern": "broken",
-        "chords": "D",
-        "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       },
       "dyn": "mf"
     },
     {
-      "bars": "14",
-      "rh": "(D5/q B4/q A4/q)",
-      "rh2": "r/q G4/h",
+      "bars": "12",
+      "rh": "E5/h r/q",
       "lh": {
         "pattern": "broken",
-        "chords": "G",
+        "chords": "A7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
+      "bars": "13-14",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "aug:2"
+        ]
+      },
+      "lh": {
+        "pattern": "bass",
+        "chords": "D Bm7",
+        "bass_range": [
+          38,
+          47
+        ]
+      },
+      "rh2": "r/h D4/q | r/q F#4/h",
+      "dyn": "mp",
+      "text": "주제 a · 음가 확대"
+    },
+    {
       "bars": "15",
-      "rh": "(G4/q F#4/q E4/q)",
-      "rh2": "r/q B3/h",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "step:-1"
+        ]
+      },
       "lh": {
         "pattern": "broken",
         "chords": "Em7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "16",
-      "rh": "(E4/h C#4/q)",
-      "rh2": "r/q A3/h",
+      "rh": "E4/h r/q",
       "lh": {
         "pattern": "broken",
         "chords": "A7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
@@ -226,111 +243,122 @@
       "rh": {
         "motif": "a"
       },
-      "rh2": "r/q D4/h",
       "lh": {
-        "pattern": "broken",
-        "chords": "D6",
+        "pattern": "alberti",
+        "chords": "D",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       },
-      "dyn": "p"
+      "dyn": "p",
+      "text": "주제의 재현"
     },
     {
       "bars": "18",
       "rh": {
         "motif": "b"
       },
-      "rh2": "r/q D4/h",
       "lh": {
-        "pattern": "broken",
-        "chords": "Bm7",
+        "pattern": "alberti",
+        "chords": "D",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "19",
-      "rh": "(B4/q A4/q G4/q)",
-      "rh2": "r/q D4/h",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "step:-1"
+        ]
+      },
       "lh": {
-        "pattern": "broken",
-        "chords": "G",
+        "pattern": "alberti",
+        "chords": "Em7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "20",
-      "rh": "(E4/h C#4/q)",
-      "rh2": "r/q A3/h",
+      "rh": "E4/h r/q",
       "lh": {
-        "pattern": "broken",
+        "pattern": "waltz",
         "chords": "A7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "21",
-      "rh": "(F#4/h A4/q)",
-      "rh2": "r/q D4/h",
+      "rh": [
+        {
+          "motif": "a",
+          "ops": [
+            "frag:0:2"
+          ]
+        },
+        "F#4/e E4/q"
+      ],
       "lh": {
-        "pattern": "broken",
+        "pattern": "shell",
         "chords": "D",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       },
-      "dyn": "p"
+      "dyn": "p",
+      "text": "주제의 조각 · 종결"
     },
     {
       "bars": "22",
-      "rh": "(B4/q A4/q G4/q)",
-      "rh2": "r/q D4/h",
+      "rh": [
+        {
+          "motif": "a",
+          "ops": [
+            "at:G4",
+            "frag:0:2"
+          ]
+        },
+        "A4/e G4/q"
+      ],
       "lh": {
-        "pattern": "broken",
+        "pattern": "shell",
         "chords": "G",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "23",
-      "rh": "(E5/q D5/q C#5/q)",
-      "rh2": "r/q A4/h",
+      "rh": "E4/h r/q",
       "lh": {
-        "pattern": "broken",
+        "pattern": "shell",
         "chords": "A7",
         "bass_range": [
-          33,
-          43
+          38,
+          47
         ]
       }
     },
     {
       "bars": "24",
       "rh": "D5/h._",
+      "lh": "[D3,A3]/h.",
+      "dyn": "pp",
       "rh2": "[F#4,A4]/h.",
-      "lh": {
-        "pattern": "bass",
-        "chords": "D",
-        "bass_range": [
-          33,
-          43
-        ]
-      },
-      "dyn": "pp"
+      "chords": "D"
     }
   ],
   "expression": [
@@ -352,7 +380,7 @@
     {
       "bars": "4",
       "pedal": "held",
-      "release": "1/4"
+      "release": "1"
     },
     {
       "bars": "5",
@@ -372,7 +400,7 @@
     {
       "bars": "8",
       "pedal": "held",
-      "release": "1/4"
+      "release": "1"
     },
     {
       "bars": "9",
@@ -392,7 +420,7 @@
     {
       "bars": "12",
       "pedal": "held",
-      "release": "1/4"
+      "release": "1"
     },
     {
       "bars": "13",
@@ -412,7 +440,7 @@
     {
       "bars": "16",
       "pedal": "held",
-      "release": "1/4"
+      "release": "1"
     },
     {
       "bars": "17",
@@ -432,7 +460,7 @@
     {
       "bars": "20",
       "pedal": "held",
-      "release": "1/4"
+      "release": "1"
     },
     {
       "bars": "21",
@@ -447,14 +475,15 @@
     {
       "bars": "23",
       "pedal": "held",
-      "release": "1/4"
+      "release": "1"
     },
     {
       "bars": "24",
-      "pedal": "held"
+      "pedal": "held",
+      "release": "0"
     },
     {
-      "bars": "9-12",
+      "bars": "9-11",
       "hairpin": "cresc"
     },
     {

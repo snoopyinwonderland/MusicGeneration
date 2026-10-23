@@ -37,6 +37,18 @@ async function main(){
     firstNotes:notes.slice(0,4).map(n=>({p:n.p,t:n.t,d:n.d,lh:n.lh,instrument:n.instrument}))}));
    assert.equal(result.log,'');assert.equal(result.pdfEnabled,true);
    await page.click('#play');
+   const signature=await page.evaluate(()=>JSON.stringify(notes.map(n=>[n.id,n.t,n.d,n.p,n.instrument])));
+   const originalHarmony=await page.locator('#score g.harm text').first().textContent();
+   await page.click('#romanAnalysis');
+   assert.equal(await page.getAttribute('#romanAnalysis','aria-pressed'),'true');
+   assert.equal(await page.evaluate(()=>JSON.stringify(notes.map(n=>[n.id,n.t,n.d,n.p,n.instrument]))),signature);
+   assert(await page.evaluate(()=>!!playing));
+   const shown=await page.evaluate(()=>[...document.querySelectorAll('#score g.harm text')].map(g=>g.textContent));
+   const expected=await page.evaluate(()=>cur.harmony.map(h=>h.display));
+   assert.deepEqual(shown,expected);
+   result.roman=shown;
+   await page.click('#chordSymbols');
+   assert.equal(await page.locator('#score g.harm text').first().textContent(),originalHarmony);
    const sounding=await page.evaluate(()=>playing.oscs.length);
    assert(sounding>0);await page.click('#stop');
    if(result.piece==='winter_morning') assert(result.firstNotes[1].d<3000);
@@ -63,16 +75,25 @@ async function main(){
      assert.equal(await page.evaluate(()=>playing.oscs.length),result.instruments.piano);
      await page.click('#stop');await page.check('#violin');
     }
+    await page.click('#romanAnalysis');
+    await page.screenshot({path:path.join(out,i?'duet-rna.png':'solo-rna.png'),fullPage:true});
+    await page.click('#chordSymbols');
     await page.screenshot({path:path.join(out,i?'duet-desktop.png':'solo-desktop.png'),fullPage:true});
+    await page.locator('[data-phrase-start="9"]').click();
+    const span=await page.evaluate(()=>({from:playing.fromMs,until:playing.untilMs}));
+    assert.deepEqual(span,{from:20000,until:30000});
+    await page.click('#stop');
    }
   }
   for(const piece of ['lingering_light','lingering_light_duet']){
    await page.goto(url+'/'+piece+'/');await page.waitForFunction(()=>pianoReady&&notes.length>0);
    assert.equal(await page.evaluate(()=>cur.piece),piece);
   }
+  await page.click('#romanAnalysis');
   await page.setViewportSize({width:390,height:844});
   await page.waitForTimeout(700);
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  assert.equal(await page.getAttribute('#romanAnalysis','aria-pressed'),'true');
   await page.screenshot({path:path.join(out,'duet-mobile.png'),fullPage:true});
   assert.equal(report.errors.length,0);
   fs.writeFileSync(path.join(out,'browser-check.json'),JSON.stringify(report,null,2));
