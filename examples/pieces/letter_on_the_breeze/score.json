@@ -268,79 +268,9 @@
   ],
   "expression": [
     {
-      "bars": "1",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "2",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "3",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "4",
-      "pedal": "held",
-      "release": "1"
-    },
-    {
-      "bars": "5",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "6",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "7",
-      "pedal": "chord",
-      "release": "1/4"
-    },
-    {
       "bars": "8",
       "pedal": "held",
       "release": "2"
-    },
-    {
-      "bars": "9",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "10",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "11",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "12",
-      "pedal": "held",
-      "release": "1"
-    },
-    {
-      "bars": "13",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "14",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "15",
-      "pedal": "chord",
-      "release": "1/4"
     },
     {
       "bars": "16",
@@ -348,24 +278,9 @@
       "release": "2"
     },
     {
-      "bars": "17",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "18",
-      "pedal": "held",
-      "release": "1/4"
-    },
-    {
-      "bars": "19",
-      "pedal": "held",
-      "release": "1"
-    },
-    {
       "bars": "20",
       "pedal": "held",
-      "release": "0"
+      "release": "1"
     },
     {
       "bars": "5-7",
