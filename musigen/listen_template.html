@@ -26,7 +26,8 @@ main{max-width:1468px;margin:auto;padding:0 24px 40px}.hero{display:flex;justify
     <div class="transport"><button id="play" class="primary" disabled>▶ 재생</button><button id="stop" disabled>■ 처음으로</button><button id="compare" disabled>바뀐 곳 비교</button><span id="status" aria-live="polite">준비 중…</span><div class="downloads"><button id="downloadXml" disabled>MusicXML 받기</button><button id="downloadPdf" class="primary" disabled>PDF 받기</button><button id="downloadAudio" disabled>샘플 WAV 받기</button></div></div>
     <div class="controls"><label>재생 음원 <select id="timbre"><option value="piano">피아노 샘플</option><option value="synth">합성음</option></select></label><label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"><span id="speedv">100%</span></label><label id="violinControl" hidden><input id="violin" type="checkbox" checked>바이올린</label><label><input id="rh" type="checkbox" checked><span id="rhLabel">오른손</span></label><label><input id="lh" type="checkbox" checked><span id="lhLabel">왼손</span></label><label><input id="follow" type="checkbox" checked>악보 따라가기</label></div>
   </section>
-  <div class="workspace"><section><div class="score-heading"><h2>악보</h2><a id="permalink" href="#">이 악보 주소</a></div><div class="harmony-switch" role="group" aria-label="화성 표기"><button id="chordSymbols" aria-pressed="true">Chord Symbols · 코드 심벌</button><button id="romanAnalysis" aria-pressed="false">Roman Numeral Analysis</button><small id="harmonyHint">화성 표기 전환은 화면에 적용됩니다. 다운로드는 원본 악보입니다.</small></div><div id="score"><p class="muted">악보를 준비하고 있습니다.</p></div></section><aside class="card" id="about"></aside></div>
+  <div class="workspace"><section><div class="score-heading"><h2>악보</h2><button id="openMotifStudio">모티프 작업실</button><a id="permalink" href="#">이 악보 주소</a></div><div class="harmony-switch" role="group" aria-label="화성 표기"><button id="chordSymbols" aria-pressed="true">Chord Symbols · 코드 심벌</button><button id="romanAnalysis" aria-pressed="false">Roman Numeral Analysis</button><label>위치 <select id="harmonyPlacement"><option value="below">보표 아래</option><option value="original">원래 위치</option></select></label><small id="harmonyHint">화성 표기 전환은 화면에 적용됩니다. 다운로드는 원본 악보입니다.</small></div><div id="score"><p class="muted">악보를 준비하고 있습니다.</p></div></section><aside class="card" id="about"></aside></div>
+  /*MOTIF_PANEL*/
   <footer class="page-footer"><span>MUSICANOTE Virtual Composer</span><span>작곡의 생각을 악보와 소리로.</span></footer>
 </main>
 <script src="/*VEROVIO_SRC*/"></script>
@@ -42,7 +43,7 @@ const MODE = {major:'장조', minor:'단조'};
 const $ = id => document.getElementById(id);
 let tk = null, cur = null, notes = [], staffOf = new Map();
 let timeMap = [], measureIds = new Map();
-let harmonyMode='symbols', harmonyOriginal=new Map();
+let harmonyMode='symbols', harmonyOriginal=new Map(), sourceMei='';
 let compareQueue = [], compareTimer = 0, compareLabel = "";
 let ctx = null, playing = null, raf = 0, lastHl = [], paused = 0;
 
@@ -142,6 +143,33 @@ function render(){
   harmonyOriginal.clear();
   applyHarmonyLabels();
 }
+
+
+function positionHarmony(){
+  if(!sourceMei) return;
+  const mei = new DOMParser().parseFromString(sourceMei, 'application/xml');
+  if($('harmonyPlacement').value === 'below'){
+    // Piano is the last part in these solo/duet scores: analysis below its bass staff.
+    const staves = [...mei.querySelectorAll('scoreDef staffDef')].map(s => Number(s.getAttribute('n')));
+    const lastStaff = Math.max(...staves);
+    for(const harm of mei.querySelectorAll('harm')){
+      harm.setAttribute('place', 'below');
+      if(Number.isFinite(lastStaff)) harm.setAttribute('staff', String(lastStaff));
+    }
+  }
+  tk.loadData(new XMLSerializer().serializeToString(mei));
+}
+$('harmonyPlacement').addEventListener('change', () => {
+  if(!cur) return;
+  const position = playing ? nowMs() : null;
+  cancelComparison();
+  stop();
+  positionHarmony();
+  render();
+  prepare();
+  colorChanges();
+  if(position !== null) play(position);
+});
 
 function applyHarmonyLabels(){
   const groups=[...$('score').querySelectorAll('g.harm')];
@@ -271,6 +299,8 @@ function open(i, comparison = false){
   cur = PIECES[i];
   about(cur);
   if(!tk.loadData(cur.xml)){ $('score').textContent = '악보를 읽지 못했습니다.'; return; }
+  sourceMei=tk.getMEI();
+  positionHarmony();
   render(); prepare(); colorChanges();
   $('pick').value = String(i);
   $('compare').disabled = !cur.info.joins?.length || !PIECES.some(p=>p.piece===cur.piece && p.info.version===cur.info.parent);
@@ -542,5 +572,6 @@ else {
   if(typeof verovio.module._vrvToolkit_constructor==='function') initializeScore();
 }
 </script>
+<script>/*MOTIF_TOOLS*/</script>
 </body>
 </html>

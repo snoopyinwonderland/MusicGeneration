@@ -80,6 +80,8 @@ def _write_page(entries, out, embed_verovio, piano_samples, individual_pages=Fal
             else:
                 item["pdf"] = {"base64":base64.b64encode(Path(entry["_pdf"]).read_bytes()).decode("ascii")}
         public.append(item)
+    page = page.replace("/*MOTIF_PANEL*/", TEMPLATE.with_name("motif_panel.html").read_text(encoding="utf-8"))
+    page = page.replace("/*MOTIF_TOOLS*/", TEMPLATE.with_name("motif_tools.js").read_text(encoding="utf-8"))
     page = page.replace("/*PIECES*/",json.dumps(public,ensure_ascii=False).replace("</","<\\/"))
     if embed_verovio:
         page = page.replace('<script src="/*VEROVIO_SRC*/"></script>',

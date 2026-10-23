@@ -48,7 +48,18 @@ def main() -> None:
     p.add_argument("source", help="솔로 v001 등 버전 폴더")
     p.add_argument("--out", required=True)
     p.add_argument("--feedback", default="", help="이 듀엣을 요청한 사용자 문장 원문")
+    p = sub.add_parser("motif", help="모티프 JSON을 기존 변형 연산으로 발전시키고 미리보기 악보 저장")
+    p.add_argument("source", help="복사·저장한 모티프 JSON")
+    p.add_argument("--out", required=True, help="새 결과 폴더")
+    p.add_argument("--ops", nargs="*", default=[], help="step:1 invert retro aug:2 frag:0:2 등")
+    p.add_argument("--key", default="C")
+    p.add_argument("--mode", choices=["major", "minor"], default="major")
+    p.add_argument("--meter", choices=["2/4", "3/4", "4/4", "6/8"], default="4/4")
     a = ap.parse_args()
+    if a.cmd == "motif":
+        from musigen.motif_clip import develop
+        print(json.dumps(develop(a.source, a.out, a.ops, a.key, a.mode, a.meter), ensure_ascii=False, indent=2))
+        return
     if a.cmd == "duet":
         from musigen.duet import save_duet
         print(json.dumps(save_duet(Path(a.source), Path(a.out), a.feedback), ensure_ascii=False, indent=2))
