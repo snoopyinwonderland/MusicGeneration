@@ -48,6 +48,8 @@ def main() -> None:
     p.add_argument("source", help="솔로 v001 등 버전 폴더")
     p.add_argument("--out", required=True)
     p.add_argument("--feedback", default="", help="이 듀엣을 요청한 사용자 문장 원문")
+    p.add_argument("--instrument", choices=["violin", "viola", "cello"], default="violin", help="피아노와 함께 연주할 현악기")
+    p.add_argument("--lead-octaves", type=int, choices=[-2,-1,0,1,2], default=0, help="현악기 선율만 명시적으로 옥타브 이동")
     p = sub.add_parser("motif", help="모티프 JSON을 기존 변형 연산으로 발전시키고 미리보기 악보 저장")
     p.add_argument("source", help="복사·저장한 모티프 JSON")
     p.add_argument("--out", required=True, help="새 결과 폴더")
@@ -62,7 +64,7 @@ def main() -> None:
         return
     if a.cmd == "duet":
         from musigen.duet import save_duet
-        print(json.dumps(save_duet(Path(a.source), Path(a.out), a.feedback), ensure_ascii=False, indent=2))
+        print(json.dumps(save_duet(Path(a.source), Path(a.out), a.feedback, instrument=a.instrument, lead_octaves=a.lead_octaves), ensure_ascii=False, indent=2))
         return
     if a.cmd == "listen":
         from musigen.listen import build_page

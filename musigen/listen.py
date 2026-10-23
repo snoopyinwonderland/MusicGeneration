@@ -8,9 +8,35 @@ import re
 import shutil
 from pathlib import Path
 from urllib.parse import quote
+from xml.etree import ElementTree as ET
+from musigen.instruments import STRINGS
 
 TEMPLATE = Path(__file__).with_name("listen_template.html")
 VEROVIO_CDN = "https://cdn.jsdelivr.net/npm/verovio@6.3.0/dist/verovio-toolkit-wasm.js"
+
+
+def _instrumentation(xml):
+    score = ET.fromstring(xml)
+    programs = {1: "piano", **{v["program"]: k for k, v in STRINGS.items()}}
+    ids = {}
+    for part in score.findall("./part-list/score-part"):
+        program = int(part.findtext("midi-instrument/midi-program", "1"))
+        if program not in programs:
+            raise ValueError(f"지원하지 않는 재생 악기 프로그램: {program}")
+        ids[part.get("id")] = programs[program]
+    staffs, n = {}, 1
+    for part in score.findall("part"):
+        instrument = ids[part.get("id")]
+        counts = {int(x.text) for x in part.findall("./measure/attributes/staves")}
+        if len(counts) > 1:
+            raise ValueError("재생 중 보표 수가 바뀌는 악보는 지원하지 않습니다")
+        count = next(iter(counts), 1)
+        for local in range(1, count + 1):
+            staffs[str(n)] = {"instrument": instrument, "lh": instrument == "piano" and local == 2}
+            n += 1
+    names = list(dict.fromkeys(x["instrument"] for x in staffs.values()))
+    label = " · ".join("피아노" if x == "piano" else STRINGS[x]["ko"] for x in names)
+    return {"staffs":staffs, "instruments":names, "label":label if names != ["piano"] else "피아노 솔로"}
 
 
 def _entry(vdir: Path) -> dict:
@@ -19,12 +45,17 @@ def _entry(vdir: Path) -> dict:
     read = lambda name: json.loads((vdir / name).read_text(encoding="utf-8"))
     design, score, info = read("design.json"), read("score.json"), read("version.json")
     piece = build(design, score)
+    # Reflect an explicit string octave shift in articulation pitch matching and bass analysis.
+    for note in piece.notes:
+        if note.hand == "rh" and note.voice == 1 and info.get("lead_octaves"):
+            note.pitches = [(m + 12 * info["lead_octaves"], tpc) for m, tpc in note.pitches]
     performance = playback(piece)
     from musigen.harmony_labels import analyze
     harmony = analyze(piece)
+    xml = (vdir / "piece.musicxml").read_text(encoding="utf-8")
     pdf = vdir / "piece.pdf"
     return {"harmony":harmony, "performance":performance, "piece":vdir.parent.name,
-            "xml":(vdir / "piece.musicxml").read_text(encoding="utf-8"),
+            "xml":xml, "instrumentation":_instrumentation(xml),
             "design":design, "checks":read("checks.json"), "info":info,
             "_pdf":str(pdf) if pdf.exists() else None}
 
@@ -59,9 +90,10 @@ def _write_page(entries, out, embed_verovio, piano_samples, individual_pages=Fal
     icon = TEMPLATE.with_name("assets").joinpath("favicon.svg").read_text(encoding="utf-8").strip()
     page = page.replace("/*FAVICON*/", "data:image/svg+xml," + quote(icon))
     instruments = {"piano"} if piano_samples else set()
-    if piano_samples and any(e["info"].get("ensemble") == "violin_piano" for e in entries):
-        instruments.add("violin")
-    for instrument, token in (("piano","/*PIANO_SAMPLES*/"),("violin","/*VIOLIN_SAMPLES*/")):
+    if piano_samples:
+        instruments.update(i for e in entries for i in e["instrumentation"]["instruments"])
+    for instrument in ("piano", *STRINGS):
+        token = f"/*{instrument.upper()}_SAMPLES*/"
         value = None
         if instrument in instruments:
             source = TEMPLATE.parent / "assets" / instrument

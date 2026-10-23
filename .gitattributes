@@ -4,3 +4,5 @@ musigen/assets/piano/UPSTREAM_README.md -text
 musigen/assets/violin/*.json -text
 musigen/assets/violin/UPSTREAM_README.md -text
 docs/listen/assets/*.json -text
+musigen/assets/viola/*.json -text
+musigen/assets/cello/*.json -text

@@ -25,7 +25,7 @@ main{max-width:1468px;margin:auto;padding:0 24px 40px}.hero{display:flex;justify
   <section class="hero"><div><div class="eyebrow">MUSICANOTE · 작곡과 감상</div><h1 id="workTitle">새로운 음악의 자리</h1><p id="workScene">악보를 읽고, 소리로 만나 보세요.</p><div class="meta" id="workMeta"></div></div><div class="hero-art" aria-hidden="true"></div></section>
   <section class="player" aria-label="재생과 악보 받기">
     <div class="transport"><button id="play" class="primary" disabled>▶ 재생</button><button id="stop" disabled>■ 처음으로</button><button id="compare" disabled>바뀐 곳 비교</button><span id="status" aria-live="polite">준비 중…</span><div class="downloads"><button id="downloadXml" disabled>MusicXML 받기</button><button id="downloadPdf" class="primary" disabled>PDF 받기</button><button id="downloadAudio" disabled>샘플 WAV 받기</button></div></div>
-    <div class="controls"><label>재생 음원 <select id="timbre"><option value="piano">피아노 샘플</option><option value="synth">합성음</option></select></label><label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"><span id="speedv">100%</span></label><label id="violinControl" hidden><input id="violin" type="checkbox" checked>바이올린</label><label><input id="rh" type="checkbox" checked><span id="rhLabel">오른손</span></label><label><input id="lh" type="checkbox" checked><span id="lhLabel">왼손</span></label><label><input id="follow" type="checkbox" checked>악보 따라가기</label></div>
+    <div class="controls"><label>재생 음원 <select id="timbre"><option value="piano">피아노 샘플</option><option value="synth">합성음</option></select></label><label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"><span id="speedv">100%</span></label><label id="violinControl" hidden><input id="violin" type="checkbox" checked>바이올린</label><label id="violaControl" hidden><input id="viola" type="checkbox" checked>비올라</label><label id="celloControl" hidden><input id="cello" type="checkbox" checked>첼로</label><label><input id="rh" type="checkbox" checked><span id="rhLabel">오른손</span></label><label><input id="lh" type="checkbox" checked><span id="lhLabel">왼손</span></label><label><input id="follow" type="checkbox" checked>악보 따라가기</label></div>
   </section>
   <div class="workspace"><section><div class="score-heading"><h2>악보</h2><button id="openMotifStudio">모티프 작업실</button><a id="permalink" href="#">이 악보 주소</a></div><div class="harmony-switch" role="group" aria-label="화성 표기"><button id="chordSymbols" aria-pressed="true">Chord Symbols · 코드 심벌</button><button id="romanAnalysis" aria-pressed="false">Roman Numeral Analysis</button><label>위치 <select id="harmonyPlacement"><option value="below">보표 아래</option><option value="original">원래 위치</option></select></label><small id="harmonyHint">화성 표기 전환은 화면에 적용됩니다. 다운로드는 원본 악보입니다.</small></div><div id="score"><p class="muted">악보를 준비하고 있습니다.</p></div></section><aside class="card" id="about"></aside></div>
   /*MOTIF_PANEL*/
@@ -36,7 +36,14 @@ main{max-width:1468px;margin:auto;padding:0 24px 40px}.hero{display:flex;justify
 const PIECES = /*PIECES*/;
 const PIANO_BANK = /*PIANO_SAMPLES*/;
 const VIOLIN_BANK = /*VIOLIN_SAMPLES*/;
+const VIOLA_BANK = /*VIOLA_SAMPLES*/;
+const CELLO_BANK = /*CELLO_SAMPLES*/;
 const violinBuffers = new Map();
+const violaBuffers = new Map();
+const celloBuffers = new Map();
+const stringBuffers = {violin:violinBuffers, viola:violaBuffers, cello:celloBuffers};
+const ensembleLabel = p => p.instrumentation.label;
+const hasStrings = p => p.instrumentation.instruments.some(i=>i!=='piano');
 const pianoBuffers = new Map();
 let pianoReady = false;
 const FUNCTIONS = {intro:'도입',statement:'제시',development:'발전',contrast:'대조',transition:'연결',return:'재현',coda:'종결'};
@@ -70,14 +77,14 @@ function ranges(bars){
 function about(p){
   const d = p.design, b = d.basics, imp = d.impression || {}, th = d.theme || {}, c = p.checks, v = p.info;
   const last = d.form[d.form.length - 1].bars[1];
-  const duet = v.ensemble==='violin_piano';
+  const duet = hasStrings(p);
   $('workTitle').textContent=d.title || p.piece;
   $('workScene').textContent=imp.arc || imp.scene || '악보를 읽고, 소리로 만나 보세요.';
-  $('workMeta').innerHTML=[duet?'바이올린 · 피아노':'피아노 솔로',`${b.key} ${MODE[b.mode]}`,b.meter,`약 ${Math.round(c.stats.seconds)}초`,v.version].map(x=>`<span>${esc(x)}</span>`).join('');
+  $('workMeta').innerHTML=[ensembleLabel(p),`${b.key} ${MODE[b.mode]}`,b.meter,`약 ${Math.round(c.stats.seconds)}초`,v.version].map(x=>`<span>${esc(x)}</span>`).join('');
   document.title=`${d.title} · ${duet?'듀엣':'피아노 솔로'} | MUSICANOTE Virtual Composer`;
   let h = `<h2>작곡 노트</h2>`;
   if(d.credits?.composer) h += `<p class="muted">작곡: ${esc(d.credits.composer)}<br>${esc(d.credits.note || '')}</p>`;
-  if(duet) h += '<p class="muted">피아노 솔로의 주선율을 바이올린이 이어받습니다. 피아노는 안쪽 응답과 베이스를 연주합니다.</p>';
+  if(duet) h += `<p class="muted">${esc(v.interpretation || ensembleLabel(p))}</p>`;
   if(d.request) h += `<blockquote>${esc(d.request)}</blockquote>`;
   h += `<div>${esc(b.key)} ${MODE[b.mode] || ''} · ${esc(b.meter)} · 빠르기 ${b.tempo} · ${last}마디(약 ${Math.round(c.stats.seconds)}초) · ${b.grade || 6}급${b.swing ? ' · 스윙(8분음 2:1로 재생)' : ''}</div>`;
   if(imp.arc) h += `<div class="muted">흐름: ${esc(imp.arc)}</div>`;
@@ -137,7 +144,7 @@ function about(p){
   if(PIANO_BANK) h += `<details><summary>재생 음원 출처</summary>FluidR3_GM — Frank Wen 및 기여자(© 2000–2002, 2008), MP3 패키징 Benjamin Gleitzman.
     <a href="https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef">원본</a> ·
     <a href="https://creativecommons.org/licenses/by/3.0/us/">CC BY 3.0 US</a>.
-    피아노 MIDI 21–108, 바이올린 21–99에서 3반음마다 선택, JSON/MIME 변환; MP3 바이트 유지. 샘플별 진폭과 가까운 음의 높이를 조절합니다. 피아노에는 악보의 페달을, 바이올린에는 약식 지속 루프를 적용합니다. 실제 연주자의 터치와 활은 재현하지 않습니다.
+    피아노·바이올린·비올라·첼로 중 악보에 필요한 샘플을 포함합니다. 지원 음역을 덮도록 3반음 간격으로 선택, JSON/MIME 변환; MP3 바이트 유지. 샘플별 진폭과 가까운 음의 높이를 조절합니다. 피아노에는 악보의 페달을, 현악기에는 약식 지속 루프를 적용합니다. 실제 연주자의 터치와 활은 재현하지 않습니다.
     WAV 저장 시 함께 받는 출처 파일을 보관해 주세요.</details>`;
   $('about').innerHTML = h;
 }
@@ -251,8 +258,9 @@ function prepare(){
         if(Math.abs(frac-.5)<1e-3){ t+=late; d=Math.max(quarter/8,d-late); }
         else if(frac<1e-3 && Math.abs(d-quarter/2)<quarter/20) d+=late;
       }
-      const staff=staffOf.get(id), duet=cur.info.ensemble==='violin_piano';
-      notes.push({id,t,d,p:v.pitch,lh:staff===(duet?'3':'2'),instrument:duet&&staff==='1'?'violin':'piano',q:e.qstamp,level:1});
+      const staff=staffOf.get(id), route=cur.instrumentation.staffs[staff];
+      if(!route) throw Error('악기의 보표를 찾지 못했습니다: '+staff);
+      notes.push({id,t,d,p:v.pitch,...route,q:e.qstamp,level:1});
     }
   }
   notes.sort((a, b) => a.t - b.t);
@@ -292,7 +300,7 @@ function applyPerformance(){
     if(art==='staccato') release=n.t+n.d*.5;
     if(art==='tenuto') release=n.t+n.d;
     // Sustain affects the acoustic release, not notation/highlight. tone() retains its decay.
-    if(n.instrument!=='violin'){
+    if(n.instrument==='piano'){
       const keyRelease=release;
       const ped=ex.find(e=>e.kind==='pedal' && qMs(e.start)<=keyRelease && keyRelease<qMs(e.end));
       if(ped){
@@ -320,11 +328,11 @@ function open(i, comparison = false){
   $('stop').disabled = false;
   $('downloadAudio').disabled = !pianoReady;
   $('downloadXml').disabled=false; $('downloadPdf').disabled=!cur.pdf;
-  const duet=cur.info.ensemble==='violin_piano';
-  $('violinControl').hidden=!duet;
+  const duet=hasStrings(cur);
+  for(const id of Object.keys(stringBuffers)) $(id+'Control').hidden=!cur.instrumentation.instruments.includes(id);
   $('rhLabel').textContent=duet?'피아노 오른손':'오른손';
   $('lhLabel').textContent=duet?'피아노 왼손':'왼손';
-  $('timbre').options[0].textContent=duet?'바이올린·피아노 샘플':'피아노 샘플';
+  $('timbre').options[0].textContent=duet?ensembleLabel(cur)+' 샘플':'피아노 샘플';
   $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`;
   const fragment = `piece=${encodeURIComponent(cur.piece)}&version=${encodeURIComponent(cur.info.version)}`;
   if(!comparison){ try{ history.replaceState(null,'','#'+fragment); }catch{} }
@@ -370,16 +378,18 @@ async function preparePiano(){
   if(!PIANO_BANK){ $('timbre').value='synth'; $('timbre').options[0].disabled=true; return; }
   $('status').textContent='음원 준비 중…';
   try{
-    await Promise.all([decodeBank(PIANO_BANK,pianoBuffers),decodeBank(VIOLIN_BANK,violinBuffers)]);
+    await Promise.all([decodeBank(PIANO_BANK,pianoBuffers),decodeBank(VIOLIN_BANK,violinBuffers),decodeBank(VIOLA_BANK,violaBuffers),decodeBank(CELLO_BANK,celloBuffers)]);
     pianoReady=true;
     $('play').disabled=!cur; $('downloadAudio').disabled=!cur;
     $('status').textContent='재생 준비됨';
   }catch(e){ $('status').textContent='음원을 불러오지 못했습니다. 합성음을 선택할 수 있습니다.'; console.error(e); }
 }
-function violinTone(audio,when,dur,pitch,level){
-  const keys=[...violinBuffers.keys()], key=keys.reduce((a,b)=>Math.abs(b-pitch)<Math.abs(a-pitch)?b:a);
+function stringTone(audio,when,dur,pitch,level,instrument){
+  const buffers=stringBuffers[instrument];
+  if(!buffers?.size) throw Error("현악기 음원이 없습니다: "+instrument);
+  const keys=[...buffers.keys()], key=keys.reduce((a,b)=>Math.abs(b-pitch)<Math.abs(a-pitch)?b:a);
   const source=audio.createBufferSource(), gain=audio.createGain();
-  source.buffer=violinBuffers.get(key); source.playbackRate.value=2**((pitch-key)/12);
+  source.buffer=buffers.get(key); source.playbackRate.value=2**((pitch-key)/12);
   source.loop=true;
   source.loopStart=Math.min(.35,source.buffer.duration*.25);
   source.loopEnd=Math.min(1.4,source.buffer.duration-.15);
@@ -390,12 +400,12 @@ function violinTone(audio,when,dur,pitch,level){
   gain.gain.exponentialRampToValueAtTime(.00001,when+dur+.12);
   source.start(when); source.stop(when+dur+.15); return [source];
 }
-const audible=n=>n.instrument==='violin'?$('violin').checked:(n.lh?$('lh').checked:$('rh').checked);
+const audible=n=>n.instrument!=='piano'?$(n.instrument).checked:(n.lh?$('lh').checked:$('rh').checked);
 function sampleTone(audio,when,dur,n){
-  return n.instrument==='violin'?violinTone(audio,when,dur,n.p,.075*n.level):pianoTone(audio,when,dur,n.p,(n.lh?.045:.085)*n.level);
+  return n.instrument!=='piano'?stringTone(audio,when,dur,n.p,.075*n.level,n.instrument):pianoTone(audio,when,dur,n.p,(n.lh?.045:.085)*n.level);
 }
 function tone(when, dur, pitch, level, instrument="piano"){
-  if($('timbre').value==='piano') return instrument==='violin'?violinTone(ctx,when,dur,pitch,level):pianoTone(ctx,when,dur,pitch,level);
+  if($('timbre').value==='piano') return instrument!=='piano'?stringTone(ctx,when,dur,pitch,level,instrument):pianoTone(ctx,when,dur,pitch,level);
   const f = 440 * 2 ** ((pitch - 69) / 12), g = ctx.createGain(), lp = ctx.createBiquadFilter();
   lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * 6);
   const parts = [[1, 1, 'triangle'], [2, .35, 'sine'], [3, .12, 'sine']].map(([h, a, type]) => {
@@ -421,7 +431,7 @@ function play(fromMs = 0, untilMs = endMs(), done = null){
   for(const n of notes){
     if(n.t >= untilMs || n.t + n.d <= fromMs || !audible(n)) continue;
     const start = Math.max(0, n.t - fromMs), dur = Math.min(n.t+n.d,untilMs)-Math.max(fromMs,n.t);
-    oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, (n.instrument==='violin'?.075:n.lh?.045:.085) * n.level, n.instrument));
+    oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, (n.instrument!=='piano'?.075:n.lh?.045:.085) * n.level, n.instrument));
   }
   playing = {oscs, t0, fromMs, k, untilMs, done};
   $('play').textContent = '❚❚ 일시정지';
@@ -541,7 +551,7 @@ $('downloadAudio').addEventListener('click',async()=>{
     const rendered=await audio.startRendering();
     const base=`${selected.piece}-${selected.info.version}`;
     download(wavBlob(rendered),base+'.wav');
-    const notice=`${selected.design.title} · ${selected.info.version}\n악기 샘플: FluidR3_GM — Frank Wen 및 기여자 (© 2000–2002, 2008). MP3 패키징 Benjamin Gleitzman.\nCC BY 3.0 US https://creativecommons.org/licenses/by/3.0/us/\n원본 https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef\n3반음 간격 샘플을 선택해 JSON으로 변환, MP3 유지. 샘플별 진폭 정규화와 음 이동·길이 조절. 피아노는 페달, 바이올린은 약식 지속 루프를 적용한 렌더링.\n이 샘플 출처는 악보 자체의 권리와 별개입니다.\n`;
+    const notice=`${selected.design.title} · ${selected.info.version}\n악기 샘플: FluidR3_GM — Frank Wen 및 기여자 (© 2000–2002, 2008). MP3 패키징 Benjamin Gleitzman.\nCC BY 3.0 US https://creativecommons.org/licenses/by/3.0/us/\n원본 https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef\n3반음 간격 샘플을 선택해 JSON으로 변환, MP3 유지. 샘플별 진폭 정규화와 음 이동·길이 조절. 피아노는 페달, 현악기는 약식 지속 루프를 적용한 렌더링.\n이 샘플 출처는 악보 자체의 권리와 별개입니다.\n`;
     download(new Blob([notice],{type:'text/plain;charset=utf-8'}),base+'-출처.txt');
   }catch(e){ $('status').textContent='음원 저장 실패: '+e.message; }
   finally{ button.disabled=false; button.textContent='샘플 WAV 받기'; }
@@ -554,7 +564,7 @@ window.addEventListener('hashchange',()=>{
 $('play').addEventListener('click', () => { cancelComparison(); if(playing) paused = stop(true); else { play(paused); paused = 0; } });
 $('stop').addEventListener('click', () => { cancelComparison(); paused = 0; stop(); $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`; });
 $('speed').addEventListener('input', () => { $('speedv').textContent = $('speed').value + '%'; if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
-for(const id of ['rh', 'lh', 'violin']) $(id).addEventListener('change', () => { if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
+for(const id of ['rh', 'lh', 'violin', 'viola', 'cello']) $(id).addEventListener('change', () => { if(playing){ const p=nowMs(); cancelComparison(); play(p); } });
 $('pick').addEventListener('change', () => open(+$('pick').value));
 $('score').addEventListener('click', e => {
   const g = e.target.closest('g.note'); if(!g || !tk) return;
@@ -563,7 +573,7 @@ $('score').addEventListener('click', e => {
 let rt = 0;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if(cur){ const p = playing ? nowMs() : null; cancelComparison(); stop(); render(); prepare(); colorChanges(); if(p != null) play(p); } }, 300); });
 
-$('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.title || p.piece)} · ${p.info.ensemble==='violin_piano'?'듀엣':'피아노 솔로'} · ${esc(p.info.version)}</option>`).join('');
+$('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.title || p.piece)} · ${esc(ensembleLabel(p))} · ${esc(p.info.version)}</option>`).join('');
 function initializeScore(){
   if(tk) return;
   // The embedded sample bank can finish downloading after WASM is already ready.

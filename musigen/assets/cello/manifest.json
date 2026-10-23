@@ -1,0 +1,157 @@
+{
+  "format": "musicanote-sample-manifest-v1",
+  "sourceRevision": "044fab8e1456bfafc5776e86dfd6bb8697149aef",
+  "sourceRepository": "https://github.com/gleitz/midi-js-soundfonts",
+  "license": "CC-BY-3.0-US",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0/us/",
+  "readmeSha256": "e42378ee860c7f866f6e6d3f60ba80a19e99ed218b5e292d2431d94a5dd5b8f4",
+  "adaptation": "Selected every third semitone covering the supported audition range; original MP3 bytes retained",
+  "instruments": {
+    "cello": {
+      "file": "cello.json",
+      "sha256": "c11fa97e34d0526329e26b18c3ac9a0f0936158f8712e631f4ba8c4002847d87",
+      "notes": [
+        36,
+        39,
+        42,
+        45,
+        48,
+        51,
+        54,
+        57,
+        60,
+        63,
+        66,
+        69,
+        72,
+        75,
+        78,
+        81
+      ],
+      "sampleSha256": {
+        "36": "b067cad9857d8fd2651ee6b2661fefd8b7305fae8227f6834f203d81c98c1e1c",
+        "39": "687b478a287c19b22b9ea0be675f78e4a7de29efa8c7da955878504fbf455bd5",
+        "42": "8234567cc225a0bda39041749407a77dafda1949f987e11736c9af7a6a08bc17",
+        "45": "aa18efdb1093f29ed02248f4be834d544bc483f82218bb3ff167eb09daa8d806",
+        "48": "945c6f8243bbe13309a5938fb55483fd215bb760e41c77e21c890714c1d9f7ec",
+        "51": "080786c62520a9f950dbd8dc3f737993c0be64b06d1a4b7f282931a97d7dd60b",
+        "54": "e12363ae687cbf7888ead7e7e943df6895ae2c9ac18bced761160c5ea17bdff6",
+        "57": "ffabf414fcd7431e4f689d05637ebac7f04cf4e0244b0d8616016f838a7d600f",
+        "60": "0495b262618c14e6b2d37f9457019ffc79d6bcd9b0571f626760aa1a497bb45b",
+        "63": "86c7a6adffa21878989e03bd4453bc21fa549c5b72cc8eee2227ef6e889a3763",
+        "66": "5be8caab906d4a28d06003ffcb80a933bd0a59e6f33f07da01b2eb0d9176a601",
+        "69": "cd9f3a2632bffdebd910278be56863f2f96767d0c854b52830ef1767c0d511ba",
+        "72": "8fb8fa3e1e8a855c0fd1466bec0450bfde80e503907407bda1f7f966d63f9fb2",
+        "75": "8cff6d68bc50b2211b57ca83685c905f4fb4f5771a4b3ac59b9ba1a1910c6726",
+        "78": "91ce319c70f5d7de97addbda67f4c1c8a3e57bef4d3c01fa5b7944c58823d2f8",
+        "81": "d0e512725709e776795a6322bdc8c0f3f6b712f154bcb80ceb454bc404e5ef32"
+      },
+      "playbackRange": [
+        36,
+        79
+      ],
+      "maxEdgePitchShift": 1,
+      "sourceUrl": "https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/044fab8e1456bfafc5776e86dfd6bb8697149aef/FluidR3_GM/cello-mp3.js",
+      "sourceSha256": "fc72c9351e0dda586802f97a1b890e415640f54dc6cc397bd5dc32b078f6ce4c",
+      "audioAudit": [
+        {
+          "midi": 36,
+          "peak": 0.1120072454214096,
+          "rms": 0.034081019275153356,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 39,
+          "peak": 0.11255276203155518,
+          "rms": 0.03520049720378284,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 42,
+          "peak": 0.11163970828056335,
+          "rms": 0.033233272459763645,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 45,
+          "peak": 0.1126975268125534,
+          "rms": 0.03956693024012623,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 48,
+          "peak": 0.11213085055351257,
+          "rms": 0.03907026280373481,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 51,
+          "peak": 0.11371171474456787,
+          "rms": 0.030627328901121,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 54,
+          "peak": 0.1119220182299614,
+          "rms": 0.04294852696249554,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 57,
+          "peak": 0.11436039209365845,
+          "rms": 0.0330256614325006,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 60,
+          "peak": 0.1142694503068924,
+          "rms": 0.036825310059231856,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 63,
+          "peak": 0.1161310002207756,
+          "rms": 0.028482009036685497,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 66,
+          "peak": 0.11541902273893356,
+          "rms": 0.03434017814647806,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 69,
+          "peak": 0.1164458617568016,
+          "rms": 0.03138606405361248,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 72,
+          "peak": 0.09014646708965302,
+          "rms": 0.026892418648660377,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 75,
+          "peak": 0.11342079937458038,
+          "rms": 0.03293911746754075,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 78,
+          "peak": 0.11240551620721817,
+          "rms": 0.035303665804723876,
+          "seconds": 3.128888888888889
+        },
+        {
+          "midi": 81,
+          "peak": 0.11433634161949158,
+          "rms": 0.022563412983324774,
+          "seconds": 3.128888888888889
+        }
+      ],
+      "audioAuditEngine": "Chromium Web Audio decodeAudioData, 44100 Hz PCM"
+    }
+  }
+}

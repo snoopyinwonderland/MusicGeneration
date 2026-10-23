@@ -35,7 +35,7 @@ async function main(){
           return {pages,log:renderer.getLog()};
         },xml);
         if(result.log) throw Error(result.log);
-        const ensemble=info.ensemble==='violin_piano'?'바이올린 · 피아노':'피아노 솔로';
+        const ensemble=({violin_piano:'바이올린 · 피아노',viola_piano:'비올라 · 피아노',cello_piano:'첼로 · 피아노'})[info.ensemble] || '피아노 솔로';
         const composer=design.credits?.composer ? ` · 작곡 ${design.credits.composer}` : '';
         await page.addStyleTag({content:`@page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;color:#172d2b;font-family:'Malgun Gothic',sans-serif}.sheet{width:210mm;height:297mm;padding:12mm 16mm 10mm;break-after:page}.sheet:last-child{break-after:auto}header{height:19mm;display:flex;justify-content:space-between;align-items:start;border-bottom:.2mm solid #c7cfc6;margin-bottom:2mm}h1{font-size:17pt;margin:0 0 2mm}p{font-size:8pt;margin:0;color:#53625d}.brand{font:8pt Georgia,serif;letter-spacing:.4mm;text-align:right;padding-top:2mm}.music{height:249mm}.music svg{width:178mm;height:249mm;display:block}footer{height:5mm;font-size:8pt;color:#53625d;display:flex;justify-content:space-between}`});
         await page.evaluate(({pages,title,ensemble,composer,version,escapeStrings})=>{

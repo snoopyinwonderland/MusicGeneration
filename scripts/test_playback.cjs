@@ -22,3 +22,7 @@ test('piano pedal never extends the violin',()=>{
 test('without pedal, existing gate duration stays unchanged',()=>{
  assert.equal(render([]).d,950);
 });
+
+for(const instrument of ['viola','cello']) test('piano pedal never extends '+instrument,()=>{
+ assert.equal(render([{kind:'pedal',start:0,changes:[],end:3}],instrument).d,950);
+});
