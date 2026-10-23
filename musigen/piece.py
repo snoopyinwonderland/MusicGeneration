@@ -79,6 +79,7 @@ class Piece:
     bar_keys: dict[int, Key] = field(default_factory=dict)
     motifs: dict[str, list[Ev]] = field(default_factory=dict)
     analysis_chords: list = field(default_factory=list)
+    pedal_notation: str = "line"
 
     def bar_start(self, bar: int) -> F:
         return F(0) if bar == 0 else self.pickup + (bar - 1) * self.bar_len
@@ -202,6 +203,9 @@ def build(design: dict, score: dict) -> Piece:
         except NotationError as e:
             raise ScoreError(f"motif {mid}: {e}") from e
     piece = Piece(design.get("title", "Untitled"), key, meter, qpm(b), n_bars)
+    piece.pedal_notation = score.get("pedal_notation", "line")
+    if piece.pedal_notation not in ("line", "signs"):
+        raise ScoreError("pedal_notation은 line 또는 signs여야 합니다")
     piece.pickup = pickup(b)
     piece.motifs = motifs
     timeline: dict[str, list[tuple[F, Ev, Key]]] = {v: [] for v in VOICES}

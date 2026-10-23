@@ -64,8 +64,23 @@ def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
     beats, beat_type = (int(x) for x in piece.meter.split("/"))
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    return write_score(path, piece.title, [part], measures, beats, beat_type, piece.key.sharps, piece.key.minor,
-                       tempo=piece.qpm, subtitle=subtitle)
+    written = write_score(path, piece.title, [part], measures, beats, beat_type, piece.key.sharps, piece.key.minor,
+                          tempo=piece.qpm, subtitle=subtitle)
+    return pedal_notation(written, piece.pedal_notation)
+
+
+def pedal_notation(path: Path, style: str) -> Path:
+    """Optional Ped/* notation; timing and start/change/stop semantics are unchanged.
+
+    Verovio 6.3's line-mode change hid all later pedal marks in the 2026-10-24
+    composition trial. Symbol mode rendered every mark. Keep legacy line default.
+    """
+    if style == "signs":
+        xml = path.read_text(encoding="utf-8")
+        xml = re.sub(r'<pedal\b[^>]*/>',
+                     lambda m: m.group().replace('line="yes" sign="no"', 'line="no" sign="yes"'), xml)
+        path.write_text(xml, encoding="utf-8")
+    return path
 
 
 def write_midi(musicxml: Path, path: Path) -> Path | None:

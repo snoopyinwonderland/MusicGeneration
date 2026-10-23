@@ -11,7 +11,7 @@ import json
 
 from musicomp.core.score import Measure
 from musicomp.realize.musicxml import OutPart, write_score
-from musigen.piano_io import piano_part, write_midi
+from musigen.piano_io import piano_part, write_midi, pedal_notation
 from musigen.piece import build
 from musigen.instruments import preset
 
@@ -46,8 +46,9 @@ def write_duet(piece, path, subtitle="", instrument="violin", lead_octaves=0):
     measures += [Measure(i + len(measures), str(i + 1), piece.bar_start(i + 1), piece.bar_len, piece.bar_len)
                  for i in range(piece.bars)]
     beats, beat_type = map(int, piece.meter.split("/"))
-    return write_score(Path(path), piece.title, [violin, piano], measures, beats, beat_type,
-                       piece.key.sharps, piece.key.minor, tempo=piece.qpm, subtitle=subtitle)
+    written = write_score(Path(path), piece.title, [violin, piano], measures, beats, beat_type,
+                          piece.key.sharps, piece.key.minor, tempo=piece.qpm, subtitle=subtitle)
+    return pedal_notation(written, piece.pedal_notation)
 
 
 INTERPRETATION = "오른손 첫 성부를 바이올린으로, 안쪽 응답과 베이스를 피아노에 배치. 원래 음과 리듬을 보존."

@@ -1,0 +1,388 @@
+{
+  "motifs": {
+    "a": "r/e (A4/e C5/q D5/e E5/e C5/q)",
+    "b": "(F4/q A4/e G4/e F4/q) r/q"
+  },
+  "blocks": [
+    {
+      "bars": "1",
+      "rh": {
+        "motif": "a"
+      },
+      "lh": {
+        "pattern": "alberti",
+        "chords": "Fmaj7",
+        "bass_range": [
+          36,
+          48
+        ]
+      },
+      "dyn": "p",
+      "text": "Andante · 가볍게"
+    },
+    {
+      "bars": "2",
+      "rh": {
+        "motif": "b"
+      },
+      "lh": {
+        "pattern": "alberti",
+        "chords": "Dm7",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "3",
+      "rh": {
+        "motif": "a",
+        "pitches": "Bb4 D5 E5 F5 D5"
+      },
+      "lh": {
+        "pattern": "alberti",
+        "chords": "Gm7",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "4",
+      "rh": "(C5/h Bb4/q) r/q",
+      "lh": {
+        "pattern": "shell",
+        "chords": "C7",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "5",
+      "rh": {
+        "motif": "a"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "Fmaj7/A",
+        "bass_range": [
+          36,
+          48
+        ]
+      },
+      "dyn": "mp",
+      "text": "조금 더 따뜻하게"
+    },
+    {
+      "bars": "6",
+      "rh": {
+        "motif": "b",
+        "pitches": "D5 F5 E5 D5"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "Bbmaj7",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "7",
+      "rh": "(G4/q Bb4/q E5/q G5/q)",
+      "lh": {
+        "pattern": "broken",
+        "chords": "Gm7:2 C7:2",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "8",
+      "rh": "F5/h r/h",
+      "chords": "F",
+      "lh": "[F2,C3]/h r/h",
+      "rh2": "[A4,C5]/h r/h"
+    },
+    {
+      "bars": "9-10",
+      "rh": {
+        "motif": "a",
+        "ops": [
+          "aug:2"
+        ]
+      },
+      "lh": {
+        "pattern": "bass",
+        "chords": "Dm7 Am7",
+        "bass_range": [
+          36,
+          48
+        ]
+      },
+      "dyn": "mp",
+      "text": "멀어진 기억",
+      "rh2": "r/h F4/h | E4/h r/h"
+    },
+    {
+      "bars": "11",
+      "rh": {
+        "motif": "a",
+        "pitches": "A5 G5 F5 E5 D5"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "Gm7",
+        "bass_range": [
+          36,
+          48
+        ]
+      },
+      "dyn": "mf",
+      "text": "펼쳐지며"
+    },
+    {
+      "bars": "12",
+      "rh": {
+        "motif": "b",
+        "pitches": "E5 G5 F5 E5"
+      },
+      "lh": {
+        "pattern": "broken",
+        "chords": "C7",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "13",
+      "rh": {
+        "motif": "a"
+      },
+      "lh": {
+        "pattern": "alberti",
+        "chords": "Fmaj7",
+        "bass_range": [
+          36,
+          48
+        ]
+      },
+      "dyn": "p",
+      "text": "처음의 인사"
+    },
+    {
+      "bars": "14",
+      "rh": {
+        "motif": "b",
+        "pitches": "D5 F5 E5 D5"
+      },
+      "lh": {
+        "pattern": "alberti",
+        "chords": "Bbmaj7",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "15",
+      "rh": "(G4/q Bb4/q E5/q G4/q)",
+      "lh": {
+        "pattern": "alberti",
+        "chords": "Gm7:2 C7:2",
+        "bass_range": [
+          36,
+          48
+        ]
+      }
+    },
+    {
+      "bars": "16",
+      "rh": "F4/h r/h",
+      "chords": "F",
+      "lh": "[F2,C3]/h r/h",
+      "rh2": "[A3,C4]/h r/h"
+    },
+    {
+      "bars": "17",
+      "rh": [
+        {
+          "motif": "a",
+          "ops": [
+            "frag:0:3"
+          ]
+        },
+        "(A4/q G4/q)"
+      ],
+      "lh": {
+        "pattern": "shell",
+        "chords": "Fmaj7",
+        "bass_range": [
+          36,
+          48
+        ]
+      },
+      "dyn": "p",
+      "text": "짧은 답장"
+    },
+    {
+      "bars": "18",
+      "rh": {
+        "motif": "b"
+      },
+      "lh": {
+        "pattern": "shell",
+        "chords": "Bbmaj7",
+        "bass_range": [
+          36,
+          48
+        ]
+      },
+      "rh2": "D4/h r/h"
+    },
+    {
+      "bars": "19",
+      "rh": "(E4/q G4/q C5/q) r/q",
+      "chords": "C7",
+      "lh": "C3/h [G3,Bb3]/q r/q"
+    },
+    {
+      "bars": "20",
+      "rh": "F4/w_",
+      "chords": "F",
+      "lh": "[F2,C3]/w",
+      "rh2": "[A3,C4]/w",
+      "dyn": "pp",
+      "text": "고요하게"
+    }
+  ],
+  "expression": [
+    {
+      "bars": "1",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "2",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "3",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "4",
+      "pedal": "held",
+      "release": "1"
+    },
+    {
+      "bars": "5",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "6",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "7",
+      "pedal": "chord",
+      "release": "1/4"
+    },
+    {
+      "bars": "8",
+      "pedal": "held",
+      "release": "2"
+    },
+    {
+      "bars": "9",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "10",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "11",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "12",
+      "pedal": "held",
+      "release": "1"
+    },
+    {
+      "bars": "13",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "14",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "15",
+      "pedal": "chord",
+      "release": "1/4"
+    },
+    {
+      "bars": "16",
+      "pedal": "held",
+      "release": "2"
+    },
+    {
+      "bars": "17",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "18",
+      "pedal": "held",
+      "release": "1/4"
+    },
+    {
+      "bars": "19",
+      "pedal": "held",
+      "release": "1"
+    },
+    {
+      "bars": "20",
+      "pedal": "held",
+      "release": "0"
+    },
+    {
+      "bars": "5-7",
+      "hairpin": "cresc"
+    },
+    {
+      "bars": "9-11",
+      "hairpin": "cresc"
+    },
+    {
+      "bars": "12",
+      "hairpin": "dim"
+    },
+    {
+      "bars": "17-19",
+      "hairpin": "dim"
+    }
+  ],
+  "pedal_notation": "signs"
+}

@@ -16,6 +16,22 @@ def work(name="after_rain"):
     p=ROOT/"examples/pieces"/name
     return [json.loads((p/n).read_text(encoding="utf-8")) for n in ("design.json","score.json")]
 class ExpressionTest(unittest.TestCase):
+    def test_pedal_signs_preserve_timing_and_notes(self):
+        from musigen.duet import write_duet
+        d,s=work("lingering_light")
+        s["expression"]=[{"bars":"1-2","pedal":"bar"},{"bars":"3","pedal":"held","release":"1/4"}]
+        line=build(d,s);s["pedal_notation"]="signs";signs=build(d,s)
+        self.assertEqual(playback(line),playback(signs))
+        with tempfile.TemporaryDirectory() as tmp:
+            a=write_musicxml(line,Path(tmp)/"line.xml").read_text(encoding="utf-8")
+            b=write_musicxml(signs,Path(tmp)/"signs.xml").read_text(encoding="utf-8")
+            self.assertEqual(a,b.replace('line="no" sign="yes"','line="yes" sign="no"'))
+            self.assertIn('type="change" line="no" sign="yes"',b)
+            duet=ET.parse(write_duet(signs,Path(tmp)/"duet.xml"))
+            self.assertTrue(all(x.get("sign")=="yes" for x in duet.findall(".//pedal")))
+        s["pedal_notation"]="invalid"
+        with self.assertRaises(ScoreError):build(d,s)
+
     def test_legacy_bytes(self):
         d,s=work()
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,0 +1,164 @@
+{
+  "title": "바람이 남긴 편지",
+  "request": "새 데이터를 이용해서 피아노 솔로 한 곡 만들어 보세요.",
+  "given": [
+    "notes"
+  ],
+  "impression": {
+    "scene": "오후의 창가, 접어 두었던 편지가 바람에 펼쳐진다",
+    "mood": "다정함, 잠깐의 그리움, 가벼운 안도",
+    "arc": "머뭇거리는 인사 → 길어지는 회상 → 밝은 절정 → 조용한 답장"
+  },
+  "basics": {
+    "meter": "4/4",
+    "tempo": 76,
+    "key": "F",
+    "mode": "major",
+    "grade": 6,
+    "length_sec": 63
+  },
+  "theme": {
+    "idea": "반 박을 쉰 뒤 A–C–D–E–C로 올라갔다 돌아오는 a와, F–A–G–F 뒤 한 박 쉬는 응답 b. a를 두 배로 늘리고 절정에서는 같은 리듬을 하행으로 바꾼다.",
+    "motifs": {
+      "a": {
+        "describe": "8분쉼표 뒤 짧게 시작해 순차 상행하고 3도 내려오는 인사",
+        "hand": "rh"
+      },
+      "b": {
+        "describe": "3도 위를 짚은 뒤 순차 하행하여 쉼으로 닫는 응답",
+        "hand": "rh"
+      }
+    }
+  },
+  "form": [
+    {
+      "label": "A",
+      "bars": [
+        1,
+        8
+      ],
+      "function": "statement",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "a–b를 제시하고 4마디 반종지, 8마디 정격종지와 두 박 쉼으로 응답.",
+      "harmony": "Fmaj7–Dm7–Gm7–C7 / Fmaj7/A–Bbmaj7–Gm7 C7–F",
+      "texture": "알베르티형에서 분산화음으로",
+      "register": "E4–G5",
+      "dynamics": "p → mp",
+      "cadence": "authentic"
+    },
+    {
+      "label": "B",
+      "bars": [
+        9,
+        12
+      ],
+      "function": "development",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "a의 음가를 두 배로 늘려 9–10마디에 펼친다. 11마디 A5에서 리듬은 유지한 채 하행하여 12마디 반종지로 진정.",
+      "harmony": "Dm7–Am7–Gm7–C7",
+      "texture": "긴 베이스와 내성, 절정의 분산화음",
+      "register": "A4–A5",
+      "dynamics": "mp → mf",
+      "cadence": "half"
+    },
+    {
+      "label": "A′",
+      "bars": [
+        13,
+        16
+      ],
+      "function": "return",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "a의 원형을 되찾고 짧은 응답 뒤 두 박 쉼.",
+      "harmony": "Fmaj7–Bbmaj7–Gm7 C7–F",
+      "texture": "알베르티형, 정격종지에서 양손 쉼",
+      "register": "F4–E5",
+      "dynamics": "p",
+      "cadence": "authentic"
+    },
+    {
+      "label": "Coda",
+      "bars": [
+        17,
+        20
+      ],
+      "function": "coda",
+      "motifs": [
+        "a",
+        "b"
+      ],
+      "plan": "a의 앞 조각만 남기고 b로 답한다. 작은 딸림화음 뒤 낮은 으뜸음으로 마침.",
+      "harmony": "Fmaj7–Bbmaj7–C7–F",
+      "texture": "긴 셸 화음과 직접 쓴 마지막 두 마디",
+      "register": "E4–C5",
+      "dynamics": "p → pp",
+      "cadence": "authentic"
+    }
+  ],
+  "climax": {
+    "bar": 11,
+    "how": "a와 같은 리듬의 A5 정점에서 하행하며 mf로 열린다."
+  },
+  "ending": {
+    "how": "19마디 끝 한 박 쉼 뒤 20마디 F장조를 길게 유지한다."
+  },
+  "credits": {
+    "composer": "Codex",
+    "note": "이 대화에서 새로 만든 주제·형식. 기존 피아노 반주 라이브러리를 활용한 청취용 초안."
+  },
+  "notes": "편성·자료 활용은 사용자 요청. 제목, 조성, 주제, 마디 구성은 작곡 제안. 기존 곡의 모티프를 입력으로 사용하지 않았다. 자료 기반 반주는 출처 보고서를 따로 저장한다.",
+  "analysis": {
+    "phrases": true
+  },
+  "phrase_plan": [
+    {
+      "bars": [
+        1,
+        4
+      ],
+      "role": "인사",
+      "plan": "a–b를 제시하고 반종지에서 한 박 쉼"
+    },
+    {
+      "bars": [
+        5,
+        8
+      ],
+      "role": "응답",
+      "plan": "주제를 조금 밝게 되풀이한 뒤 두 박 쉼"
+    },
+    {
+      "bars": [
+        9,
+        12
+      ],
+      "role": "회상과 절정",
+      "plan": "a의 음가 확대, 정점 뒤 하행"
+    },
+    {
+      "bars": [
+        13,
+        16
+      ],
+      "role": "재현",
+      "plan": "원형으로 돌아온 뒤 두 박 쉼"
+    },
+    {
+      "bars": [
+        17,
+        20
+      ],
+      "role": "답장",
+      "plan": "조각과 응답만 남겨 정격종지"
+    }
+  ]
+}
