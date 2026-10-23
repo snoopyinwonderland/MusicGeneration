@@ -171,3 +171,8 @@ python -m musigen motif a.motif.json --out output/motif_study --key D --mode maj
 결과는 `motif.json`, `design.json`, `score.json`, `piece.musicxml`, `piece.mid`입니다. 기존 폴더를 덮어쓰지 않습니다. 이 명령은 모티프 변형의 미리보기이며 완성곡 자동 작곡은 아닙니다. 원본 모티프 JSON과 ‘이 주제로 조용히 시작해서 중간에 확대해 주세요’ 같은 요청을 대화로 주면, 작곡 설계에서 원형·변형·반주·종지를 구성합니다. `score.json`의 `motifs.a`에 복사한 객체를 그대로 넣어 기존 `motif`/`ops`/`seq` 문법으로 발전시킬 수도 있습니다.
 
 화성 표시의 ‘위치’는 기본 **보표 아래**이며 피아노 낮은 보표 밑에 놓습니다. 코드 심벌·로마자 모두 적용하고 ‘원래 위치’로 돌아갈 수 있습니다. 이것은 화면 배치 설정이며 다운로드하는 MusicXML/PDF 원본은 바꾸지 않습니다.
+
+
+## 기존 피아노 자료 활용 (선택 기능)
+
+`piece --corpus-accompaniment`는 기존 피아노 반주 라이브러리와 밀도 모델을 사용해, 계획한 반주 유형 안에서 왼손 패턴을 선택합니다. 주제·오른손·화성·표현은 보존하고 결과와 출처를 고정 저장합니다. 기본은 꺼짐이며 청취 품질 검수 전입니다. [사용법·자료 범위·제한](docs/CORPUS_ACCOMPANIMENT.md)을 확인하세요.

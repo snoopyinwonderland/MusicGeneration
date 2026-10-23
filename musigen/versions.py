@@ -121,6 +121,8 @@ def save(root: Path, design: dict, score: dict, reason: str = "", preserve: list
     dump = lambda name, obj: (vdir / name).write_text(json.dumps(obj, ensure_ascii=False, indent=1), encoding="utf-8")
     dump("design.json", design)
     dump("score.json", score)
+    if "corpus_accompaniment" in score:
+        dump("accompaniment.json", score["corpus_accompaniment"]["report"])
     xml = write_musicxml(piece, vdir / "piece.musicxml", subtitle=f"v{num:03d}")
     midi = write_midi(xml, vdir / "piece.mid")
     dump("checks.json", result)
