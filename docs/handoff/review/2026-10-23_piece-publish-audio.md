@@ -55,3 +55,5 @@ musicomp `codex/xml-expression` (`eb882fe`) → MusicGeneration `codex/piece-not
 추가 음원 검증: 햇살 골목 63.902초(peak 0.4367, RMS 0.0544), 모퉁이 카페는 스윙 시간표로 샘플 재생·WAV를 생성했습니다. musicomp 최종 Node 4/Python 105개 통과(MUSICOMP_PYTHON을 지정).
 
 공개 환경 추가 수정: 약 1MB의 내장 샘플 HTML이 내려오는 동안 Verovio WASM이 먼저 초기화되면 onRuntimeInitialized 콜백을 놓치는 경쟁 상태를 발견했습니다. 콜백 등록과 이미 준비된 runtime 초기화를 모두 지원하도록 수정했습니다. 로컬 파일·느린 공개 다운로드에서 모두 동작하도록 한 변경입니다. raw.githack 첫 방문은 외부 콘텐츠 안내의 ‘Open the page’를 눌러야 합니다. 최신 musicomp 의존성은 `269676b`입니다. 모퉁이 카페 WAV는 57.741초, peak 0.6079/RMS 0.0641로 클리핑이 없습니다.
+
+최종 공개 검증(32bd57b): raw.githack의 안내에서 Open the page를 누른 뒤 네 개 곡 URL 모두 HTTP 200, 실제 CDN Verovio 로그 빈 문자열, 피아노 샘플 30개 준비, 재생/정지 성공, 모바일 폭 390px 가로 넘침 없음, 페이지 오류 0. 모퉁이 카페 약박 지연 75.833ms로 2:1 스윙 계산값과 일치했습니다. 공개 검수 URL의 커밋은 32bd57bf657f6cf8fcab244050b011fdd4bcca55로 고정할 수 있습니다.
