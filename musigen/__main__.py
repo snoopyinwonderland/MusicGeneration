@@ -40,11 +40,13 @@ def main() -> None:
     p.add_argument("roots", nargs="+", help="piece output folders (with v001, v002 ...)")
     p.add_argument("--out", required=True)
     p.add_argument("--latest", action="store_true", help="only the newest version of each piece")
+    p.add_argument("--piano-samples", action="store_true", help="출처를 표시한 FluidR3 피아노 샘플 포함")
+    p.add_argument("--individual-pages", action="store_true", help="곡별·버전별 URL 경로와 catalog.json 생성")
     p.add_argument("--embed-verovio", help="path to verovio-toolkit-wasm.js to embed (offline page, about 7 MB)")
     a = ap.parse_args()
     if a.cmd == "listen":
         from musigen.listen import build_page
-        print(build_page([Path(r) for r in a.roots], Path(a.out), a.latest, a.embed_verovio))
+        print(build_page([Path(r) for r in a.roots], Path(a.out), a.latest, a.embed_verovio, a.piano_samples, a.individual_pages))
         return
     if a.cmd == "design":
         from musigen.design import summary_ko, validate

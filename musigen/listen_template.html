@@ -46,6 +46,9 @@ ul.checks li.warn{color:var(--warn)}
   <button id="play" class="primary" disabled>▶ 재생</button>
   <button id="stop" disabled>■ 처음으로</button>
   <button id="compare" disabled>바뀐 곳 비교</button>
+  <label>음색 <select id="timbre"><option value="piano">피아노</option><option value="synth">합성음</option></select></label>
+  <button id="downloadAudio" disabled>피아노 WAV 저장</button>
+  <a id="permalink" href="#">이 악보 주소</a>
   <span id="status">불러오는 중…</span>
   <label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"> <span id="speedv">100%</span></label>
   <label><input id="rh" type="checkbox" checked> 오른손</label>
@@ -59,6 +62,9 @@ ul.checks li.warn{color:var(--warn)}
 <script src="/*VEROVIO_SRC*/"></script>
 <script>
 const PIECES = /*PIECES*/;
+const PIANO_BANK = /*PIANO_SAMPLES*/;
+const pianoBuffers = new Map();
+let pianoReady = false;
 const FUNCTIONS = {intro:'도입',statement:'제시',development:'발전',contrast:'대조',transition:'연결',return:'재현',coda:'종결'};
 const MODE = {major:'장조', minor:'단조'};
 const $ = id => document.getElementById(id);
@@ -111,13 +117,18 @@ function about(p){
   for(const e of c.errors) h += `<li class="err">오류: ${esc(e)}</li>`;
   for(const w of c.warnings) h += `<li class="warn">주의: ${esc(w)}</li>`;
   for(const n of c.notes || []) h += `<li>참고: ${esc(n)}</li>`;
-  for(const s of c.musical?.sections || []) h += `<li>${esc(s.label)} 오른손: 평균 MIDI ${s.mean_pitch ?? '없음'}, 음역 ${esc(s.range?.join('–') || '없음')}, 마디당 ${s.density.toFixed(2)}음 · 화음 변화 ${s.chord_changes_per_bar.toFixed(2)}회 · ${esc(s.keys.join(', '))}</li>`;
+  for(const s of c.musical?.sections || []) h += `<li>${esc(s.label)} 오른손: 평균 MIDI ${s.mean_pitch ?? '없음'}, 음역 ${esc(s.range?.join('–') || '없음')}, 마디당 ${s.density.toFixed(2)}음 · 화음 변화 ${s.chord_changes_per_bar.toFixed(2)}회 · ${esc(s.keys.map(k=>k.replace(/Key\(tonic_tpc=(-?\d+), minor=(True|False)\)/g,(_,t,m)=>['C','G','D','A','E','B','F#'][+t] ? ['C','G','D','A','E','B','F#'][+t]+' '+(m==='True'?'단조':'장조') : ({'-1':'F','-2':'Bb','-3':'Eb','-4':'Ab','-5':'Db','-6':'Gb'}[t]||t)+' '+(m==='True'?'단조':'장조'))).join(', '))}</li>`;
   if(c.recognition){
     for(const s of c.recognition.sections) h += `<li>${esc(s.label)} 동기 마디: 출처 ${s.source_bars}, 유사도 기준 ${s.score_bars} (잠정)</li>`;
     h += `<li>동기 음정·리듬 점수는 청취 인식률이 아닙니다.</li>`;
   }
   if(!c.errors.length && !c.warnings.length) h += `<li>자동 검사에서 걸린 것이 없습니다.</li>`;
-  h += `</ul></details><div class="muted" style="margin-top:6px">음표를 누르면 그 위치부터 재생합니다. 소리는 브라우저 합성음이라 실제 피아노와 다릅니다.</div>`;
+  h += `</ul></details><div class="muted" style="margin-top:6px">음표를 누르면 그 위치부터 재생합니다. ${PIANO_BANK ? "피아노는 녹음 샘플을 사용하며, 실제 연주자의 표현을 재현한 것은 아닙니다." : "합성음 미리듣기입니다. 피아노 샘플은 이 페이지에 포함하지 않았습니다."}</div>`;
+  if(PIANO_BANK) h += `<details><summary>피아노 음원 출처</summary>FluidR3_GM — Frank Wen 및 기여자(© 2000–2002, 2008), MP3 패키징 Benjamin Gleitzman.
+    <a href="https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef">원본</a> ·
+    <a href="https://creativecommons.org/licenses/by/3.0/us/">CC BY 3.0 US</a>.
+    MIDI 21–108에서 3반음마다 선택, JSON/MIME 변환; MP3 바이트 유지. 샘플별 최대 진폭을 맞추고, 근접 음을 최대 1반음 이동하여 음량·음 길이·페달을 적용합니다.
+    WAV 저장 시 함께 받는 출처 파일을 보관해 주세요.</details>`;
   $('about').innerHTML = h;
 }
 
@@ -211,8 +222,14 @@ function open(i, comparison = false){
   render(); prepare(); colorChanges();
   $('pick').value = String(i);
   $('compare').disabled = !cur.info.joins?.length || !PIECES.some(p=>p.piece===cur.piece && p.info.version===cur.info.parent);
-  $('play').disabled = $('stop').disabled = false;
+  $('play').disabled = $('timbre').value==='piano' && !pianoReady;
+  $('stop').disabled = false;
+  $('downloadAudio').disabled = !pianoReady;
   $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`;
+  const fragment = `piece=${encodeURIComponent(cur.piece)}&version=${encodeURIComponent(cur.info.version)}`;
+  if(!comparison){ try{ history.replaceState(null,'','#'+fragment); }catch{} }
+  $('permalink').href = '#'+fragment;
+  $('permalink').title = '현재 곡과 버전으로 바로 열리는 주소';
   try{ localStorage.setItem('musigen-listen', `${cur.piece}/${cur.info.version}`); }catch{}
 }
 
@@ -220,7 +237,42 @@ const endMs = () => notes.length ? Math.max(...notes.map(n => n.t + n.d)) : 0;
 function fmt(ms){ ms = Math.max(0, ms | 0); const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
 
 // a plucked-string tone: quick attack, decay that keeps sounding through long notes (closer to a piano than a flat organ tone)
+function pianoTone(audio, when, dur, pitch, level){
+  const keys=[...pianoBuffers.keys()], key=keys.reduce((a,b)=>Math.abs(b-pitch)<Math.abs(a-pitch)?b:a);
+  const src=audio.createBufferSource(), gain=audio.createGain();
+  src.buffer=pianoBuffers.get(key); src.playbackRate.value=2**((pitch-key)/12);
+  src.connect(gain).connect(audio.destination);
+  // The recording supplies the hammer attack and natural decay; no oscillator/loop.
+  const end=when+Math.max(.01,dur);
+  gain.gain.setValueAtTime(level*6,when);
+  gain.gain.setValueAtTime(level*6,end);
+  gain.gain.exponentialRampToValueAtTime(.00001,end+.16);
+  src.start(when); src.stop(end+.18); return [src];
+}
+async function preparePiano(){
+  if(!PIANO_BANK){ $('timbre').value='synth'; $('timbre').options[0].disabled=true; return; }
+  $('status').textContent='피아노 음원 준비 중…';
+  try{
+    const decoder=new OfflineAudioContext(1,1,44100);
+    await Promise.all(Object.entries(PIANO_BANK.notes).map(async([key,url])=>{
+      const raw=atob(url.split(',')[1]), bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
+      const buffer=await decoder.decodeAudioData(bytes.buffer);
+      // One recorded velocity layer: normalize each sample peak for consistent preview level.
+      let peak=0;
+      for(let c=0;c<buffer.numberOfChannels;c++) for(const x of buffer.getChannelData(c)) peak=Math.max(peak,Math.abs(x));
+      if(!peak) throw Error('무음 피아노 샘플: '+key);
+      for(let c=0;c<buffer.numberOfChannels;c++){
+        const channel=buffer.getChannelData(c); for(let i=0;i<channel.length;i++) channel[i]*=.8/peak;
+      }
+      pianoBuffers.set(+key,buffer);
+    }));
+    pianoReady=true;
+    $('play').disabled=!cur; $('downloadAudio').disabled=!cur;
+    $('status').textContent='피아노 준비됨';
+  }catch(e){ $('status').textContent='피아노 음원을 읽지 못했습니다. 합성음을 선택할 수 있습니다.'; console.error(e); }
+}
 function tone(when, dur, pitch, level){
+  if($('timbre').value==='piano') return pianoTone(ctx,when,dur,pitch,level);
   const f = 440 * 2 ** ((pitch - 69) / 12), g = ctx.createGain(), lp = ctx.createBiquadFilter();
   lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * 6);
   const parts = [[1, 1, 'triangle'], [2, .35, 'sine'], [3, .12, 'sine']].map(([h, a, type]) => {
@@ -238,6 +290,7 @@ function tone(when, dur, pitch, level){
 }
 
 function play(fromMs = 0, untilMs = endMs(), done = null){
+  if($('timbre').value==='piano' && !pianoReady) return;
   stop();
   ctx = ctx || new (window.AudioContext || window.webkitAudioContext)({latencyHint: 'interactive'});
   ctx.resume();
@@ -283,7 +336,11 @@ function colorChanges(){
   const changed=new Set([...(cur.info.changed_bars?.rh||[]),...(cur.info.changed_bars?.lh||[])]);
   for(const bar of changed){
     const el=document.getElementById(measureIds.get(bar)); if(!el) continue;
-    const b=el.getBBox(), rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    const boxes=[...el.querySelectorAll('g.staff')].map(s=>s.getBBox());
+    const all=el.getBBox();
+    const y=boxes.length?Math.min(...boxes.map(b=>b.y)):all.y;
+    const end=boxes.length?Math.max(...boxes.map(b=>b.y+b.height)):all.y+all.height;
+    const b={x:all.x,y,width:all.width,height:end-y}, rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
     rect.setAttribute('x',b.x); rect.setAttribute('y',b.y); rect.setAttribute('width',b.width); rect.setAttribute('height',b.height);
     rect.setAttribute('fill','#ffe6a1'); rect.setAttribute('opacity','.45'); rect.setAttribute('class','changed-bar');
     el.prepend(rect);
@@ -302,6 +359,7 @@ function runComparison(){
   });
 }
 $('compare').addEventListener('click',()=>{
+  if($('timbre').value==='piano' && !pianoReady) return;
   cancelComparison(); stop();
   const current=PIECES.indexOf(cur), parent=PIECES.findIndex(p=>p.piece===cur.piece && p.info.version===cur.info.parent);
   if(parent<0) return;
@@ -310,6 +368,47 @@ $('compare').addEventListener('click',()=>{
     compareQueue.push({index:parent,a,z,gap:0},{index:current,a,z,gap:1000});
   }
   runComparison();
+});
+$('timbre').addEventListener('change',()=>{
+  const at=playing?nowMs():null; cancelComparison(); stop();
+  $('play').disabled=$('timbre').value==='piano'&&!pianoReady;
+  if(at!==null && !$('play').disabled) play(at);
+});
+function download(blob,name){
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+function wavBlob(buffer){
+  const pcm=buffer.getChannelData(0), bytes=new ArrayBuffer(44+pcm.length*2), v=new DataView(bytes);
+  const str=(at,s)=>[...s].forEach((c,i)=>v.setUint8(at+i,c.charCodeAt(0)));
+  str(0,'RIFF'); v.setUint32(4,36+pcm.length*2,true); str(8,'WAVE'); str(12,'fmt ');
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,buffer.sampleRate,true); v.setUint32(28,buffer.sampleRate*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true);
+  str(36,'data'); v.setUint32(40,pcm.length*2,true);
+  let peak=0; for(const x of pcm) peak=Math.max(peak,Math.abs(x));
+  const scale=peak>.98?.98/peak:1;
+  for(let i=0;i<pcm.length;i++) v.setInt16(44+i*2,Math.round(Math.max(-1,Math.min(1,pcm[i]*scale))*32767),true);
+  return new Blob([bytes],{type:'audio/wav'});
+}
+$('downloadAudio').addEventListener('click',async()=>{
+  if(!pianoReady) return;
+  const button=$('downloadAudio'); button.disabled=true; button.textContent='음원 만드는 중…';
+  const selected=cur, seq=notes.slice(), k=100/+$('speed').value, rh=$('rh').checked, lh=$('lh').checked;
+  try{
+    const audio=new OfflineAudioContext(1,Math.ceil((endMs()*k/1000+.5)*44100),44100);
+    for(const n of seq) if(n.lh?lh:rh) pianoTone(audio,n.t*k/1000,n.d*k/1000,n.p,(n.lh?.045:.085)*n.level);
+    const rendered=await audio.startRendering();
+    const base=`${selected.piece}-${selected.info.version}-piano`;
+    download(wavBlob(rendered),base+'.wav');
+    const notice=`${selected.design.title} · ${selected.info.version}\n피아노: FluidR3_GM — Frank Wen 및 기여자 (© 2000–2002, 2008). MP3 패키징 Benjamin Gleitzman.\nCC BY 3.0 US https://creativecommons.org/licenses/by/3.0/us/\n원본 https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef\n3반음 간격 샘플을 선택해 JSON으로 변환, MP3 유지. 샘플별 최대 진폭 정규화, 근접 음 이동·음량·길이·페달을 적용한 렌더링.\n이 샘플 출처는 악보 자체의 권리와 별개입니다.\n`;
+    download(new Blob([notice],{type:'text/plain;charset=utf-8'}),base+'-출처.txt');
+  }catch(e){ $('status').textContent='음원 저장 실패: '+e.message; }
+  finally{ button.disabled=false; button.textContent='피아노 WAV 저장'; }
+});
+window.addEventListener('hashchange',()=>{
+  const q=new URLSearchParams(location.hash.slice(1));
+  const i=PIECES.findIndex(p=>p.piece===q.get('piece')&&(!q.get('version')||p.info.version===q.get('version')));
+  if(i>=0) open(i);
 });
 $('play').addEventListener('click', () => { cancelComparison(); if(playing) paused = stop(true); else { play(paused); paused = 0; } });
 $('stop').addEventListener('click', () => { cancelComparison(); paused = 0; stop(); $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`; });
@@ -327,9 +426,12 @@ $('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.
 verovio.module.onRuntimeInitialized = () => {
   tk = new verovio.toolkit();
   let last = null; try{ last = localStorage.getItem('musigen-listen'); }catch{}
-  const i = Math.max(0, PIECES.findIndex(p => `${p.piece}/${p.info.version}` === last));
+  const q=new URLSearchParams(location.hash.slice(1));
+  const linked=PIECES.findIndex(p=>p.piece===q.get('piece') && (!q.get('version')||p.info.version===q.get('version')));
+  const i = linked>=0?linked:Math.max(0, PIECES.findIndex(p => `${p.piece}/${p.info.version}` === last));
   $('pick').value = String(i);
-  open(i);
+  $('timbre').value=PIANO_BANK?'piano':'synth';
+  open(i); preparePiano();
 };
 </script>
 </body>
