@@ -145,7 +145,7 @@ class VersionTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             save(Path(d), design, score, "first")
             sc = copy.deepcopy(score)
-            sc["blocks"][13]["rh"] = "D6/q E6/q. F6/e"        # bar 14 only
+            next(b for b in sc["blocks"] if b["bars"] == "14")["rh"] = "D6/q E6/q. F6/e"        # bar 14 only
             info = save(Path(d), design, sc, "climax later in the bar", ["bars:1-8", "rh:14"])
             hist = (Path(d) / "history.md").read_text(encoding="utf-8")
         self.assertEqual(info["changed_bars"], {"rh": [14], "lh": []})

@@ -126,3 +126,7 @@ score 최상위 `expression`은 `{"bars":"1-8","pedal":"bar","hairpin":"cresc"}`
 페달은 bar/half/chord/held, 증감은 cresc/dim. 3/4의 half는 마디마다 갱신한다.
 표현 기호 출력에는 musicomp `codex/xml-expression` 변경이 필요하다(병합 전 MUSICOMP_ROOT 지정).
 위 '지금 없는 것' 목록 중 여린내기·표현 기보·브라우저 표현 재생은 P1에서 추가됐다.
+
+## 주제 반복과 인식 (P2)
+
+`{"motif":"a","ops":["at:C5"],"seq":{"times":3,"step":1}}`은 변형 후 세 차례 반복합니다. step 목록은 각 반복의 이동량, semi:true는 반음 단위입니다. delay:e는 앞에 쉼을 넣고 마지막 음을 줄이며, extend:q는 마지막 음을 늘리고, tail:C5,D5는 마지막 두 음만 바꿉니다. 블록의 길이는 정확히 맞아야 합니다. checks.recognition의 점수와 임계값은 잠정적인 악보 유사도이며 청취 인식률이 아닙니다.

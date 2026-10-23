@@ -123,7 +123,23 @@ def _material(item, motifs: dict, key: Key, blen: F, bt: F, where: str, chords_o
         mid = item["motif"]
         if mid not in motifs:
             raise ScoreError(f"{where}: unknown motif {mid!r}")
-        return realise(motifs[mid], list(item.get("ops", [])), key, item.get("pitches"), item.get("durs"), mid)
+        result = realise(motifs[mid], list(item.get("ops", [])), key, item.get("pitches"), item.get("durs"), mid)
+        if "seq" not in item:
+            return result
+        seq = item["seq"]
+        times, step = seq.get("times"), seq.get("step", 1)
+        if type(times) is not int or not 1 <= times <= 128:
+            raise ScoreError("seq.times는 1–128 정수여야 합니다")
+        shifts = step if isinstance(step, list) else [k*step for k in range(times)] if type(step) is int else []
+        if len(shifts) != times or any(type(x) is not int for x in shifts):
+            raise ScoreError("seq.step은 정수 또는 times와 길이가 같은 정수 목록이어야 합니다")
+        if "semi" in seq and type(seq["semi"]) is not bool:
+            raise ScoreError("seq.semi는 true/false여야 합니다")
+        out = []
+        for k, shift in enumerate(shifts):
+            changed = apply(result, f"{'semi' if seq.get('semi') else 'step'}:{shift}", key) if shift else result
+            out += [replace(e, src=f"{e.src}|seq:{k}") for e in changed]
+        return out
     if "pattern" in item:
         cs = accomp.parse_chords(item.get("chords", ""), blen, bt, start % blen)
         chords_out += [(start + off, ch) for off, _, ch in cs]

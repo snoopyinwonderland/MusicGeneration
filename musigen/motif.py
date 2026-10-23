@@ -50,6 +50,24 @@ def _first(evs: list[Ev]) -> int | None:
 def apply(evs: list[Ev], op: str, key: Key) -> list[Ev]:
     name, _, arg = op.partition(":")
     lad = _ladder(key)
+    if name in ("delay", "extend"):
+        amount = parse(f"C4/{arg}")[0].dur
+        if not evs or evs[-1].rest:
+            raise NotationError("delay/extend의 마지막 사건은 음이어야 합니다")
+        if name == "delay":
+            if evs[-1].dur <= amount:
+                raise NotationError("delay 길이는 마지막 음보다 짧아야 합니다")
+            return [Ev(amount)] + evs[:-1] + [replace(evs[-1], dur=evs[-1].dur-amount)]
+        return evs[:-1] + [replace(evs[-1], dur=evs[-1].dur+amount)]
+    if name == "tail":
+        ps = [parse_pitch(p.strip()) for p in arg.split(",")]
+        slots = [i for i,e in enumerate(evs) if not e.rest]
+        if len(ps) > len(slots):
+            raise NotationError("tail 음 수가 동기 음 수보다 많습니다")
+        out = list(evs)
+        for i, (p,t) in zip(slots[-len(ps):],ps):
+            out[i] = replace(out[i],pitches=(p,),tpcs=(t,))
+        return out
     if name == "step":
         n = int(arg)
         return _map(evs, lambda p: lad[max(0, min(len(lad) - 1, _index(lad, p) + n))])

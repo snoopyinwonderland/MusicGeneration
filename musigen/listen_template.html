@@ -107,6 +107,11 @@ function about(p){
   for(const s of c.sections) h += `<li>${esc(s.label)} ${s.bars[0]}–${s.bars[1]}마디(${FUNCTIONS[s.function] || ''}): 동기 ${esc(s.motifs_used.join(', ') || '없음')}, 동기가 나오는 마디 ${s.motif_bars}/${s.bars_total}</li>`;
   for(const e of c.errors) h += `<li class="err">오류: ${esc(e)}</li>`;
   for(const w of c.warnings) h += `<li class="warn">주의: ${esc(w)}</li>`;
+  for(const n of c.notes || []) h += `<li>참고: ${esc(n)}</li>`;
+  if(c.recognition){
+    for(const s of c.recognition.sections) h += `<li>${esc(s.label)} 동기 마디: 출처 ${s.source_bars}, 유사도 기준 ${s.score_bars} (잠정)</li>`;
+    h += `<li>동기 음정·리듬 점수는 청취 인식률이 아닙니다.</li>`;
+  }
   if(!c.errors.length && !c.warnings.length) h += `<li>자동 검사에서 걸린 것이 없습니다.</li>`;
   h += `</ul></details><div class="muted" style="margin-top:6px">음표를 누르면 그 위치부터 재생합니다. 소리는 브라우저 합성음이라 실제 피아노와 다릅니다.</div>`;
   $('about').innerHTML = h;

@@ -87,56 +87,26 @@
       }
     },
     {
-      "bars": "9",
+      "bars": "9-11",
       "lh": {
         "motif": "a",
         "ops": [
           "at:G3"
-        ]
+        ],
+        "seq": {
+          "times": 3,
+          "step": 1
+        }
       },
       "rh": {
         "pattern": "bass",
-        "chords": "G",
+        "chords": "G Am Bm",
         "bass_range": [
           67,
           71
         ]
       },
       "dyn": "mp"
-    },
-    {
-      "bars": "10",
-      "lh": {
-        "motif": "a",
-        "ops": [
-          "at:A3"
-        ]
-      },
-      "rh": {
-        "pattern": "bass",
-        "chords": "Am",
-        "bass_range": [
-          67,
-          71
-        ]
-      }
-    },
-    {
-      "bars": "11",
-      "lh": {
-        "motif": "a",
-        "ops": [
-          "at:B3"
-        ]
-      },
-      "rh": {
-        "pattern": "bass",
-        "chords": "Bm",
-        "bass_range": [
-          67,
-          71
-        ]
-      }
     },
     {
       "bars": "12",
