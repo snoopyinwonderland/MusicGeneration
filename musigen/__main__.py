@@ -47,10 +47,11 @@ def main() -> None:
     p = sub.add_parser("duet", help="피아노 솔로 버전을 바이올린–피아노 듀엣으로 확장")
     p.add_argument("source", help="솔로 v001 등 버전 폴더")
     p.add_argument("--out", required=True)
+    p.add_argument("--feedback", default="", help="이 듀엣을 요청한 사용자 문장 원문")
     a = ap.parse_args()
     if a.cmd == "duet":
         from musigen.duet import save_duet
-        print(json.dumps(save_duet(Path(a.source),Path(a.out)),ensure_ascii=False,indent=2))
+        print(json.dumps(save_duet(Path(a.source), Path(a.out), a.feedback), ensure_ascii=False, indent=2))
         return
     if a.cmd == "listen":
         from musigen.listen import build_page

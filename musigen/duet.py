@@ -45,7 +45,10 @@ def write_duet(piece, path, subtitle=""):
                        piece.key.sharps, piece.key.minor, tempo=piece.qpm, subtitle=subtitle)
 
 
-def save_duet(source: Path, root: Path):
+INTERPRETATION = "오른손 첫 성부를 바이올린으로, 안쪽 응답과 베이스를 피아노에 배치. 원래 음과 리듬을 보존."
+
+
+def save_duet(source: Path, root: Path, feedback: str = "", interpretation: str = INTERPRETATION):
     """Save a derivative as its own version; keep provenance back to the solo."""
     from musigen.versions import _versions
     from musigen.listen import build_page
@@ -61,8 +64,8 @@ def save_duet(source: Path, root: Path):
     info = read("version.json")
     info.update(created=dt.datetime.now(dt.timezone.utc).isoformat(), version=vdir.name, parent=None, ensemble="violin_piano", joins=[], changed_bars=None,
                 source={"piece":source.parent.name,"version":source.name},
-                feedback="일단 솔로 만들고 그걸로 바이올린-피아노 듀엣을 만들어 보죠.",
-                interpretation="오른손 첫 성부를 바이올린으로, 안쪽 응답과 베이스를 피아노에 배치. 원래 음과 리듬을 보존.",
+                feedback=feedback,  # the request this duet answers, from the command line (not fixed in code)
+                interpretation=interpretation,
                 preserve_broken=[], preserve=["선율·리듬·화성·전체 길이"],
                 files={"musicxml":"piece.musicxml","midi":"piece.mid"})
     # The original design remains the shared compositional source; the version states instrumentation.
