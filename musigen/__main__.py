@@ -58,7 +58,29 @@ def main() -> None:
     p.add_argument("--key", default="C")
     p.add_argument("--mode", choices=["major", "minor"], default="major")
     p.add_argument("--meter", choices=["2/4", "3/4", "4/4", "6/8"], default="4/4")
+    p = sub.add_parser("motifs", help="P1 모티프 후보와 비교 페이지 만들기 (선택 기능)")
+    p.add_argument("work", help="design.json이 있는 작업 폴더")
+    p.add_argument("--count", type=int, default=8)
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--include", nargs="+", action="extend", default=[], help="작곡자/작업실 모티프 JSON")
+    p = sub.add_parser("choose", help="후보 선택 JSON 또는 id를 기록하고 다음 단계 입력 만들기")
+    p.add_argument("work")
+    p.add_argument("selection")
     a = ap.parse_args()
+    if a.cmd in ("motifs", "choose"):
+        try:
+            if a.cmd == "motifs":
+                from musigen.motif_candidates import run
+                result = run(a.work, a.count, a.seed, a.include)
+            else:
+                from musigen.selections import choose
+                result = choose(a.work, a.selection)
+        except (ValueError, OSError) as exc:
+            ap.error(str(exc))
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        if a.cmd == "motifs" and result["status"] != "ready":
+            sys.exit(2)
+        return
     if a.cmd == "motif":
         from musigen.motif_clip import develop
         print(json.dumps(develop(a.source, a.out, a.ops, a.key, a.mode, a.meter), ensure_ascii=False, indent=2))

@@ -1,0 +1,21 @@
+{
+  "title": "밝은 당김음",
+  "basics": {
+    "key": "C",
+    "mode": "major",
+    "meter": "4/4",
+    "tempo": 100,
+    "grade": 6
+  },
+  "impression": {
+    "mood": "밝고 경쾌하게"
+  },
+  "theme": {
+    "constraints": {
+      "bars": 1,
+      "range": "C4-A5",
+      "rhythm": "syncopated",
+      "start_on_beat": false
+    }
+  }
+}
