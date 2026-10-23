@@ -1,0 +1,34 @@
+{
+ "motifs": {
+  "a": {"notes": "r/e A4/e C5/e E5/q. D5/e C5/e", "note": "화음을 타고 올라가 엇박에 거는 동기"},
+  "b": {"notes": "F#5/q. E5/e Eb5/e D5/e C5/q", "note": "도미넌트 3음에서 반음계로 내려오는 답"}
+ },
+ "show_chords": true,
+ "blocks": [
+  {"bars": "1-8", "text": "Swing", "dyn": "mp",
+   "rh": [{"motif": "a"}, {"motif": "b"}, {"motif": "a", "ops": ["at:Bb4"]}, {"motif": "b", "ops": ["at:E5"]},
+          "C5/e E5/e G5/e A5/q. F#5/q", "F5/e D5/e Bb4/e G4/q E5/e Db5/e Bb4/e",
+          "A4/h r/e A4/e C5/e F#5/e", "G5/q. F5/q E5/e D5/e Db5/e"],
+   "lh": {"pattern": "shell", "push": true, "chords": "Fmaj7 D7 Gm7 C7 Am7:2 D7:2 Gm7:2 C7:2 F6:2 D7:2 Gm7:2 C7:2"}},
+
+  {"bars": "9-16", "dyn": "mf",
+   "rh": [{"motif": "a"}, {"motif": "b"}, {"motif": "a", "ops": ["at:Bb4"]}, {"motif": "b", "ops": ["at:E5"]},
+          "C5/e E5/e G5/e A5/q. F#5/q", "F5/e D5/e Bb4/e G4/q E5/e Db5/e Bb4/e",
+          "Bb4/e D5/e F5/e A5/q. G5/e E5/e", "r/e F5/q. r/h"],
+   "lh": {"pattern": "walk", "chords": "Fmaj7 D7 Gm7 C7 Am7:2 D7:2 Gm7:2 C7:2 Gm7:2 C7:2 F6"}},
+
+  {"bars": "17-24", "dyn": "f",
+   "rh": [{"motif": "a", "pitches": "Eb5 G5 Bb5 A5 G5"}, {"motif": "b", "ops": ["at:A5"]},
+          {"motif": "a", "pitches": "F5 A5 D6 C6 Bb5"}, {"motif": "b", "ops": ["at:G5"]},
+          {"motif": "a", "pitches": "E5 G5 C6 B5 A5"}, {"motif": "b"},
+          {"motif": "a", "ops": ["at:Bb4"]}, "Bb4/e C5/e Db5/e D5/q. E5/e G5/e"],
+   "lh": {"pattern": "waltz", "chords": "Cm7 F7 Bbmaj7 Eb7 Am7 D7 Gm7 C7"}},
+
+  {"bars": "25-31", "dyn": "mf",
+   "rh": [{"motif": "a"}, {"motif": "b"}, {"motif": "a", "ops": ["at:Bb4"]}, {"motif": "b", "ops": ["at:E5"]},
+          "C5/e E5/e G5/e A5/q. F#5/q", "F5/e D5/e Bb4/e G4/q E5/e Db5/e Bb4/e",
+          "Bb4/e D5/e F5/e A5/q. Ab5/e E5/e"],
+   "lh": {"pattern": "walk", "chords": "Fmaj7 D7 Gm7 C7 Am7:2 D7:2 Gm7:2 C7:2 Gm7:2 Gb7:2"}},
+  {"bars": "32", "chords": "F6", "dyn": "f", "rh": "r/e [A4,D5,F5]/q. r/h", "lh": "r/e [F2,C3,E3]/q. r/h"}
+ ]
+}

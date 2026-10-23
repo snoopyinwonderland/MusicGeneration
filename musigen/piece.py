@@ -118,7 +118,7 @@ def _material(item, motifs: dict, key: Key, blen: F, bt: F, where: str, chords_o
     if "pattern" in item:
         cs = accomp.parse_chords(item.get("chords", ""), blen, bt, start % blen)
         chords_out += [(start + off, ch) for off, _, ch in cs]
-        return accomp.figure(item["pattern"], cs, bt, tuple(item.get("bass_range", (38, 50))))
+        return accomp.figure(item["pattern"], cs, bt, tuple(item.get("bass_range", (38, 50))), bool(item.get("push")))
     raise ScoreError(f"{where}: material item needs 'motif' or 'pattern'")
 
 
