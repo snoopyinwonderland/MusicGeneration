@@ -1,0 +1,34 @@
+{
+ "motifs": {
+  "a": {"notes": "A4/q D5/q. E5/e", "note": "묻는 동기"},
+  "b": {"notes": "F5/h E5/e D5/e", "note": "답하는 동기"}
+ },
+ "show_chords": true,
+ "blocks": [
+  {"bars": "1", "rh": {"motif": "a"}, "lh": {"pattern": "broken", "chords": "Dm"}, "dyn": "p"},
+  {"bars": "2", "rh": {"motif": "b"}, "lh": {"pattern": "broken", "chords": "Bb"}},
+  {"bars": "3", "rh": {"motif": "a", "ops": ["at:D5"]}, "lh": {"pattern": "broken", "chords": "Gm"}},
+  {"bars": "4", "rh": {"motif": "b", "ops": ["step:+1"]}, "lh": {"pattern": "broken", "chords": "A7"}},
+  {"bars": "5", "rh": {"motif": "a"}, "lh": {"pattern": "broken", "chords": "Dm"}},
+  {"bars": "6", "rh": {"motif": "b", "durs": "q q q"}, "lh": {"pattern": "broken", "chords": "Bb"}},
+  {"bars": "7", "rh": "E5/q. D5/e C#5/q", "lh": {"pattern": "broken", "chords": "Gm6:2 A7:1"}},
+  {"bars": "8", "rh": "D5/h.", "lh": {"pattern": "broken", "chords": "Dm"}},
+
+  {"bars": "9", "key": "F major", "rh": {"motif": "a", "ops": ["at:C5"]}, "lh": {"pattern": "broken", "chords": "F"}, "dyn": "mp"},
+  {"bars": "10", "key": "F major", "rh": {"motif": "a", "ops": ["at:D5"]}, "lh": {"pattern": "broken", "chords": "Gm7"}},
+  {"bars": "11", "key": "F major", "rh": {"motif": "a", "ops": ["at:E5"]}, "lh": {"pattern": "broken", "chords": "C7"}},
+  {"bars": "12", "key": "F major", "rh": {"motif": "b", "ops": ["invert", "at:A5"]}, "lh": {"pattern": "broken", "chords": "F/A"}},
+  {"bars": "13", "key": "F major", "rh": {"motif": "a", "ops": ["at:F5"]}, "lh": {"pattern": "broken", "chords": "Bb"}, "dyn": "mf"},
+  {"bars": "14", "key": "F major", "rh": "D6/q F6/q. E6/e", "lh": {"pattern": "broken", "chords": "Csus4:2 C:1"}, "dyn": "f"},
+  {"bars": "15", "rh": "D6/q Bb5/q A5/q", "lh": {"pattern": "broken", "chords": "Bb:2 A7:1"}, "text": "dim."},
+  {"bars": "16", "rh": "G5/q E5/q C#5/q", "lh": {"pattern": "broken", "chords": "A7"}},
+
+  {"bars": "17-20", "copy": "1-4",
+   "rh2": "r/q A4/h | r/q Bb4/h | r/q Bb4/h | r/q A4/h",
+   "lh": {"pattern": "broken", "chords": "Dm Bbmaj7 Gm7 A7sus4:2 A7:1"}, "dyn": "p"},
+  {"bars": "21", "rh": {"motif": "a"}, "lh": {"pattern": "broken", "chords": "Bbmaj7"}},
+  {"bars": "22", "rh": {"motif": "b", "durs": "q. e q"}, "lh": {"pattern": "broken", "chords": "Gm7"}},
+  {"bars": "23", "rh": "E5/q. D5/e C#5/q", "lh": {"pattern": "broken", "chords": "Gm6:2 A7:1"}, "text": "rit."},
+  {"bars": "24", "rh": "[A4,D5,F#5]/h.", "lh": "[D2,A2]/h.", "dyn": "pp"}
+ ]
+}

@@ -11,6 +11,28 @@
             prompt.py          spec.py         harmony.py   melody.py   score_io.py        compose.py
 ```
 
+## 피아노 소품 작곡 (새 틀)
+
+요청 문장에서 주제를 제시하고 발전시켜 완결하는 피아노 솔로 곡을 직접 씁니다. 흐름은 다음과 같습니다.
+
+1. 작곡 설계(`design.json`)
+2. 악보(`score.json`)
+3. 검사와 버전 기록
+
+```
+요청 ──(작곡자)──▶ design.json ──▶ score.json ──▶ piece.musicxml / piece.mid ──▶ checks.json, history.md
+                    design.py      piece.py        piano_io.py                 checks.py, versions.py
+                                   (notation.py, motif.py, accomp.py)
+```
+
+```powershell
+python -m musigen design examples\pieces\after_rain            # 설계표 (요청/제안 표시)
+python -m musigen piece examples\pieces\after_rain --out output\after_rain --reason "첫 시험곡"
+python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마디부터 더 고조" --preserve bars:1-8 motif:a
+```
+
+흐름, 원칙, 파일 형식은 [docs/COMPOSING.md](docs/COMPOSING.md)에 있습니다.
+
 ## 설치
 
 musicomp를 라이브러리로 씁니다. musicomp는 복사하지 않고 그 폴더를 경로로 읽습니다. 기본 위치는 이 폴더 옆의 `Music Composition`이고, 다른 곳에 있으면 `MUSICOMP_ROOT`로 지정합니다.
@@ -57,4 +79,7 @@ python -m unittest discover -s tests
 
 ## 현재 상태
 
-기틀만 있습니다. 선율은 규칙 기반 기준선입니다: 리듬 템플릿, 아치형 윤곽, 강박 화음음, 약박 음계 경과. 개선 방향은 [docs/HANDOFF.md](docs/HANDOFF.md)에 있습니다.
+기틀만 있습니다.
+
+- 리드시트 기준선(`compose`/`text`): 규칙으로 선율을 만듭니다. 리듬 템플릿, 아치형 윤곽, 강박 화음음, 약박 음계 경과를 씁니다. 개선 방향은 [docs/HANDOFF.md](docs/HANDOFF.md)에 있습니다.
+- 피아노 소품 틀(`design`/`piece`): 작곡자가 설계와 악보를 쓰면 검증, 출력, 검사, 버전 기록을 합니다. 다음 개발은 [docs/handoff/2026-10-23_PIANO_PIECE_CODEX.md](docs/handoff/2026-10-23_PIANO_PIECE_CODEX.md)에 있습니다.
