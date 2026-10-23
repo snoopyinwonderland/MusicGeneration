@@ -74,6 +74,7 @@ class Piece:
     expression: list[dict] = field(default_factory=list)
     bar_keys: dict[int, Key] = field(default_factory=dict)
     motifs: dict[str, list[Ev]] = field(default_factory=dict)
+    analysis_chords: list = field(default_factory=list)
 
     def bar_start(self, bar: int) -> F:
         return F(0) if bar == 0 else self.pickup + (bar - 1) * self.bar_len
@@ -239,6 +240,10 @@ def build(design: dict, score: dict) -> Piece:
             for e in evs:
                 timeline[v].append((pos, e, lkey))
                 pos += e.dur
+        # An explicitly written block without chord material has unknown harmony.
+        # Do not silently carry the preceding block's chord into its final cadence.
+        if not any(t0 <= on < t0 + need for on, _ in piece.chords):
+            piece.analysis_chords.append((t0, None))
         if blk.get("dyn"):
             if blk["dyn"] not in DYNAMICS:
                 raise ScoreError(f"{where}: dyn one of {sorted(DYNAMICS)}")
@@ -252,5 +257,6 @@ def build(design: dict, score: dict) -> Piece:
     from musigen.expression import compile_expression
     piece.expression = compile_expression(piece, score.get("expression", []))
     piece.notes.sort(key=lambda n: (n.onset, n.voice))
+    piece.analysis_chords = sorted(piece.chords + piece.analysis_chords, key=lambda c: c[0])
     piece.chords = sorted(piece.chords, key=lambda c: c[0]) if score.get("show_chords", True) else []
     return piece

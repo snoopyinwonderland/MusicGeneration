@@ -93,7 +93,8 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(validate(self.design), [])
         res = checks.check(self.piece, self.design)
         self.assertEqual(res["errors"], [])
-        self.assertEqual(res["warnings"], [])
+        # Existing design/playing checks remain clean; P3 adds local musical observations.
+        self.assertEqual([w for w in res["warnings"] if w not in res["musical"]["warnings"]], [])
         self.assertEqual(res["stats"]["climax"]["bars"], [14])
 
     def test_return_copies_the_opening(self):

@@ -100,6 +100,8 @@ def validate(d: dict) -> list[str]:
             raise DesignError(f"form[{i}] bars {s.get('bars')}: sections must follow each other from bar 1")
         if s.get("function") not in FUNCTIONS:
             raise DesignError(f"form[{i}].function one of {sorted(FUNCTIONS)}")
+        if s.get("cadence", "none") not in ("authentic", "half", "plagal", "deceptive", "none"):
+            raise DesignError(f"{a}–{z}마디: cadence는 authentic/half/plagal/deceptive/none 중 하나여야 합니다")
         nxt = z + 1
     motifs = (d.get("theme") or {}).get("motifs") or {}
     for i, s in enumerate(form):

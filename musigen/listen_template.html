@@ -108,6 +108,7 @@ function about(p){
   for(const e of c.errors) h += `<li class="err">오류: ${esc(e)}</li>`;
   for(const w of c.warnings) h += `<li class="warn">주의: ${esc(w)}</li>`;
   for(const n of c.notes || []) h += `<li>참고: ${esc(n)}</li>`;
+  for(const s of c.musical?.sections || []) h += `<li>${esc(s.label)} 오른손: 평균 MIDI ${s.mean_pitch ?? '없음'}, 음역 ${esc(s.range?.join('–') || '없음')}, 마디당 ${s.density.toFixed(2)}음 · 화음 변화 ${s.chord_changes_per_bar.toFixed(2)}회 · ${esc(s.keys.join(', '))}</li>`;
   if(c.recognition){
     for(const s of c.recognition.sections) h += `<li>${esc(s.label)} 동기 마디: 출처 ${s.source_bars}, 유사도 기준 ${s.score_bars} (잠정)</li>`;
     h += `<li>동기 음정·리듬 점수는 청취 인식률이 아닙니다.</li>`;

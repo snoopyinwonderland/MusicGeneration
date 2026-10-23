@@ -115,7 +115,11 @@ def check(piece: Piece, design: dict) -> dict:
     recognition = measure(piece, design)
     notes = [f"{r['bar']}마디 {_hand(r['hand'])}: 동기 {r['motif']} 점수 {r['score']:.2f}, 알아듣기 어려울 수 있음(잠정)"
              for r in recognition["occurrences"] if r["score"] is not None and r["score"] < .5]
-    return {"errors": errors, "warnings": warnings, "notes": notes, "recognition": recognition,
+    from musigen.musical_checks import evaluate
+    musical = evaluate(piece, design)
+    warnings += musical["warnings"]
+    notes += musical["notes"]
+    return {"errors": errors, "warnings": warnings, "notes": notes, "recognition": recognition, "musical": musical,
             "stats": {"bars": piece.bars, "seconds": round(secs, 2), "notes_rh": len(rh),
                       "notes_lh": sum(1 for n in piece.notes if n.hand == "lh"), "climax": climax},
             "sections": sections, "motifs": dict(usage)}

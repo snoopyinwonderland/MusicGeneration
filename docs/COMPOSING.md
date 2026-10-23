@@ -130,3 +130,7 @@ score 최상위 `expression`은 `{"bars":"1-8","pedal":"bar","hairpin":"cresc"}`
 ## 주제 반복과 인식 (P2)
 
 `{"motif":"a","ops":["at:C5"],"seq":{"times":3,"step":1}}`은 변형 후 세 차례 반복합니다. step 목록은 각 반복의 이동량, semi:true는 반음 단위입니다. delay:e는 앞에 쉼을 넣고 마지막 음을 줄이며, extend:q는 마지막 음을 늘리고, tail:C5,D5는 마지막 두 음만 바꿉니다. 블록의 길이는 정확히 맞아야 합니다. checks.recognition의 점수와 임계값은 잠정적인 악보 유사도이며 청취 인식률이 아닙니다.
+
+## 음악 검사 (P3)
+
+form의 선택 필드 cadence는 authentic/half/plagal/deceptive/none입니다. errors는 연주 불가, warnings는 설계 위반·분명한 검사 조건 위반, notes는 해석이 필요한 관찰입니다. 강박은 박자 단위 박 시작이며 6/8은 점4분음표 두 박을 검사합니다. 리듬 4마디, 구간 대비 2반음/15%는 잠정값입니다. 화음 기호가 없는 직접 기보 블록은 화성 검사를 미평가로 표시합니다.
