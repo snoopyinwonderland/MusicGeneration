@@ -30,8 +30,12 @@ def compile_expression(piece, rows):
                     if ch.symbol != prev and start < on < end:
                         changes.append(on)
                     prev = ch.symbol
-            result.append({"kind": "pedal", "start": start, "end": end,
-                           "changes": sorted(set(t for t in changes if start < t < end)), "mode": mode})
+            release = F(str(row.get("release", 0)))
+            if release < 0 or release >= end - start:
+                raise ScoreError("페달을 미리 떼는 길이는 0 이상, 구간보다 짧아야 합니다")
+            pedal_end = end - release
+            result.append({"kind": "pedal", "start": start, "end": pedal_end,
+                           "changes": sorted(set(t for t in changes if start < t < pedal_end)), "mode": mode})
         if row.get("hairpin"):
             kind = row["hairpin"]
             if kind not in ("cresc", "dim"):

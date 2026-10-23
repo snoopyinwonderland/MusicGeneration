@@ -1,5 +1,27 @@
 [
   {
+    "piece": "lingering_light",
+    "title": "빛이 머무는 자리",
+    "url": "lingering_light/",
+    "versions": [
+      {
+        "version": "v001",
+        "url": "lingering_light/v001.html"
+      }
+    ]
+  },
+  {
+    "piece": "lingering_light_duet",
+    "title": "빛이 머무는 자리",
+    "url": "lingering_light_duet/",
+    "versions": [
+      {
+        "version": "v002",
+        "url": "lingering_light_duet/v002.html"
+      }
+    ]
+  },
+  {
     "piece": "after_rain",
     "title": "비 갠 밤",
     "url": "after_rain/",

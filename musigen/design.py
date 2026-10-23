@@ -30,7 +30,7 @@ from fractions import Fraction as F
 FUNCTIONS = {"intro": "도입", "statement": "제시", "development": "발전", "contrast": "대조", "transition": "연결",
              "return": "재현", "coda": "종결"}
 METERS = {"2/4", "3/4", "4/4", "6/8", "9/8", "12/8"}
-TOP = {"title", "request", "given", "impression", "basics", "theme", "form", "climax", "ending", "notes"}
+TOP = {"title", "request", "given", "impression", "basics", "theme", "form", "climax", "ending", "notes", "credits"}
 
 
 class DesignError(ValueError):

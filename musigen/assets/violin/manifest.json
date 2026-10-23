@@ -1,0 +1,92 @@
+{
+  "format": "musicanote-sample-manifest-v1",
+  "sourceRevision": "044fab8e1456bfafc5776e86dfd6bb8697149aef",
+  "sourceRepository": "https://github.com/gleitz/midi-js-soundfonts",
+  "license": "CC-BY-3.0-US",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0/us/",
+  "readmeSha256": "e42378ee860c7f866f6e6d3f60ba80a19e99ed218b5e292d2431d94a5dd5b8f4",
+  "adaptation": "Selected every third semitone and excluded three audited silent violin notes (102/105/108); JSON envelope only; retained MP3 bytes unchanged",
+  "instruments": {
+    "violin": {
+      "file": "violin.json",
+      "sha256": "e0aeb6d1a4c656edb1578b33c920492b991bab1cc02a9a9edb509b62304ed043",
+      "notes": [
+        21,
+        24,
+        27,
+        30,
+        33,
+        36,
+        39,
+        42,
+        45,
+        48,
+        51,
+        54,
+        57,
+        60,
+        63,
+        66,
+        69,
+        72,
+        75,
+        78,
+        81,
+        84,
+        87,
+        90,
+        93,
+        96,
+        99
+      ],
+      "sampleSha256": {
+        "21": "20a8e567bda75388e0ccbcd7e73c3f80fc8e7442e2aba7201c50b62c1da69f47",
+        "24": "b78e94b90ac29d933aceae4f32c4f5c73c281eea5912247d2645b21e1fdff154",
+        "27": "0a72c1d3abdb1bb90abbd50829b85e60a7d5864b031de478e38be5029157be42",
+        "30": "7f2f1d1825326401cf14676e1145b2022a579667d6d2db546bfaa70fe8b18093",
+        "33": "5a410ce10b3903ef1ba347a0cae6eb65891ec64e29ff63a9bd2200fc73819f07",
+        "36": "5da09320f408f14141147f398085fd2a651c1493fdfaae704ac8375186584344",
+        "39": "e7b9d05f6da446b5266a09aca227e48e3a8f6ec8364ed84197149c279704d165",
+        "42": "5c309fdf49b20260835dea1008c83cfad992302b36037da31a6fc3e18f22dad0",
+        "45": "b7a6de643272af53f0831ca05e9394ab2912c02bdfb69f2682bf47e8ad52f587",
+        "48": "929e86fd48dac861900fa309bacff3109fe07fba456c350b4838f589510ba314",
+        "51": "a0964295eb5cdc8aff0953b745c2c1cd29ab57a54c9db0cb27bcfaeaa13603d4",
+        "54": "99d46556bac1d960775af90f6460514b4e5597a8f2ce294e458f1108af17198b",
+        "57": "e914941fedc19081276debdce78ebd4edfd19c35a45586821442a7224720b330",
+        "60": "65b06ce5993748a3666704f4fee56661989ef225dc5394d0198be8bfa6f1d9f5",
+        "63": "4eb51042660ab3f44e37560abfdc4bf00894bf992e85938e5c417ca13fa4ded5",
+        "66": "3258d23b91cc6430ddc9ae4d2cabde819c058f7f09089405098aa16dcba1acef",
+        "69": "b38214489431ec990f6b7a82bf736126464ddda59aef3c25310c9c854a496342",
+        "72": "190b0646492ff186c51dff70ceb6ed33aecc3ec691cacb895302ae0daa4c6585",
+        "75": "1b2c95fd68eeec5d7cf6583fee127b6e2b12262d59a95ce7f6fdaf1b8970eab5",
+        "78": "6fb2e39b8fac3d21799e9f2546fbd046794973776c297800c757210dfc53944a",
+        "81": "f8ea42c8f4f3fe39ba798a897f0772b7daca7b134c1dd08542ee6752db234a64",
+        "84": "2751aba9241f7c76ac59155d1e67f9677bb0de37de15e56aee0bd58a9c6834df",
+        "87": "4ebc50795174f9fdc402705d358fad885a2bd4be8ee0e50050a7c3b2f6349a9c",
+        "90": "9849074b21f3d29591c952100b65f9541c40b6f40444479427f07e91dca53d63",
+        "93": "54417b150617e4f6ba2269510f3e254a08a7704a95a4acdae111020d673f73ae",
+        "96": "5ac830f075ea3dfcc3560bd78f2aff7a8673f3a5f2d6a513fc830ffa3994312f",
+        "99": "be0ebd8553c968f1ab3c2a8304dddc2c197ce132aba0556a0fa14492682904a0"
+      },
+      "audioBytes": 690795,
+      "fileBytes": 922040,
+      "validRange": [
+        21,
+        99
+      ],
+      "playbackRange": [
+        55,
+        93
+      ],
+      "maxEdgePitchShift": 1,
+      "excludedSilentSourceSha256": {
+        "102": "cd20893f17b39244b0141ce4be12243d1d4d57904f430e332adc32307921562d",
+        "105": "cd20893f17b39244b0141ce4be12243d1d4d57904f430e332adc32307921562d",
+        "108": "cd20893f17b39244b0141ce4be12243d1d4d57904f430e332adc32307921562d"
+      },
+      "silentAudit": "libsndfile 1.2.2, exact-zero peak and RMS across all PCM channels; MIDI-grid interior shifts remain <=1.5 semitones",
+      "sourceUrl": "https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/044fab8e1456bfafc5776e86dfd6bb8697149aef/FluidR3_GM/violin-mp3.js",
+      "sourceSha256": "3c169ac4c7781fe145e545e909993371188aa6bad617bc3a5f0692b7678995f8"
+    }
+  }
+}

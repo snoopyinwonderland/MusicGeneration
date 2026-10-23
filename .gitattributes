@@ -1,3 +1,6 @@
 tests/data/*.musicxml -text
 musigen/assets/piano/*.json -text
 musigen/assets/piano/UPSTREAM_README.md -text
+musigen/assets/violin/*.json -text
+musigen/assets/violin/UPSTREAM_README.md -text
+docs/listen/assets/*.json -text

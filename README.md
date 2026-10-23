@@ -1,6 +1,8 @@
-# Music Generation (musigen)
+# MUSICANOTE Virtual Composer
 
-말로 쓴 작곡 요청에서 새 곡을 만듭니다. 편곡이 아니라 작곡입니다.
+말로 쓴 요청에서 새 피아노 곡을 만듭니다. 지금은 대화에서 작곡 설계와 악보를 작성하며, 검증·기보·감상·다운로드는 코드가 맡습니다. 내부 Python 패키지와 실행 명령 `musigen`은 호환성을 위해 유지합니다.
+
+기존 리드시트 실험도 함께 남아 있습니다:
 
 - 조성, 박자, 형식, 화음, 마디별 요구를 받아 선율과 화음을 만듭니다.
 - 결과는 리드시트(선율 + 반주 화음 파트)입니다.
@@ -35,7 +37,7 @@ python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마�
 
 ### 듣기 페이지
 
-[docs/listen/index.html](docs/listen/index.html)은 시험곡 "햇살 골목"(G장조, 당김음, 구간마다 다른 반주)과 "비 갠 밤"(D단조)을 담은 페이지입니다. 위쪽 메뉴에서 곡을 고릅니다.
+[듣기 페이지](docs/listen/index.html)는 새 곡 **빛이 머무는 자리**의 피아노 솔로·바이올린–피아노 듀엣과 기존 시험곡 네 곡을 담습니다. 위쪽 메뉴에서 곡과 편성을 고릅니다. 「겨울 아침」은 Codex가 기보 기능 검증용으로 작성한 시험곡입니다.
 
 - 악보를 보면서 재생할 수 있습니다. 음표를 누르면 그 위치부터 재생합니다.
 - 빠르기를 바꾸거나 한 손만 들을 수 있습니다.
@@ -43,7 +45,7 @@ python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마�
 
 여는 방법은 두 가지입니다.
 
-- 파일을 내려받아 브라우저로 엽니다. 악보를 그리는 Verovio를 인터넷(jsDelivr)에서 불러옵니다.
+- 독립 HTML은 내려받아 브라우저에서 엽니다. `--shared-assets`로 만든 공개 페이지는 HTTP로 제공해야 합니다. `python -m http.server 8000 --directory docs`로 시작하고 `http://localhost:8000/listen/`을 엽니다. Verovio는 인터넷(jsDelivr)에서 불러옵니다.
 - 저장소 설정에서 GitHub Pages를 `main` 브랜치의 `/docs`로 켭니다. 그러면 `https://snoopyinwonderland.github.io/MusicGeneration/listen/`에서 바로 열립니다.
 
 `piece` 명령은 버전을 만들 때마다 `output\<곡>\listen.html`(모든 버전, 최신이 먼저)을 새로 씁니다. 따로 만들려면 다음 명령을 씁니다.
@@ -112,8 +114,32 @@ python -m musigen listen output/p3/after_rain output/p3/winter_morning --out doc
 
 `--individual-pages`는 `listen/<곡 폴더>/index.html`과 `listen/<곡 폴더>/v001.html`, `catalog.json`을 만듭니다. 같은 곡 폴더 이름을 유지하면 곡 주소가 유지됩니다. 버전 고정 주소는 그 버전 악보만 표시합니다. 통합 페이지에서도 ‘이 악보 주소’가 곡과 버전을 지정합니다. 여러 버전 비교는 부모 버전도 포함하도록 --latest를 빼고 생성합니다.
 
-`--piano-samples`는 선택 옵션입니다. 공개 예시에는 켰으며 일반 빌드는 기존 합성음을 유지합니다. 페이지의 ‘피아노 WAV 저장’은 선택한 손·빠르기·페달·셈여림을 적용한 음원과 출처 파일을 저장합니다. 샘플을 HTML에 포함하므로 외부 음원 서버에 접속하지 않습니다. Verovio는 기본적으로 CDN에서 읽습니다. 음원 저작자·라이선스·변경 내역은 [출처](musigen/assets/piano/ATTRIBUTION.md)에 있습니다.
+`--piano-samples`는 선택 옵션입니다. 공개 예시에는 켰으며 일반 빌드는 기존 합성음을 유지합니다. 페이지의 ‘샘플 WAV 받기’는 선택한 손·빠르기·페달·셈여림을 적용한 음원과 출처 파일을 저장합니다. 기본 빌드는 샘플을 HTML에 포함하고, `--shared-assets` 빌드는 같은 사이트의 공통 파일을 읽습니다. 별도 음원 서버에는 접속하지 않습니다. Verovio는 기본적으로 CDN에서 읽습니다. 음원 저작자·라이선스·변경 내역은 [출처](musigen/assets/piano/ATTRIBUTION.md)에 있습니다.
 
 Claude가 검수 후 docs를 병합하면 기존 GitHub Pages에서 `/MusicGeneration/listen/after_rain/`, `/MusicGeneration/listen/winter_morning/` 경로로 열립니다. Codex는 main을 수정하거나 push하지 않습니다. 병합 전 검수는 공개 브랜치 커밋의 `raw.githack.com/snoopyinwonderland/MusicGeneration/<커밋>/docs/listen/<곡>/index.html` 주소를 사용합니다. 제3자 미리보기 서비스라 GitHub Pages 운영 주소와는 구분합니다.
 
 최종 검수판은 최신 main의 햇살 골목·모퉁이 카페도 포함합니다. 생성 루트는 `output/p5/after_rain output/p5/winter_morning output/p5/sunny_alley output/p5/corner_cafe`입니다. 최신 main의 보표별 성부 번호와 스윙을 유지하며, 1차 꾸러미와의 바이트 기준 차이는 검수서에 기록했습니다.
+
+
+## 새 곡과 듀엣, 악보 다운로드
+
+「빛이 머무는 자리」는 이 요청에 맞춰 Codex가 새로 쓴 곡입니다. D장조·3/4·♩=72·24마디·60초이며, 제목·정서·형식·음은 작곡 제안입니다. 청취 승인을 받은 완성작으로 표시하지 않습니다.
+
+```powershell
+python -m musigen piece examples/pieces/lingering_light --out output/my_solo --feedback "새 악보 한 개만 만들어 보죠."
+python -m musigen duet output/my_solo/v001 --out output/my_duet
+$env:MUSICOMP_ROOT = "K:\Music Composition"
+$env:CHROME_PATH = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+node scripts/render_score_pdf.cjs output/my_solo/v001 output/my_duet/v001
+python -m musigen listen output/my_solo output/my_duet --out docs/listen/index.html --latest --individual-pages --piano-samples --shared-assets
+```
+
+PDF 생성은 musicomp 쪽에 설치된 `verovio`와 `playwright-core`를 읽습니다. `CHROME_PATH`를 생략하면 Playwright에 설치된 Chromium을 사용합니다. MusicXML을 같은 Verovio로 그린 벡터 PDF이며 PDF 생성 뒤 `listen`을 다시 실행하면 받기 버튼이 연결됩니다. PDF가 없는 버전은 버튼을 비활성화합니다. MusicXML은 원본 바이트 그대로, PDF는 저장된 파일을 내려받습니다. 화면의 빠르기·음소거는 악보 파일을 바꾸지 않습니다. 샘플 WAV에는 재생 설정이 반영됩니다.
+
+`duet`은 선택 명령입니다. 솔로 오른손 첫 성부의 음높이·길이·이음줄·아티큘레이션을 바이올린으로 옮기고, 오른손 안쪽 성부와 왼손을 피아노에 남깁니다. 단선율 및 G3–A6 범위를 확인하며, 여러 음짜리 주선율은 임의로 버리지 않고 거부합니다. 셈여림은 두 악기에, 페달과 원래의 글자 지시는 피아노에 남깁니다. 활 배분·운지·실제 연주 가능성의 세부 검수는 다음 단계입니다. 범용 앙상블 편곡기는 아닙니다.
+
+페달 구간의 선택 필드 `release`는 4분음표 단위로 마지막 떼는 시점을 앞당깁니다. 예: `{"bars":"1","pedal":"held","release":"1/4"}`. 새 곡에서는 매 마디 16분음표만큼 먼저 떼고 마지막 마디는 끝까지 밟습니다. 기본값 0이며 기존 악보 출력은 유지합니다. 재생은 첫 페달 교체 지점에서 이전 음을 끊고 바이올린에는 페달을 적용하지 않습니다.
+
+공개 예시의 음원과 PDF는 `docs/listen/assets/`를 공용으로 씁니다. 일반 작업 출력은 `output/`에 두고 Git에 넣지 않습니다. 공개 다운로드용 PDF만 자작곡의 배포 자산으로 포함합니다. 바이올린 샘플 출처는 [라이선스와 변경 내역](musigen/assets/violin/ATTRIBUTION.md)에 있습니다. 바이올린 지속음은 약식 루프이며 실제 활 표현을 재현하지 않습니다.
+
+재생 회귀 검사는 `node --test scripts/test_playback.cjs`로 실행합니다.
