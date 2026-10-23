@@ -53,6 +53,13 @@ def write_duet(piece, path, subtitle="", instrument="violin", lead_octaves=0):
 INTERPRETATION = "오른손 첫 성부를 바이올린으로, 안쪽 응답과 베이스를 피아노에 배치. 원래 음과 리듬을 보존."
 
 
+def _ro(word: str) -> str:
+    """'으로' after a final consonant other than ㄹ, else '로' (첼로로, 비올라로, 바이올린으로)."""
+    code = ord(word[-1]) - 0xAC00
+    final = code % 28 if 0 <= code < 11172 else 0
+    return "으로" if final not in (0, 8) else "로"
+
+
 def save_duet(source: Path, root: Path, feedback: str = "", interpretation: str | None = None,
               instrument: str = "violin", lead_octaves: int = 0):
     """Save a derivative as its own version; keep provenance back to the solo."""
@@ -66,7 +73,7 @@ def save_duet(source: Path, root: Path, feedback: str = "", interpretation: str 
     violin, piano = parts(piece, instrument, lead_octaves)  # validate before creating a version directory
     if interpretation is None:
         interpretation = INTERPRETATION if instrument == "violin" and lead_octaves == 0 else (
-            f"오른손 첫 성부를 {config['ko']}으로, 안쪽 응답과 베이스를 피아노에 배치. "
+            f"오른손 첫 성부를 {config['ko']}{_ro(config['ko'])}, 안쪽 응답과 베이스를 피아노에 배치. "
             f"선율 {lead_octaves:+d}옥타브 이동, 리듬·화성 보존.")
     versions = _versions(root)
     number = int(versions[-1].name[1:]) + 1 if versions else 1

@@ -272,4 +272,7 @@ def build(design: dict, score: dict) -> Piece:
     piece.notes.sort(key=lambda n: (n.onset, n.voice))
     piece.analysis_chords = sorted(piece.chords + piece.analysis_chords, key=lambda c: c[0])
     piece.chords = sorted(piece.chords, key=lambda c: c[0]) if score.get("show_chords", True) else []
+    if "corpus_accompaniment" in score:
+        from musigen.corpus_accomp import apply_snapshot
+        apply_snapshot(piece, design, score)
     return piece

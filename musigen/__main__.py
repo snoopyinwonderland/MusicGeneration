@@ -35,6 +35,7 @@ def main() -> None:
     p.add_argument("--reason", default="", help="what this version answers (the listener's words)")
     p.add_argument("--feedback", default="", help="사용자 피드백 원문")
     p.add_argument("--interpretation", default="", help="작곡자의 변경 해석")
+    p.add_argument("--corpus-accompaniment", action="store_true", help="기존 피아노 자료·밀도 모델로 왼손 패턴 선택 (실험 옵션, 결과 고정 저장)")
     p.add_argument("--preserve", nargs="*", default=[], help="kept from the last version: bars:1-8 rh:1-8 lh:1-8 motif:a")
     p = sub.add_parser("listen", help="one HTML page to see and hear built pieces (every version, newest first)")
     p.add_argument("roots", nargs="+", help="piece output folders (with v001, v002 ...)")
@@ -83,6 +84,9 @@ def main() -> None:
         if score is None:
             sys.exit(f"{a.work}: score.json not found")
         validate(design)
+        if a.corpus_accompaniment:
+            from musigen.corpus_accomp import select
+            score = select(design, score)
         info = save(Path(a.out), design, score, a.reason, a.preserve, a.feedback, a.interpretation)
         print(json.dumps(info, ensure_ascii=False, indent=1))
         print((Path(a.out) / info["version"] / "checks.json").resolve())

@@ -188,3 +188,7 @@ python -m musigen listen output/my_viola output/my_cello --out output/strings/in
 재생은 MusicXML의 파트·보표·GM 악기 번호를 읽어 연결합니다. 듀엣 생성 명령은 여전히 현악기 한 대와 피아노를 대상으로 하며, 여러 현악기 성부를 새로 배치하는 실내악 편곡은 별도 작업입니다.
 
 새 음원 출처: [비올라](musigen/assets/viola/ATTRIBUTION.md), [첼로](musigen/assets/cello/ATTRIBUTION.md). 원본 버전·해시와 전 샘플 PCM 무음 검사 결과는 각 폴더의 manifest.json에 있습니다. 브라우저 검수는 `node scripts/check_strings.cjs <catalog.json이 있는 감상 폴더> <결과 폴더>`로 실행합니다. 샘플을 넣은 페이지가 필요합니다.
+
+## 기존 피아노 자료 활용 (선택 기능)
+
+`piece --corpus-accompaniment`는 기존 피아노 반주 라이브러리와 밀도 모델을 사용해, 계획한 반주 유형 안에서 왼손 패턴을 선택합니다. 주제·오른손·화성·표현은 보존하고 결과와 출처를 고정 저장합니다. 기본은 꺼짐이며 청취 품질 검수 전입니다. [사용법·자료 범위·제한](docs/CORPUS_ACCOMPANIMENT.md)을 확인하세요.
