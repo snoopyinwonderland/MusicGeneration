@@ -3,6 +3,7 @@
   output/<piece>/v001/  design.json  score.json  piece.musicxml  piece.mid  checks.json  bars.json  version.json
   output/<piece>/v002/  ...
   output/<piece>/history.md   one entry per version (Korean, for the user)
+  output/<piece>/listen.html  every version drawn and playable in the browser (musigen/listen.py)
 
 version.json: {"version", "parent", "created", "reason", "preserve", "changed_bars": {"rh": [...], "lh": [...]},
                "design_changes": [...], "preserve_broken": [...]}
@@ -108,6 +109,8 @@ def save(root: Path, design: dict, score: dict, reason: str = "", preserve: list
         info["preserve_broken"] = _preserve_broken(preserve or [], old_sig, sig, old_score, score)
     dump("version.json", info)
     _history(root, info, result)
+    from musigen.listen import build_page
+    build_page([root], root / "listen.html")
     return info
 
 

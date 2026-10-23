@@ -111,5 +111,8 @@ python -m musigen piece examples\pieces\after_rain --out output\after_rain --rea
 - 곡 중간의 박자와 조표 변화가 없습니다. 조성 바꿈은 철자에만 반영됩니다.
 - 이음줄, 페달, 셈여림 증감 기호(hairpin), 아티큘레이션 표기가 없습니다.
 - 검사가 성부 진행(병행 5·8도), 비화성음 처리, 단조로움을 보지 않습니다. 동기를 알아들을 수 있는지도 출처로만 셉니다(음정·리듬 유사도 없음).
-- 작업 화면(workbench)에서 열리지 않습니다. MusicXML은 MuseScore나 Verovio로, MIDI는 아무 재생기로 엽니다.
+- 듣기 수단이 제한적입니다.
+  - musicomp 작업 화면(workbench)에서는 열리지 않습니다.
+  - 대신 버전마다 `output\<곡>\listen.html`이 생깁니다. Verovio로 악보를 그리고 브라우저 합성음으로 재생합니다(`musigen/listen.py`).
+  - 소리는 실제 피아노 음색이 아니고, 셈여림과 페달도 반영하지 않습니다.
 - 문장에서 설계로 가는 자동 변환이 없습니다. 지금은 작곡자가 직접 씁니다.

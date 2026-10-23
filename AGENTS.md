@@ -15,7 +15,8 @@
 ## 작업 순서 (코덱스)
 1. 작업 트리와 브랜치에서 작업합니다. `K:\Music Generation`은 클로드의 작업 공간입니다.
    ```powershell
-   git -C "K:\Music Generation" worktree add "K:\Music Generation-codex" -b codex/<주제> main
+   git -C "K:\Music Generation" fetch
+   git -C "K:\Music Generation" worktree add "K:\Music Generation-codex" -b codex/<주제> origin/main
    ```
 2. 테스트를 통과시킵니다: `python -m unittest discover -s tests`. Python은 `K:\Music Analysis\.venv\Scripts\python.exe`입니다.
 3. 검수 요청서를 `docs/handoff/review/YYYY-MM-DD_<주제>.md`에 씁니다. 다음을 적습니다.
@@ -23,7 +24,9 @@
    - 바꾼 파일과 함수
    - 전후 결과(들어 볼 폴더·마디)
    - 위험
-4. 브랜치에만 커밋합니다. 클로드가 검수해 main에 병합합니다. 저장소에는 아직 원격이 없습니다.
+4. 브랜치에 커밋하고, 브랜치만 push합니다: `git push origin codex/<주제>`.
+   - 원격 저장소는 github.com/snoopyinwonderland/MusicGeneration입니다.
+   - main에는 커밋하거나 push하지 않습니다. 클로드가 검수해 병합합니다.
 
 ## 건드리지 않을 것
 - musicomp(`K:\Music Composition`)는 불러 쓰기만 합니다. 고쳐야 하면 그 저장소의 `AGENTS.md` 절차를 따릅니다.

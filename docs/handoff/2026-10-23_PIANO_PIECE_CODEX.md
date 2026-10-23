@@ -26,14 +26,15 @@
 ## 작업 규칙
 
 - **작업 위치**
-  - musigen 저장소(`K:\Music Generation`)는 아직 원격이 없고 로컬 git만 있습니다.
+  - musigen 저장소의 원격은 github.com/snoopyinwonderland/MusicGeneration입니다.
   - 작업 트리를 만들어 브랜치에서 작업합니다.
     ```powershell
-    git -C "K:\Music Generation" worktree add "K:\Music Generation-codex" -b codex/<주제> main
+    git -C "K:\Music Generation" fetch
+    git -C "K:\Music Generation" worktree add "K:\Music Generation-codex" -b codex/<주제> origin/main
     ```
   - `K:\Music Generation`은 클로드의 작업 공간이니 직접 고치지 않습니다.
 - **커밋과 검수**
-  - 브랜치에만 커밋합니다.
+  - 브랜치에 커밋하고 브랜치만 push합니다(`git push origin codex/<주제>`). main에는 커밋하거나 push하지 않습니다.
   - 검수 요청서를 `docs/handoff/review/YYYY-MM-DD_<주제>.md`에 씁니다. 클로드가 검수하고 main에 병합합니다.
 - **테스트**: `python -m unittest discover -s tests`. Python은 `K:\Music Analysis\.venv\Scripts\python.exe`입니다.
 - **musicomp**(`K:\Music Composition`)는 불러 쓰기만 합니다. 고쳐야 하면 그 저장소의 `AGENTS.md` 절차를 따릅니다.
@@ -89,12 +90,17 @@
 - 바뀐 마디 앞뒤 한 마디를 연결부로 표시합니다. 연결부가 같이 바뀌었는지도 표시합니다.
 - 두 버전의 바뀐 구간만 잘라 들을 수 있는 MIDI 발췌를 만듭니다.
 
-### 5. 듣기 화면
+### 5. 듣기 페이지 다듬기
 
-- musicomp 작업 화면(`workbench`)은 `viewer.json`이 있는 결과 폴더만 엽니다.
-- 다음 두 방식 중 하나를 고르고 근거를 적어 주세요.
-  - musigen 결과에 맞는 `viewer.json`을 만듭니다. 형식은 musicomp `pipeline.py` 참고입니다.
-  - 독립 듣기 페이지를 만듭니다. 참고: `Q:\KY Data\Leadsheets\leadsheet_listen.html`의 Verovio 6.3.0 방식.
+- 이미 있는 것
+  - `musigen/listen.py`와 `listen_template.html`: Verovio 6.3.0으로 악보를 그리고, 브라우저 합성음으로 재생합니다. 음표를 누르면 그 위치부터 재생하고, 버전 메뉴와 설계·검사 표시가 있습니다.
+  - 버전마다 `output\<곡>\listen.html`이 생깁니다. 저장소 표본은 `docs/listen/index.html`입니다.
+- 남은 일
+  - 셈여림을 음량에 반영합니다.
+  - 페달(1번 작업 이후)을 지속음에 반영합니다.
+  - 피아노 음색을 개선합니다. 공개 샘플을 쓴다면 라이선스를 확인합니다.
+  - 두 버전에서 바뀐 마디만 이어 들을 수 있게 합니다.
+  - 바뀐 마디와 동기 출처를 악보 위에 색으로 표시합니다.
 
 ### 6. 나중 (지금은 하지 않음)
 

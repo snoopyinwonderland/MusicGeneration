@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>musigen 듣기</title>
+<style>
+:root{--bg:#f6f5f2;--panel:#fff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e2e0db;--accent:#0b63c5;--hl:#d9480f;--warn:#8a5a00}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.55 "Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+header h1{font-size:16px;margin:0 6px 0 0}
+select,button,input{font:inherit}
+button{border:1px solid var(--line);background:#fafafa;border-radius:6px;padding:4px 12px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+label{display:inline-flex;align-items:center;gap:4px;color:var(--muted)}
+#status{color:var(--muted);min-width:84px;font-variant-numeric:tabular-nums}
+main{max-width:1200px;margin:0 auto;padding:12px 16px 40px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 6px}
+.card h3{font-size:14px;margin:10px 0 4px}
+blockquote{margin:4px 0 8px;padding:4px 10px;border-left:3px solid var(--line);color:var(--muted)}
+details summary{cursor:pointer;color:var(--accent)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-top:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:normal;white-space:nowrap}
+.src{font-size:11px;padding:0 5px;border-radius:8px;white-space:nowrap}
+.src.req{background:#e6eefb;color:var(--accent)}
+.src.sug{background:#f1efe9;color:var(--muted)}
+ul.checks{margin:4px 0;padding-left:18px}
+ul.checks li.err{color:#b00020}
+ul.checks li.warn{color:var(--warn)}
+#score .page{background:#fff;border:1px solid var(--line);border-radius:6px;margin:0 0 12px;padding:4px}
+#score svg{width:100%;height:auto;display:block}
+#score g.note.playing, #score g.note.playing *{fill:var(--hl)!important;stroke:var(--hl)!important}
+#score g.note{cursor:pointer}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>musigen 듣기</h1>
+  <select id="pick" aria-label="곡과 버전"></select>
+  <button id="play" class="primary" disabled>▶ 재생</button>
+  <button id="stop" disabled>■ 처음으로</button>
+  <span id="status">불러오는 중…</span>
+  <label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"> <span id="speedv">100%</span></label>
+  <label><input id="rh" type="checkbox" checked> 오른손</label>
+  <label><input id="lh" type="checkbox" checked> 왼손</label>
+  <label><input id="follow" type="checkbox" checked> 따라가기</label>
+</header>
+<main>
+  <div class="card" id="about"></div>
+  <div id="score"><p class="muted">악보를 그리는 중…</p></div>
+</main>
+<script src="/*VEROVIO_SRC*/"></script>
+<script>
+const PIECES = /*PIECES*/;
+const FUNCTIONS = {intro:'도입',statement:'제시',development:'발전',contrast:'대조',transition:'연결',return:'재현',coda:'종결'};
+const MODE = {major:'장조', minor:'단조'};
+const $ = id => document.getElementById(id);
+let tk = null, cur = null, notes = [], staffOf = new Map();
+let ctx = null, playing = null, raf = 0, lastHl = [], paused = 0;
+
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const given = (d, path) => (d.given || []).some(g => path === g || path.startsWith(g + '.'));
+const mark = (d, path) => given(d, path) ? '<span class="src req">요청</span>' : '<span class="src sug">제안</span>';
+function ranges(bars){
+  const out = []; let s = null;
+  bars.forEach((b, i) => { if(s === null) s = b; if(i + 1 === bars.length || bars[i + 1] !== b + 1){ out.push(s === b ? `${s}` : `${s}–${b}`); s = null; } });
+  return out.join(', ');
+}
+
+function about(p){
+  const d = p.design, b = d.basics, imp = d.impression || {}, th = d.theme || {}, c = p.checks, v = p.info;
+  const last = d.form[d.form.length - 1].bars[1];
+  let h = `<h2>${esc(d.title || p.piece)} <span class="muted">· ${esc(v.version)}</span></h2>`;
+  if(d.request) h += `<blockquote>${esc(d.request)}</blockquote>`;
+  h += `<div>${esc(b.key)} ${MODE[b.mode] || ''} · ${esc(b.meter)} · 빠르기 ${b.tempo} · ${last}마디(약 ${Math.round(c.stats.seconds)}초) · ${b.grade || 6}급</div>`;
+  if(imp.arc) h += `<div class="muted">흐름: ${esc(imp.arc)}</div>`;
+  if(v.reason || v.parent){
+    h += `<h3>이 버전</h3><ul class="checks">`;
+    if(v.reason) h += `<li>요청: ${esc(v.reason)}</li>`;
+    if(v.parent && v.changed_bars){
+      const both = [...new Set([...v.changed_bars.rh, ...v.changed_bars.lh])].sort((a, b) => a - b);
+      h += `<li>${esc(v.parent)}에서 바뀐 마디: ${both.length ? ranges(both) : '없음'}</li>`;
+    }
+    for(const x of v.preserve_broken || []) h += `<li class="warn">보존 약속: ${esc(x)}</li>`;
+    h += `</ul>`;
+  }
+  h += `<details><summary>작곡 설계 보기</summary>`;
+  const rows = [];
+  for(const [k, n] of [['mood','정서'],['scene','장면'],['arc','변화']]) if(imp[k]) rows.push([n, imp[k], `impression.${k}`]);
+  if(th.idea) rows.push(['주제', th.idea, 'theme.idea']);
+  for(const [k, m] of Object.entries(th.motifs || {})) rows.push([`동기 ${k}`, m.describe || '', `theme.motifs.${k}`]);
+  h += `<div class="tablewrap"><table><tr><th>요소</th><th>내용</th><th>출처</th></tr>` +
+    rows.map(r => `<tr><th>${esc(r[0])}</th><td>${esc(r[1])}</td><td>${mark(d, r[2])}</td></tr>`).join('') + `</table></div>`;
+  h += `<h3>형식</h3><div class="tablewrap"><table><tr><th>구간</th><th>마디</th><th>역할</th><th>계획</th><th>화성</th><th>셈여림</th><th>출처</th></tr>` +
+    d.form.map((s, i) => `<tr><td>${esc(s.label)}</td><td>${s.bars[0]}–${s.bars[1]}</td><td>${FUNCTIONS[s.function] || ''}</td><td>${esc(s.plan)}</td><td>${esc(s.harmony)}</td><td>${esc(s.dynamics)}</td><td>${mark(d, 'form.' + i)}</td></tr>`).join('') + `</table></div>`;
+  if(d.climax) h += `<div>절정 ${mark(d, 'climax')} ${d.climax.bar}마디. ${esc(d.climax.how)}</div>`;
+  if(d.ending) h += `<div>끝맺음 ${mark(d, 'ending')} ${esc(d.ending.how)}</div>`;
+  h += `</details><details><summary>자동 검사와 동기 사용</summary><ul class="checks">`;
+  if(c.stats.climax) h += `<li>가장 높은 음 ${esc(c.stats.climax.pitch)} (${ranges(c.stats.climax.bars)}마디)</li>`;
+  for(const s of c.sections) h += `<li>${esc(s.label)} ${s.bars[0]}–${s.bars[1]}마디(${FUNCTIONS[s.function] || ''}): 동기 ${esc(s.motifs_used.join(', ') || '없음')}, 동기가 나오는 마디 ${s.motif_bars}/${s.bars_total}</li>`;
+  for(const e of c.errors) h += `<li class="err">오류: ${esc(e)}</li>`;
+  for(const w of c.warnings) h += `<li class="warn">주의: ${esc(w)}</li>`;
+  if(!c.errors.length && !c.warnings.length) h += `<li>자동 검사에서 걸린 것이 없습니다.</li>`;
+  h += `</ul></details><div class="muted" style="margin-top:6px">음표를 누르면 그 위치부터 재생합니다. 소리는 브라우저 합성음이라 실제 피아노와 다릅니다.</div>`;
+  $('about').innerHTML = h;
+}
+
+function render(){
+  const w = $('score').clientWidth || 1000;
+  const scale = w < 600 ? 30 : 40;
+  tk.setOptions({pageWidth: Math.round((w - 10) * 100 / scale), pageHeight: 60000, scale, breaks: 'auto', adjustPageHeight: true,
+    svgViewBox: true, header: 'auto', footer: 'none', pageMarginTop: 30, pageMarginBottom: 30, pageMarginLeft: 30, pageMarginRight: 30});
+  tk.redoLayout();
+  let html = '';
+  for(let p = 1; p <= tk.getPageCount(); p++) html += `<div class="page">${tk.renderToSVG(p)}</div>`;
+  $('score').innerHTML = html;
+}
+
+function prepare(){
+  const mei = new DOMParser().parseFromString(tk.getMEI(), 'application/xml');
+  staffOf = new Map();
+  for(const st of mei.getElementsByTagName('staff'))
+    for(const nt of st.getElementsByTagName('note')) staffOf.set(nt.getAttribute('xml:id'), st.getAttribute('n'));
+  const tieNext = new Map(), tieEnds = new Set();
+  for(const t of mei.getElementsByTagName('tie')){
+    const a = (t.getAttribute('startid') || '').replace('#', ''), b = (t.getAttribute('endid') || '').replace('#', '');
+    if(a && b){ tieNext.set(a, b); tieEnds.add(b); }
+  }
+  notes = [];
+  for(const e of tk.renderToTimemap()){
+    for(const id of (e.on || [])){
+      if(tieEnds.has(id)) continue;
+      const v = tk.getMIDIValuesForElement(id);
+      if(!v || !(v.pitch > 0) || !(v.duration > 0)) continue;
+      let end = v.time + v.duration, x = id, guard = 0;
+      while(tieNext.has(x) && guard++ < 64){ x = tieNext.get(x); const u = tk.getMIDIValuesForElement(x); if(u && u.duration > 0) end = Math.max(end, u.time + u.duration); }
+      notes.push({id, t: v.time, d: end - v.time, p: v.pitch, lh: staffOf.get(id) === '2'});
+    }
+  }
+  notes.sort((a, b) => a.t - b.t);
+}
+
+function open(i){
+  stop(); paused = 0;
+  cur = PIECES[i];
+  about(cur);
+  if(!tk.loadData(cur.xml)){ $('score').textContent = '악보를 읽지 못했습니다.'; return; }
+  render(); prepare();
+  $('play').disabled = $('stop').disabled = false;
+  $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`;
+  try{ localStorage.setItem('musigen-listen', `${cur.piece}/${cur.info.version}`); }catch{}
+}
+
+const endMs = () => notes.length ? Math.max(...notes.map(n => n.t + n.d)) : 0;
+function fmt(ms){ ms = Math.max(0, ms | 0); const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+
+// a plucked-string tone: quick attack, decay that keeps sounding through long notes (closer to a piano than a flat organ tone)
+function tone(when, dur, pitch, level){
+  const f = 440 * 2 ** ((pitch - 69) / 12), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * 6);
+  const parts = [[1, 1, 'triangle'], [2, .35, 'sine'], [3, .12, 'sine']].map(([h, a, type]) => {
+    const o = ctx.createOscillator(), og = ctx.createGain();
+    o.type = type; o.frequency.value = f * h; og.gain.value = a; o.connect(og).connect(lp); return o;
+  });
+  lp.connect(g); g.connect(ctx.destination);
+  const decay = Math.max(.6, 3.2 - (pitch - 40) * .03), end = when + Math.max(.1, dur);
+  g.gain.setValueAtTime(.0001, when);
+  g.gain.linearRampToValueAtTime(level, when + .006);
+  g.gain.setTargetAtTime(level * .25, when + .01, decay / 3);
+  g.gain.setTargetAtTime(.0001, end, .08);
+  for(const o of parts){ o.start(when); o.stop(end + .5); }
+  return parts;
+}
+
+function play(fromMs = 0){
+  stop();
+  ctx = ctx || new (window.AudioContext || window.webkitAudioContext)({latencyHint: 'interactive'});
+  ctx.resume();
+  const k = 100 / +$('speed').value, t0 = ctx.currentTime + .08, oscs = [];
+  const rh = $('rh').checked, lh = $('lh').checked;
+  for(const n of notes){
+    if(n.t + n.d <= fromMs || (n.lh ? !lh : !rh)) continue;
+    const start = Math.max(0, n.t - fromMs), dur = n.d - Math.max(0, fromMs - n.t);
+    oscs.push(...tone(t0 + start * k / 1000, dur * k / 1000, n.p, n.lh ? .045 : .085));
+  }
+  playing = {oscs, t0, fromMs, k};
+  $('play').textContent = '❚❚ 일시정지';
+  tick();
+}
+function stop(keep){
+  if(playing) for(const o of playing.oscs) try{ o.stop(); }catch{}
+  const pos = playing ? nowMs() : 0;
+  playing = null; cancelAnimationFrame(raf); highlight([]);
+  $('play').textContent = '▶ 재생';
+  return keep ? pos : 0;
+}
+const nowMs = () => playing ? playing.fromMs + (ctx.currentTime - playing.t0) * 1000 / playing.k : 0;
+function highlight(ids){
+  for(const el of lastHl) el.classList.remove('playing');
+  lastHl = [];
+  for(const id of ids){ const el = document.getElementById(id); if(el){ el.classList.add('playing'); lastHl.push(el); } }
+}
+function tick(){
+  if(!playing) return;
+  const ms = nowMs(), end = endMs();
+  $('status').textContent = `${fmt(ms)} / ${fmt(end)}`;
+  if(ms > end + 400){ stop(); paused = 0; return; }
+  const at = tk.getElementsAtTime(Math.max(0, Math.round(ms)));
+  highlight(at && at.notes ? at.notes : []);
+  if($('follow').checked && lastHl.length){
+    const r = lastHl[0].getBoundingClientRect();
+    if(r.top < 70 || r.bottom > window.innerHeight - 40) window.scrollBy({top: r.top - window.innerHeight / 3, behavior: 'smooth'});
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+$('play').addEventListener('click', () => { if(playing) paused = stop(true); else { play(paused); paused = 0; } });
+$('stop').addEventListener('click', () => { paused = 0; stop(); $('status').textContent = `${fmt(0)} / ${fmt(endMs())}`; });
+$('speed').addEventListener('input', () => { $('speedv').textContent = $('speed').value + '%'; if(playing) play(nowMs()); });
+for(const id of ['rh', 'lh']) $(id).addEventListener('change', () => { if(playing) play(nowMs()); });
+$('pick').addEventListener('change', () => open(+$('pick').value));
+$('score').addEventListener('click', e => {
+  const g = e.target.closest('g.note'); if(!g || !tk) return;
+  const v = tk.getMIDIValuesForElement(g.id); if(v && v.time >= 0){ paused = 0; play(v.time); }
+});
+let rt = 0;
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if(cur){ const p = playing ? nowMs() : null; stop(); render(); prepare(); if(p != null) play(p); } }, 300); });
+
+$('pick').innerHTML = PIECES.map((p, i) => `<option value="${i}">${esc(p.design.title || p.piece)} · ${esc(p.info.version)}${p.info.reason ? ' · ' + esc(p.info.reason) : ''}</option>`).join('');
+verovio.module.onRuntimeInitialized = () => {
+  tk = new verovio.toolkit();
+  let last = null; try{ last = localStorage.getItem('musigen-listen'); }catch{}
+  const i = Math.max(0, PIECES.findIndex(p => `${p.piece}/${p.info.version}` === last));
+  $('pick').value = String(i);
+  open(i);
+};
+</script>
+</body>
+</html>

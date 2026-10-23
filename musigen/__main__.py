@@ -34,7 +34,16 @@ def main() -> None:
     p.add_argument("--out", required=True, help="the piece's output folder; versions v001, v002 ... go inside")
     p.add_argument("--reason", default="", help="what this version answers (the listener's words)")
     p.add_argument("--preserve", nargs="*", default=[], help="kept from the last version: bars:1-8 rh:1-8 lh:1-8 motif:a")
+    p = sub.add_parser("listen", help="one HTML page to see and hear built pieces (every version, newest first)")
+    p.add_argument("roots", nargs="+", help="piece output folders (with v001, v002 ...)")
+    p.add_argument("--out", required=True)
+    p.add_argument("--latest", action="store_true", help="only the newest version of each piece")
+    p.add_argument("--embed-verovio", help="path to verovio-toolkit-wasm.js to embed (offline page, about 7 MB)")
     a = ap.parse_args()
+    if a.cmd == "listen":
+        from musigen.listen import build_page
+        print(build_page([Path(r) for r in a.roots], Path(a.out), a.latest, a.embed_verovio))
+        return
     if a.cmd == "design":
         from musigen.design import summary_ko, validate
         design, _ = _load_work(Path(a.work))

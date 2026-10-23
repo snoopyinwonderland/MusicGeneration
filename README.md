@@ -33,6 +33,26 @@ python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마�
 
 흐름, 원칙, 파일 형식은 [docs/COMPOSING.md](docs/COMPOSING.md)에 있습니다.
 
+### 듣기 페이지
+
+[docs/listen/index.html](docs/listen/index.html)은 시험곡 "비 갠 밤"을 담은 페이지입니다.
+
+- 악보를 보면서 재생할 수 있습니다. 음표를 누르면 그 위치부터 재생합니다.
+- 빠르기를 바꾸거나 한 손만 들을 수 있습니다.
+- 작곡 설계(요청/제안 표시)와 자동 검사 결과도 함께 보입니다.
+
+여는 방법은 두 가지입니다.
+
+- 파일을 내려받아 브라우저로 엽니다. 악보를 그리는 Verovio를 인터넷(jsDelivr)에서 불러옵니다.
+- 저장소 설정에서 GitHub Pages를 `main` 브랜치의 `/docs`로 켭니다. 그러면 `https://snoopyinwonderland.github.io/MusicGeneration/listen/`에서 바로 열립니다.
+
+`piece` 명령은 버전을 만들 때마다 `output\<곡>\listen.html`(모든 버전, 최신이 먼저)을 새로 씁니다. 따로 만들려면 다음 명령을 씁니다.
+
+```powershell
+python -m musigen listen output\after_rain --out docs\listen\index.html --latest
+python -m musigen listen output\after_rain --out x.html --embed-verovio "K:\Music Composition\node_modules\verovio\dist\verovio-toolkit-wasm.js"   # 인터넷 없이 (약 7MB)
+```
+
 ## 설치
 
 musicomp를 라이브러리로 씁니다. musicomp는 복사하지 않고 그 폴더를 경로로 읽습니다. 기본 위치는 이 폴더 옆의 `Music Composition`이고, 다른 곳에 있으면 `MUSICOMP_ROOT`로 지정합니다.

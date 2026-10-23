@@ -5,6 +5,7 @@ barlines and beats with ties, several voices per staff, chord symbols, dynamics.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from musicomp.core.score import Measure
@@ -20,8 +21,14 @@ def write_musicxml(piece: Piece, path: Path, subtitle: str = "") -> Path:
                                   meta={"src": n.src}))
     for on, text, dyn in piece.directions:
         part.directions.append(Direction(on, text, 1, "below" if dyn else "above", dyn))
+    prev = None
     for on, ch in piece.chords:
-        part.harmonies.append(HarmonySymbol(on, ch.root_tpc, ch.kind, ch.bass_tpc, ch.symbol))
+        if ch.symbol == prev:  # the same chord again (A7 at the end of one bar and through the next): written once
+            continue
+        prev = ch.symbol
+        # <kind text> is the suffix only - the reader prints the root and the /bass itself ('DDm', 'F/A/A' otherwise)
+        suffix = re.sub(r"^[A-G][#b]?", "", ch.symbol).split("/")[0]
+        part.harmonies.append(HarmonySymbol(on, ch.root_tpc, ch.kind, ch.bass_tpc, suffix))
     blen = piece.bar_len
     measures = [Measure(i, str(i + 1), i * blen, blen, blen) for i in range(piece.bars)]
     beats, beat_type = (int(x) for x in piece.meter.split("/"))
