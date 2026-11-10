@@ -39,6 +39,8 @@ def run(base,work,out,protected=8,pages_only=False):
     motif,plan,library,decisions=[read(n) for n in ('motif.json','development.json','references.json','decisions.json')]
     plans,leads,solos,details=assemble(base,motif,plan)
     report=controls(*solos,protected);controls(*leads,protected)
+    from musigen.melodic_connection import compare_connections
+    report['melodic_connections']=compare_connections(*solos)
     report['evidence']=evidence(library,decisions['uses'],report['changed_melody_bars'])
     report['input_sha256']=digest([motif,plan,library,decisions])
     report['baseline_xml_sha256']=hashlib.sha256((base/'piano_solo.musicxml').read_bytes()).hexdigest()
@@ -76,8 +78,11 @@ def run(base,work,out,protected=8,pages_only=False):
     page='''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>주제의 귀환과 마침 | MUSICANOTE</title>
 <style>body{margin:0;background:#f6f3eb;color:#243b32;font:16px/1.8 system-ui}main{max-width:1040px;margin:auto;padding:38px 24px}h1{font-size:36px}section{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}article,aside{border-radius:16px;padding:24px;background:#fffefa;border:1px solid #d1d9cd}a{color:#285b43}.listen{display:inline-block;padding:10px 20px;background:#315944;color:white;border-radius:8px;text-decoration:none}aside{background:#e8eee2}small{color:#5a6b60}@media(max-width:700px){section{grid-template-columns:1fr}h1{font-size:29px}}</style>
 <main><small>MUSICANOTE VIRTUAL COMPOSER</small><h1>주제의 귀환과 마침</h1><p>PIECE_FACTS</p><p>CONTROL_TEXT</p><section>CARDS</section><aside><strong>FOCUS_TITLE</strong><p>FOCUS_TEXT</p></aside><h2>관찰과 작곡 결정</h2><p>자료의 반복 관계, 긴 끝음과 뒤 쉼을 참고했습니다. 구체적인 조각내기·음높이·적용 마디는 작성자의 선택입니다. 자동 점수로 B가 더 좋다고 판정하지 않습니다.</p><p><a href="comparison.json">보존·프레이즈 검사</a> · <a href="decisions.json">마디별 근거</a> · <a href="references.json">자료와 출처</a></p><p><small>TAVERN · Devaney 외 · CC BY-SA 4.0. 작곡가 스타일 생성이나 새로운 학습 모델의 결과는 아닙니다.</small></p></main></html>'''.replace('CARDS',cards)
+    page=page.replace('주제의 귀환과 마침',e(decisions['presentation'].get('title','주제의 귀환과 마침')))
     values={'PIECE_FACTS':f'{solos[0].title} · {solos[0].bars}마디', 'CONTROL_TEXT':f'첫 {protected}마디, 전체 화성·왼손·빠르기·셈여림·페달을 같게 두고 선율 발전을 비교합니다.', 'FOCUS_TITLE':decisions['presentation']['focus_title'],'FOCUS_TEXT':decisions['presentation']['focus']}
     for token,value in values.items():page=page.replace(token,e(value))
+    from musigen.review_choice import manifest,section
+    page=page.replace('</main>',section(manifest(out,report))+'</main>')
     (out/'index.html').write_text(page,encoding='utf-8');return report
 
 
