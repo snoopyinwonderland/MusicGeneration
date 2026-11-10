@@ -58,7 +58,15 @@ def main() -> None:
     p.add_argument("--key", default="C")
     p.add_argument("--mode", choices=["major", "minor"], default="major")
     p.add_argument("--meter", choices=["2/4", "3/4", "4/4", "6/8"], default="4/4")
+    p = sub.add_parser("blueprint", help="모티프·발전 설계로 상세 화성 악보와 선택적 피아노 솔로 생성")
+    p.add_argument("work", help="motif.json + development.json 폴더")
+    p.add_argument("--out", required=True, help="새 결과 폴더")
+    p.add_argument("--arrange", action="store_true", help="기존 musicomp 검색 반주로 피아노 솔로 생성")
     a = ap.parse_args()
+    if a.cmd == "blueprint":
+        from musigen.blueprint import run
+        print(json.dumps(run(a.work,a.out,a.arrange),ensure_ascii=False,indent=2))
+        return
     if a.cmd == "motif":
         from musigen.motif_clip import develop
         print(json.dumps(develop(a.source, a.out, a.ops, a.key, a.mode, a.meter), ensure_ascii=False, indent=2))
