@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[프레이즈 발전 비교](docs/PHRASE_DEVELOPMENT_REVIEW.md)는 기존 완성곡의 화성·반주를 고정하고 주제 발전과 호흡을 비교하는 선택 기능입니다.
+
 [프레이즈 참조 자료](docs/PHRASE_REFERENCE_LIBRARY.md): 사람이 나눈 악구의 주제–변주 관계·끝 음가·쉼과 분석자별 원 주석을 조회하는 선택 기능입니다.
 
 말로 쓴 요청에서 새 피아노 곡을 만듭니다. 지금은 대화에서 작곡 설계와 악보를 작성하며, 검증·기보·감상·다운로드는 코드가 맡습니다. 내부 Python 패키지와 실행 명령 `musigen`은 호환성을 위해 유지합니다.
