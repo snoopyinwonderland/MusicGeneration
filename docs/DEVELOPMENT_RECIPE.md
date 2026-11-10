@@ -31,6 +31,8 @@ blocks의 `bars`는 해당 구간 안의 1부터 시작하는 상대 마디입�
 
 ## 출력과 보존
 
+선택적으로 `--tonal-references output/tonal/library.json`을 지정하면 각 stage의 `tonal_moves`와 실제 악보의 조성·세컨더리 화음·공통화음을 검증합니다. recipe의 `tonal_library_sha256`으로 참조 내용을 잠그며, 자료의 관찰과 작성 결정을 구분합니다. 필드·실행·제한은 [국소 조성 연결 안내](TONAL_DEVELOPMENT_REFERENCES.md)에 있습니다. 옵션이 없고 tonal_moves가 없는 기존 설계의 출력은 유지합니다.
+
 - 두 버전의 MusicXML·감상 HTML: 멜로디 + 상세 화성, 피아노 솔로.
 - `harmony.json`: 전체 구성음, 베이스, 전위, 국소 조성, 로마자, 길이, 종지·기능 의도.
 - `performed_harmony.json`: 실제 왼손 음표·출처와 설계 화음에서 생략된 음. 펼쳐진 음들을 동시 화음으로 오해하지 않도록 범위도 기록.
