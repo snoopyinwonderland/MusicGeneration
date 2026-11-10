@@ -39,6 +39,8 @@ python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마�
 
 `python -m musigen studio --out output\studio --port 8794`로 [모티프 입력 화면](docs/MOTIF_STUDIO.md)을 엽니다. 모티프·발전 방향·화성 선택·희망 작곡가를 로컬 작곡 대기함에 저장합니다. 작곡가 참조는 선택한 경우에만 비상업 DCML 마디 자료를 읽으며, 현재는 참고 검색까지 자동화되어 있습니다.
 
+TAVERN의 실제 주제–변주 악구를 관찰하고, 동일 모티프·화성·반주에서 대화로 작성한 두 발전안을 비교하는 선택 명령은 [모티프 발전 비교](docs/MOTIF_DEVELOPMENT_COMPARISON.md)에 있습니다. 자동 스타일 학습이나 기본 생성 방식의 변경은 아닙니다.
+
 ### 듣기 페이지
 
 [듣기 페이지](docs/listen/index.html)는 새 곡 **빛이 머무는 자리**의 피아노 솔로·바이올린–피아노 듀엣과 기존 시험곡 네 곡을 담습니다. 위쪽 메뉴에서 곡과 편성을 고릅니다. 「겨울 아침」은 Codex가 기보 기능 검증용으로 작성한 시험곡입니다.
