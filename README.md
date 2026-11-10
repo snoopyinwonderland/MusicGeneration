@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[모티프 발전 과정 작성](docs/DEVELOPMENT_RECIPE.md)은 구간 역할·자료 관찰·작곡 판단을 기록하고 같은 선율에서 상세 화성 악보와 피아노 솔로를 만드는 선택 명령입니다. 3/4·6/8의 다른 모티프 두 곡으로 작성 과정을 시험했습니다.
+
 [프레이즈 발전 비교](docs/PHRASE_DEVELOPMENT_REVIEW.md)는 기존 완성곡의 화성·반주를 고정하고 주제 발전과 호흡을 비교하는 선택 기능입니다.
 
 [프레이즈 참조 자료](docs/PHRASE_REFERENCE_LIBRARY.md): 사람이 나눈 악구의 주제–변주 관계·끝 음가·쉼과 분석자별 원 주석을 조회하는 선택 기능입니다.
