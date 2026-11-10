@@ -200,12 +200,12 @@ function applyHarmonyLabels(){
     const g=groups[i];
     if(!harmonyOriginal.has(g.id)) harmonyOriginal.set(g.id,g.innerHTML);
     g.innerHTML=harmonyOriginal.get(g.id);
-    if(harmonyMode!=='roman' || !compatible) continue;
+    if(!compatible || (harmonyMode!=='roman' && !rows[i].symbol_display)) continue;
     const texts=[...g.querySelectorAll('text')], text=texts[0];
     if(!text) continue;
     const original=text.querySelector('tspan[font-size]');
     const size=original?.getAttribute('font-size');
-    text.textContent=rows[i].display;
+    text.textContent=harmonyMode==='roman'?rows[i].display:rows[i].symbol_display;
     text.setAttribute('font-family','Times New Roman, serif');
     if(size) text.setAttribute('font-size',size);
     for(const other of texts.slice(1)) other.remove();
