@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[선율 연결 비교와 청취 의견](docs/MELODIC_CONNECTION_REVIEW.md): 원형·화성·왼손을 보존한 연결 수정판과 A/B·거절·보류 기록을 제공합니다. [초기 P1–P5 진행 상태](docs/PLAN_STATUS_2026-11-11.md)는 완료·중단·실제 선택 대기를 구별합니다.
+
 [기존 작품의 같은 주제로 다른 곡 만들기](docs/SOURCE_MOTIF_COMPOSITIONS.md): 명시한 MusicXML 성부·구간에서 모티프와 출처를 가져옵니다. 「엘리제를 위하여」의 같은 첫 9음으로 3/4 서정곡과 4/4 춤곡을 작성해 비교했습니다.
 
 [모티프 발전 과정 작성](docs/DEVELOPMENT_RECIPE.md)은 구간 역할·자료 관찰·작곡 판단을 기록하고 같은 선율에서 상세 화성 악보와 피아노 솔로를 만드는 선택 명령입니다. 3/4·6/8의 다른 모티프 두 곡으로 작성 과정을 시험했습니다.
