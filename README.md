@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[2·4·8마디 구절과 화성 시각 참조](docs/PHRASE_CONTEXT_LIBRARY.md): 사람이 나눈 프레이즈 안에서 마디별 화성 변화와 끝의 쉼을 조회하고, 분석자별 해석·출처를 보존한 참고 JSON을 받습니다. 선택 자료 탐색 기능이며 기본 생성은 바꾸지 않습니다.
+
 [선율 연결 비교와 청취 의견](docs/MELODIC_CONNECTION_REVIEW.md): 원형·화성·왼손을 보존한 연결 수정판과 A/B·거절·보류 기록을 제공합니다. [초기 P1–P5 진행 상태](docs/PLAN_STATUS_2026-11-11.md)는 완료·중단·실제 선택 대기를 구별합니다.
 
 [기존 작품의 같은 주제로 다른 곡 만들기](docs/SOURCE_MOTIF_COMPOSITIONS.md): 명시한 MusicXML 성부·구간에서 모티프와 출처를 가져옵니다. 「엘리제를 위하여」의 같은 첫 9음으로 3/4 서정곡과 4/4 춤곡을 작성해 비교했습니다.
