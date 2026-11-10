@@ -14,7 +14,7 @@ from musigen.piece import _bars
 ROLES={'statement':'statement','response':'statement','development':'development','contrast':'contrast','return':'return','cadence':'coda'}
 
 
-def compile_recipe(motif,recipe,library):
+def compile_recipe(motif,recipe,library,tonal_library=None):
     if recipe.get('format')!='musicanote-development-recipe' or recipe.get('version')!=1:raise ValueError('발전 과정 형식 오류')
     observed={r['id'] for r in library['phrases'] if r['status']=='observed'}
     design=copy.deepcopy(recipe['design']);design['form']=[];design['phrase_plan']=[]
@@ -48,7 +48,12 @@ def compile_recipe(motif,recipe,library):
           'harmony':copy.deepcopy(recipe['harmony']),
           'references':[{'kind':'author_interpreted_observations','source':library['source_url'],
                          'license':library['license'],'ids':sorted({r for s in trace for r in s['reference_ids']})}]}
-    lead,_,_=prepare(motif,plan)  # protects the exact opening and checks harmony coverage
+    lead,_,details=prepare(motif,plan)  # protects the exact opening and checks harmony coverage
+    from musigen.tonal_plan import validate as validate_tonal
+    tonal_trace=validate_tonal(recipe,tonal_library,lead,details)
+    if tonal_trace:
+        plan['references'].append({'kind':'authored_tonal_moves_from_verified_annotations',
+            'library_sha256':digest(tonal_library),'moves':tonal_trace})
     for row in trace:
         lo,hi=lead.bar_start(row['bars'][0]),lead.bar_end(row['bars'][1])
         notes=[n for n in lead.notes if n.hand=='rh' and lo<=n.onset<hi]
@@ -59,23 +64,33 @@ def compile_recipe(motif,recipe,library):
     score={'blocks':solo_blocks,'motifs':{'input':copy.deepcopy(motif)},'expression':copy.deepcopy(recipe.get('expression',[]))}
     realization={'format':'musicanote-piano-realization','version':1,'score':score,
                  'feedback':{'user_text':recipe['request'],'scope':'다른 모티프의 작성 과정 재사용 시험; 사용자 선택 기록 아님'}}
-    return plan,realization,{'recipe_sha256':digest(recipe),'library_sha256':digest(library),'motif_sha256':digest(motif),
-                             'status':'authored_recipe_not_fitted_generator','stages':trace}
+    if tonal_trace:realization['feedback']['scope']='국소 조성 참조에 근거해 작성한 발전 설계; 사용자 선택 기록 아님'
+    report={'recipe_sha256':digest(recipe),'library_sha256':digest(library),'motif_sha256':digest(motif),
+            'status':'authored_recipe_not_fitted_generator','stages':trace}
+    if tonal_trace:report.update(tonal_library_sha256=digest(tonal_library),tonal_moves=tonal_trace)
+    return plan,realization,report
 
 
-def run(work,out,corpus=False,pages_only=False):
+def run(work,out,corpus=False,pages_only=False,tonal_references=None):
     work,out=Path(work),Path(out);read=lambda n:json.loads((work/n).read_text(encoding='utf-8'))
     motif,recipe,library=[read(n) for n in ('motif.json','recipe.json','references.json')]
-    plan,realization,trace=compile_recipe(motif,recipe,library)
+    tonal=json.loads(Path(tonal_references).read_text(encoding='utf-8')) if tonal_references else None
+    plan,realization,trace=compile_recipe(motif,recipe,library,tonal)
     compiled=work/'compiled';compiled.mkdir(exist_ok=True)
     for n,v in [('motif.json',motif),('development.json',plan),('realization.json',realization)]:dump(compiled/n,v)
     result=render(compiled,out,corpus,pages_only)
     dump(out/'development_trace.json',trace);dump(out/'recipe.json',recipe);dump(out/'references.json',library)
+    if trace.get('tonal_moves'):
+        from musigen.tonal_plan import write_page
+        dump(out/'tonal_references.json',tonal);write_page(trace['tonal_moves'],tonal,out)
+        target=out/'index.html';text=target.read_text(encoding='utf-8')
+        target.write_text(text.replace('<main>','<main><nav><a href="tonal_development.html">조성 이동과 모티프 발전 근거 →</a></nav>',1),encoding='utf-8')
     return result
 
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description='명시적인 프레이즈 발전 과정을 두 악보로 실현')
     p.add_argument('--work',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
-    p.add_argument('--corpus-accompaniment',action='store_true');p.add_argument('--pages-only',action='store_true');a=p.parse_args()
-    print(json.dumps(run(a.work,a.out,a.corpus_accompaniment,a.pages_only),ensure_ascii=False))
+    p.add_argument('--corpus-accompaniment',action='store_true');p.add_argument('--pages-only',action='store_true')
+    p.add_argument('--tonal-references',type=Path,help='선택: 검증한 국소 조성 참조 JSON');a=p.parse_args()
+    print(json.dumps(run(a.work,a.out,a.corpus_accompaniment,a.pages_only,a.tonal_references),ensure_ascii=False))
