@@ -24,7 +24,7 @@ main{max-width:1468px;margin:auto;padding:0 24px 40px}.hero{display:flex;justify
 <main>
   <section class="hero"><div><div class="eyebrow">MUSICANOTE · 작곡과 감상</div><h1 id="workTitle">새로운 음악의 자리</h1><p id="workScene">악보를 읽고, 소리로 만나 보세요.</p><div class="meta" id="workMeta"></div></div><div class="hero-art" aria-hidden="true"></div></section>
   <section class="player" aria-label="재생과 악보 받기">
-    <div class="transport"><button id="play" class="primary" disabled>▶ 재생</button><button id="stop" disabled>■ 처음으로</button><button id="compare" disabled>바뀐 곳 비교</button><span id="status" aria-live="polite">준비 중…</span><div class="downloads"><button id="downloadXml" disabled>MusicXML 받기</button><button id="downloadPdf" class="primary" disabled>PDF 받기</button><button id="downloadAudio" disabled>샘플 WAV 받기</button></div></div>
+    <div class="transport"><button id="play" class="primary" disabled>▶ 재생</button><button id="stop" disabled>■ 처음으로</button><button id="compare" disabled>바뀐 곳 비교</button><span id="status" aria-live="polite">준비 중…</span><div class="downloads"><button id="downloadXml" disabled>MusicXML 받기</button><button id="downloadPdf" class="primary" disabled>PDF 받기</button><button id="downloadAudio" disabled>샘플 WAV 받기</button><button id="downloadAudioCredit">음원 출처 받기</button></div></div>
     <div class="controls"><label>재생 음원 <select id="timbre"><option value="piano">피아노 샘플</option><option value="synth">합성음</option></select></label><label>빠르기 <input id="speed" type="range" min="50" max="150" value="100" step="5"><span id="speedv">100%</span></label><label id="violinControl" hidden><input id="violin" type="checkbox" checked>바이올린</label><label id="violaControl" hidden><input id="viola" type="checkbox" checked>비올라</label><label id="celloControl" hidden><input id="cello" type="checkbox" checked>첼로</label><label><input id="rh" type="checkbox" checked><span id="rhLabel">오른손</span></label><label><input id="lh" type="checkbox" checked><span id="lhLabel">왼손</span></label><label><input id="follow" type="checkbox" checked>악보 따라가기</label></div>
   </section>
   <div class="workspace"><section><div class="score-heading"><h2>악보</h2><button id="openMotifStudio">모티프 작업실</button><a id="permalink" href="#">이 악보 주소</a></div><div class="harmony-switch" role="group" aria-label="화성 표기"><button id="chordSymbols" aria-pressed="true">Chord Symbols · 코드 심벌</button><button id="romanAnalysis" aria-pressed="false">Roman Numeral Analysis</button><label>위치 <select id="harmonyPlacement"><option value="below">보표 아래</option><option value="original">원래 위치</option></select></label><small id="harmonyHint">화성 표기 전환은 화면에 적용됩니다. 다운로드는 원본 악보입니다.</small></div><div id="score"><p class="muted">악보를 준비하고 있습니다.</p></div></section><aside class="card" id="about"></aside></div>
@@ -81,7 +81,7 @@ function about(p){
   $('workTitle').textContent=d.title || p.piece;
   $('workScene').textContent=imp.arc || imp.scene || '악보를 읽고, 소리로 만나 보세요.';
   $('workMeta').innerHTML=[ensembleLabel(p),`${b.key} ${MODE[b.mode]}`,b.meter,`약 ${Math.round(c.stats.seconds)}초`,v.version].map(x=>`<span>${esc(x)}</span>`).join('');
-  document.title=`${d.title} · ${duet?'듀엣':'피아노 솔로'} | MUSICANOTE Virtual Composer`;
+  document.title=`${d.title} · ${ensembleLabel(p)} | MUSICANOTE Virtual Composer`;
   let h = `<h2>작곡 노트</h2>`;
   if(d.credits?.composer) h += `<p class="muted">작곡: ${esc(d.credits.composer)}<br>${esc(d.credits.note || '')}</p>`;
   if(duet) h += `<p class="muted">${esc(v.interpretation || ensembleLabel(p))}</p>`;
@@ -551,10 +551,14 @@ $('downloadAudio').addEventListener('click',async()=>{
     const rendered=await audio.startRendering();
     const base=`${selected.piece}-${selected.info.version}`;
     download(wavBlob(rendered),base+'.wav');
-    const notice=`${selected.design.title} · ${selected.info.version}\n악기 샘플: FluidR3_GM — Frank Wen 및 기여자 (© 2000–2002, 2008). MP3 패키징 Benjamin Gleitzman.\nCC BY 3.0 US https://creativecommons.org/licenses/by/3.0/us/\n원본 https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef\n3반음 간격 샘플을 선택해 JSON으로 변환, MP3 유지. 샘플별 진폭 정규화와 음 이동·길이 조절. 피아노는 페달, 현악기는 약식 지속 루프를 적용한 렌더링.\n이 샘플 출처는 악보 자체의 권리와 별개입니다.\n`;
-    download(new Blob([notice],{type:'text/plain;charset=utf-8'}),base+'-출처.txt');
   }catch(e){ $('status').textContent='음원 저장 실패: '+e.message; }
   finally{ button.disabled=false; button.textContent='샘플 WAV 받기'; }
+});
+// One download per user action: consecutive Blob links can replace each other in embedded browsers.
+$('downloadAudioCredit').addEventListener('click',()=>{
+  if(!cur) return;
+  const notice=`${cur.design.title} · ${cur.info.version}\n악기 샘플: FluidR3_GM — Frank Wen 및 기여자 (© 2000–2002, 2008). MP3 패키징 Benjamin Gleitzman.\nCC BY 3.0 US https://creativecommons.org/licenses/by/3.0/us/\n원본 https://github.com/gleitz/midi-js-soundfonts/tree/044fab8e1456bfafc5776e86dfd6bb8697149aef\n3반음 간격 샘플을 선택해 JSON으로 변환, MP3 유지. 샘플별 진폭 정규화와 음 이동·길이 조절. 피아노는 페달, 현악기는 약식 지속 루프를 적용한 렌더링.\n이 샘플 출처는 악보 자체의 권리와 별개입니다.\n`;
+  download(new Blob([notice],{type:'text/plain;charset=utf-8'}),`${cur.piece}-${cur.info.version}-출처.txt`);
 });
 window.addEventListener('hashchange',()=>{
   const q=new URLSearchParams(location.hash.slice(1));
