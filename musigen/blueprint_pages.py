@@ -34,7 +34,8 @@ def write_pages(piece,plan,details,report,out,checks):
             check_view={'stats':{'seconds':float(piece.bars*piece.bar_len)*60/piece.qpm},'sections':[],
                         'errors':[],'warnings':['편곡 검사는 별도 arrangement/report.json 참조. 이 화면의 표현 재생은 기본값입니다.'],'notes':[]}
         harmony=[{**e['roman'],'q':float(Fraction(e['onset'])),
-                  'bar':e['bar'],'symbol':e['symbol']} for e in details['events']]
+                  'bar':e['bar'],'symbol':e['symbol'],
+                  'symbol_display':e['roman']['display'] if e['quality'] in ('It6','Fr43','Ger65') else None} for e in details['events']]
         pdf=out/(key+'.pdf')
         entry={'piece':key,'xml':xml,'design':design,'checks':check_view,
                'info':{'version':'v001','reason':f'짧은 모티프의 {piece.bars}마디 발전 및 상세 화성 전달 검증','preserve':[],'preserve_broken':[]},
@@ -51,7 +52,7 @@ def write_pages(piece,plan,details,report,out,checks):
     esc=lambda v:html.escape(str(v))
     functions={'tonic':'으뜸 기능','predominant':'딸림 준비','dominant':'딸림 기능','other':'기타'}
     rows=''.join('<tr>'+''.join('<td>'+esc(v)+'</td>' for v in
-        (e['bar'],e['offset'],e['duration'],e['symbol'],e['roman']['display'],e['bass'],
+        (e['bar'],e['offset'],e['duration'],e['key'],e['symbol'],e['roman']['display'],e['bass'],
          ' · '.join(e['tones']),' · '.join(e['voicing']),functions.get(e.get('function'),''),e.get('cadence','')))+'</tr>' for e in details['events'])
     links=''.join('<a class="button" href="'+url+'">'+esc(title)+' 악보·듣기</a>' for title,url in entries)
     page='''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MUSICANOTE · 모티프에서 한 곡으로</title>
@@ -59,6 +60,6 @@ def write_pages(piece,plan,details,report,out,checks):
 <small>MUSICANOTE Virtual Composer</small><h1>모티프에서 한 곡으로</h1><h2>'''+esc(plan['design']['title'])+'''</h2><p>입력 모티프 → 구절별 발전 설계 → 멜로디와 상세 화성 → 기존 musicomp 피아노 편곡</p>'''+links+'''
 <p class="note">작곡자가 작성한 첫 초안입니다. 화성 악보는 왼손에 전체 구성음을 펼쳐 보이는 설계용 악보이고, 피아노 솔로는 기존 반주 라이브러리로 만든 연주용 편곡입니다. 종지·기능은 작곡 의도이며 자동 분석의 정답 라벨이 아닙니다.</p>
 <p><a href="melody_harmony.musicxml" download>화성 악보 MusicXML</a> · <a href="melody_harmony.mid" download>MIDI</a> · <a href="harmony.json" download>상세 화성 JSON</a> · <a href="development.json" download>발전 설계 JSON</a></p>
-<h2>왼손 화성 설계</h2><p>시작과 길이는 4분음표 단위입니다. 시작 0은 해당 마디의 첫 박입니다. 선율과의 관계·출처·구절 계획은 JSON에 포함합니다.</p><div class="scroll"><table><thead><tr>'''+''.join('<th>'+x+'</th>' for x in ['마디','시작','길이','코드','로마자','베이스','전체 구성음','왼손 배치','기능 의도','종지 의도'])+'''</tr></thead><tbody>'''+rows+'''</tbody></table></div></main></html>'''
+<h2>왼손 화성 설계</h2><p>시작과 길이는 4분음표 단위입니다. 시작 0은 해당 마디의 첫 박입니다. 선율과의 관계·출처·구절 계획은 JSON에 포함합니다.</p><div class="scroll"><table><thead><tr>'''+''.join('<th>'+x+'</th>' for x in ['마디','시작','길이','국소 조성','코드','로마자','베이스','전체 구성음','왼손 배치','기능 의도','종지 의도'])+'''</tr></thead><tbody>'''+rows+'''</tbody></table></div></main></html>'''
     (out/'index.html').write_text(page,encoding='utf-8')
     return str(out/'index.html')
