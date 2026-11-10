@@ -105,6 +105,8 @@ python -m unittest discover -s tests
 
 ## 현재 상태
 
+로컬 MusicXML·MIDI·대중음악·주제/화성 주석 자료의 조사 및 스타일 관찰 도구는 [전체 자료 목록과 스타일 관찰](docs/CORPUS_STYLE_CATALOG.md)에 있습니다. `python -m musigen.corpus_catalog`로 자료 목록, 마디/성부 통계, 작곡가·시대·활동 지역별 참고를 조회합니다. 이 꾸러미는 새 작곡 모델 학습이나 기본 생성 설정 변경과 구분합니다.
+
 기틀만 있습니다.
 
 - 리드시트 기준선(`compose`/`text`): 규칙으로 선율을 만듭니다. 리듬 템플릿, 아치형 윤곽, 강박 화음음, 약박 음계 경과를 씁니다. 개선 방향은 [docs/HANDOFF.md](docs/HANDOFF.md)에 있습니다.
