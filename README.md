@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[기존 작품의 같은 주제로 다른 곡 만들기](docs/SOURCE_MOTIF_COMPOSITIONS.md): 명시한 MusicXML 성부·구간에서 모티프와 출처를 가져옵니다. 「엘리제를 위하여」의 같은 첫 9음으로 3/4 서정곡과 4/4 춤곡을 작성해 비교했습니다.
+
 [모티프 발전 과정 작성](docs/DEVELOPMENT_RECIPE.md)은 구간 역할·자료 관찰·작곡 판단을 기록하고 같은 선율에서 상세 화성 악보와 피아노 솔로를 만드는 선택 명령입니다. 3/4·6/8의 다른 모티프 두 곡으로 작성 과정을 시험했습니다.
 
 [프레이즈 발전 비교](docs/PHRASE_DEVELOPMENT_REVIEW.md)는 기존 완성곡의 화성·반주를 고정하고 주제 발전과 호흡을 비교하는 선택 기능입니다.
