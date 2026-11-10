@@ -26,3 +26,23 @@ test('without pedal, existing gate duration stays unchanged',()=>{
 for(const instrument of ['viola','cello']) test('piano pedal never extends '+instrument,()=>{
  assert.equal(render([{kind:'pedal',start:0,changes:[],end:3}],instrument).d,950);
 });
+
+test('audio and attribution each use one explicit download action',async()=>{
+ const handlers={},downloads=[],elements={};
+ const context={
+  $:id=>elements[id]??=( {addEventListener:(event,fn)=>{handlers[id]=fn;},value:'100'} ),
+  pianoReady:true,cur:{piece:'sample',design:{title:'시험곡'},info:{version:'v001'}},
+  notes:[],audible:()=>true,endMs:()=>1000,sampleTone:()=>{},
+  OfflineAudioContext:class{async startRendering(){return 'pcm';}},
+  wavBlob:pcm=>new Blob([pcm]),Blob,download:(blob,name)=>downloads.push({blob,name})
+ };
+ const start=source.indexOf("$('downloadAudio').addEventListener");
+ const end=source.indexOf("window.addEventListener('hashchange'",start);
+ vm.runInNewContext(source.slice(start,end),context);
+ await handlers.downloadAudio();
+ assert.deepEqual(downloads.map(d=>d.name),['sample-v001.wav']);
+ handlers.downloadAudioCredit();
+ assert.deepEqual(downloads.map(d=>d.name),['sample-v001.wav','sample-v001-출처.txt']);
+ assert.match(await downloads[1].blob.text(),/CC BY 3\.0 US/);
+ assert.equal(elements.downloadAudio.disabled,false);
+});
