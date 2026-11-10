@@ -17,6 +17,7 @@ from musigen.motif_clip import read_events, pitch_name
 from musigen.piano_io import piano_part, write_midi
 from musigen.harmony_labels import label
 from musicomp.theory import tpc_name
+from musigen.functional_harmony import resolve, resolution_report, AUGMENTED
 
 
 def dump(path, value):
@@ -48,8 +49,8 @@ def prepare(motif, plan):
     piece=build(plan['design'],score)
     if piece.pickup:
         raise ValueError('첫 버전의 화성 교환은 온마디 시작만 지원합니다')
-    if any(k!=piece.key for k in piece.bar_keys.values()):
-        raise ValueError('첫 교환 버전은 단일 조성만 지원합니다. 국소 조성을 조용히 버리지 않습니다')
+    if piece.bar_keys[1]!=piece.key:
+        raise ValueError('첫 마디 조성은 design.basics의 조성과 같아야 합니다')
     if any(n.hand!='rh' or n.voice!=1 or len(n.pitches)!=1 for n in piece.notes):
         raise ValueError('설계 score에는 단선율 rh만 씁니다. 왼손은 harmony로 지정하세요')
     if any(ch for _,ch in piece.analysis_chords) or piece.expression:
@@ -64,14 +65,15 @@ def prepare(motif, plan):
         raise ValueError('첫 제시는 입력 모티프의 음·음가·쉼을 그대로 보존해야 합니다')
     events=[];cursor=F(0);left=[]
     for i,event in enumerate(plan['harmony']):
-        if set(event)-{'bar','offset','duration','symbol','function','cadence','voicing','note','source'}:
+        if set(event)-{'bar','offset','duration','symbol','figure','function','cadence','voicing','note','source'}:
             raise ValueError('알 수 없는 화성 필드입니다')
         bar=event['bar'];off=F(event.get('offset','0'));dur=F(event['duration'])
         if type(bar)is not int or not 1<=bar<=piece.bars or off<0 or dur<=0 or off+dur>piece.bar_len:
             raise ValueError('화성은 마디 안의 양의 길이를 가져야 합니다')
         start=piece.bar_start(bar)+off
         if start!=cursor:raise ValueError('화성 시점은 순서대로 빈틈·겹침 없이 이어져야 합니다')
-        ch=parse_chord(event['symbol'])
+        key=piece.bar_keys[bar]
+        ch,roman,intent=resolve(event,key)
         if event.get('function') not in (None,'tonic','predominant','dominant','other'):
             raise ValueError('function은 tonic/predominant/dominant/other입니다')
         if event.get('cadence') not in (None,'PAC','IAC','HC','DC','PC','EC'):
@@ -90,8 +92,6 @@ def prepare(motif, plan):
             raise ValueError('화성 요약 악보의 왼손 배치는 한 옥타브 이내로 지정하세요')
         left.append(Note(start,dur,pairs,'lh',1,'harmony:authored'))
         piece.chords.append((start,ch));piece.analysis_chords.append((start,ch))
-        key=piece.bar_keys[bar]
-        roman=label(ch,key)
         relationships=[]
         for n in piece.notes:
             if n.onset<start+dur and n.onset+n.dur>start:
@@ -99,20 +99,26 @@ def prepare(motif, plan):
                 relationships.append({'onset':str(n.onset),'duration':str(n.dur),'pitch':pitch_name(m,t),
                                       'chord_tone':m%12 in {pc for pc,t in ch.tones},
                                       'sustained_into_event':n.onset<start})
-        events.append({**event,'offset':str(off),'duration':str(dur),'onset':str(start),
+        events.append({**event,'symbol':ch.symbol,'offset':str(off),'duration':str(dur),'onset':str(start),
             'key':tpc_name(key.tonic_tpc)+(' minor' if key.minor else ' major'),
-            'roman':roman,'root':tpc_name(ch.root_tpc),'quality':ch.quality,
+            'roman':roman,'root':None if ch.quality in AUGMENTED else tpc_name(ch.root_tpc),'quality':ch.quality,
+            'functional_intent':intent,
+            'root_basis':'reference_tonic_for_functional_sixth' if ch.quality in AUGMENTED else 'chord_root',
             'bass':tpc_name(ch.bass_tpc),'tones':[tpc_name(t) for pc,t in ch.tones],
-            'inversion':inversion(ch) if ch.bass_tpc in {t for pc,t in ch.tones} else None,
+            'inversion':inversion(ch) if ch.quality not in AUGMENTED and ch.bass_tpc in {t for pc,t in ch.tones} else None,
             'voicing':[pitch_name(m,t) for m,t in pairs],
             'cadence_status':'composer_intent_not_verified' if event.get('cadence') else None,
             'melody_relation':relationships,'source':event.get('source',{'kind':'composer','status':'proposed'})})
         cursor=start+dur
     if cursor!=piece.bars*piece.bar_len:raise ValueError('모든 마디의 화성을 지정해야 합니다')
+    resolution_report(events)
     piece.notes=sorted(piece.notes+left,key=lambda n:(n.onset,n.hand,n.voice))
     return piece,score,{'format':'musicanote-harmony','version':1,'time_unit':'quarter_note',
         'motif_sha256':digest(motif),'plan_sha256':digest(plan),'events':events,
         'phrase_plan':plan['design'].get('phrase_plan',[]),'references':plan.get('references',[]),
+        'key_plan':[{'bar':b,'tonic':tpc_name(k.tonic_tpc),'mode':'minor' if k.minor else 'major',
+                     'status':'composer_intent_not_cadence_verified'} for b,k in piece.bar_keys.items()
+                    if b==1 or k!=piece.bar_keys[b-1]],
         'arranger_contract':{'musicxml':'timing, chord tones, bass and melody',
             'sidecar_only':['function','cadence intent','emotion','provenance','voicing intent'],
             'note':'musicomp는 sidecar를 아직 읽지 않으며 지정 화음으로 편곡합니다. 보이싱 유지 보장은 아님.'}}
@@ -128,7 +134,16 @@ def verify_roundtrip(piece,path):
     wanted=[(on,chords[i+1][0] if i+1<len(chords) else end,{t for pc,t in ch.tones}|{ch.bass_tpc},ch.bass_tpc) for i,(on,ch) in enumerate(chords)]
     got=[(c.onset,c.end,set(c.tpcs),c.bass_tpc) for c in mel.given_chords]
     if wanted!=got:raise ValueError('MusicXML 재읽기에서 화음 시점·구성음·베이스가 달라졌습니다')
-    return {'melody_notes':len(actual),'harmony_events':len(got),'exact':True}
+    changes=[(piece.bar_start(b),k.sharps) for b,k in piece.bar_keys.items()
+             if b==1 or k.sharps!=piece.bar_keys[b-1].sharps]
+    if mel.key_changes!=changes:raise ValueError('MusicXML 재읽기에서 조표 변화가 달라졌습니다')
+    # musicomp's key_changes carries fifths only. Verify major/minor mode in XML too.
+    keys=[(int(m.get('number')),int(k.findtext('fifths')),k.findtext('mode'))
+          for m in ET.parse(path).findall('./part/measure') for k in m.findall('./attributes/key')]
+    wanted_keys=[(b,k.sharps,'minor' if k.minor else 'major') for b,k in piece.bar_keys.items()
+                 if b==1 or k!=piece.bar_keys[b-1]]
+    if keys!=wanted_keys:raise ValueError('MusicXML의 조성·장단조 정보가 달라졌습니다')
+    return {'melody_notes':len(actual),'harmony_events':len(got),'key_regions':len(keys),'exact':True}
 
 
 def write_xml(piece,path):
@@ -140,10 +155,15 @@ def write_xml(piece,path):
                     for on,ch in piece.analysis_chords]
     measures=[Measure(i,str(i+1),i*piece.bar_len,piece.bar_len,piece.bar_len) for i in range(piece.bars)]
     beats,unit=map(int,piece.meter.split('/'))
-    path=write_score(path,piece.title,[part],measures,beats,unit,piece.key.sharps,piece.key.minor,tempo=piece.qpm)
+    changes=[(b-1,k.sharps,k.minor) for b,k in piece.bar_keys.items() if b>1 and k!=piece.bar_keys[b-1]]
+    path=write_score(path,piece.title,[part],measures,beats,unit,piece.key.sharps,piece.key.minor,tempo=piece.qpm,key_changes=changes)
     tree=ET.parse(path)
     for h,(_,ch) in zip(tree.findall('.//harmony'),piece.analysis_chords):
         h.set('placement','below')
+        if ch.quality in AUGMENTED:
+            h.find('kind').text=AUGMENTED[ch.quality]
+            h.find('kind').set('text',ch.quality)
+            h.find('root/root-step').set('text','')
         if ch.quality in ('6','m6'):
             h.find('kind').text='minor-sixth' if ch.quality=='m6' else 'major-sixth'
         if ch.quality in ('add9','madd9','7sus4'):
