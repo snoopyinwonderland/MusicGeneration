@@ -62,7 +62,14 @@ def main() -> None:
     p.add_argument("work", help="motif.json + development.json 폴더")
     p.add_argument("--out", required=True, help="새 결과 폴더")
     p.add_argument("--arrange", action="store_true", help="기존 musicomp 검색 반주로 피아노 솔로 생성")
+    p = sub.add_parser("studio", help="모티프 입력·작곡 요청 보관 화면 (로컬 전용)")
+    p.add_argument("--out", default="output/studio")
+    p.add_argument("--port", type=int, default=8794)
     a = ap.parse_args()
+    if a.cmd == "studio":
+        from musigen.studio import serve
+        serve(a.out,a.port)
+        return
     if a.cmd == "blueprint":
         from musigen.blueprint import run
         print(json.dumps(run(a.work,a.out,a.arrange),ensure_ascii=False,indent=2))
