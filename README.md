@@ -35,6 +35,8 @@ python -m musigen piece <작업 폴더> --out output\after_rain --reason "17마�
 
 흐름, 원칙, 파일 형식은 [docs/COMPOSING.md](docs/COMPOSING.md)에 있습니다.
 
+짧은 선율을 발전시켜 **멜로디 + 상세 왼손 화성**, 선택적으로 기존 musicomp의 **피아노 독주**를 만드는 새 `blueprint` 명령은 [모티프·화성 교환 안내](docs/MOTIF_HARMONY_BLUEPRINT.md)에 있습니다. 발전 설계는 현재 대화에서 작성하며, 코드는 보존·교환 검증과 출력을 맡습니다.
+
 ### 듣기 페이지
 
 [듣기 페이지](docs/listen/index.html)는 새 곡 **빛이 머무는 자리**의 피아노 솔로·바이올린–피아노 듀엣과 기존 시험곡 네 곡을 담습니다. 위쪽 메뉴에서 곡과 편성을 고릅니다. 「겨울 아침」은 Codex가 기보 기능 검증용으로 작성한 시험곡입니다.
