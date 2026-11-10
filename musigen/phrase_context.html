@@ -1,0 +1,65 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>구절의 연결과 마침 | MUSICANOTE Virtual Composer</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f1e9;color:#243b32;font:16px/1.75 system-ui,sans-serif}main{max-width:1140px;margin:auto;padding:38px 28px}.brand{font-size:12px;letter-spacing:.14em;color:#53725e;font-weight:700}h1{font-size:clamp(30px,4vw,45px);line-height:1.3;margin:16px 0}h2{font-size:23px}h3{font-size:17px}header p{max-width:850px;color:#52685b}.stats{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}.stats span{border:1px solid #c8d3c3;border-radius:24px;padding:5px 14px;font-size:14px}.panel{background:#fffefa;border:1px solid #d3dccd;border-radius:16px;padding:23px;margin:20px 0}.filters{display:flex;gap:18px;flex-wrap:wrap;align-items:end}label{font-size:14px}select,button{font:inherit;border:1px solid #b5c4b5;border-radius:7px;padding:8px 12px;background:white;color:inherit}select{display:block;max-width:100%;margin:6px 0}button{cursor:pointer;background:#315c43;color:white}#unit{width:100%}.muted{color:#627266;font-size:14px}.bands{display:grid;gap:18px}.bar-row{display:flex;min-width:600px}.bar-cell{flex:1;border-right:1px solid #bdcabb;border-bottom:1px solid #bdcabb;padding:5px 8px;min-width:90px;font-size:13px}.bar-cell:first-child{border-left:1px solid #bdcabb}.scroll{overflow:auto;max-width:100%}.band{position:relative;height:50px;min-width:600px;background:#edf1e8;border-bottom:1px solid #bdcabb}.segment{position:absolute;height:100%;border-right:1px solid white;background:#d8e5d0;overflow:hidden;padding:3px 5px;color:#25432d;font:14px/1.45 Georgia,serif}.segment:nth-child(even){background:#e4ebdc}.functions .segment{background:#e8dfc8;color:#594b2c}.functions .segment:nth-child(even){background:#efe8d6}.segment small{display:block;font:10px system-ui;color:#586452}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;border-bottom:1px solid #d7dfd1;padding:9px;vertical-align:top}td{overflow-wrap:anywhere}.notice{background:#e6eddf}.warning{background:#f3ead7}.actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center}a{color:#315c43}details{margin:18px 0}summary{cursor:pointer;font-weight:600}code{overflow-wrap:anywhere}footer{font-size:13px;color:#647367;margin:28px 0}@media(max-width:650px){main{padding:24px 16px}.panel{padding:17px}th,td{padding:8px 5px}.filters>label{flex:1 1 130px}}
+.segment strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.segment small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+<main><header><div class="brand">MUSICANOTE VIRTUAL COMPOSER · 자료 작업실</div><h1>구절은 어떻게 이어지고 마무리될까요?</h1>
+<p>사람이 나눈 프레이즈 안에서 2·4·8마디를 함께 살펴봅니다. 화성이 바뀌는 시각, 끝의 쉼, 분석자마다 다른 해석을 보존해 새 모티프의 발전 설계에 참고합니다.</p>
+<p class="muted">원 악보와 분석 파일의 음표 시각·마디 경계·박자가 맞는 자료만 표시합니다. 반복은 펼치지 않으며, 자동 스타일 학습이나 새 곡 생성 화면은 아닙니다.</p></header>
+<div class="stats" id="coverage"></div>
+<section class="panel"><div class="filters">
+<label>구간 길이<select id="length"><option value="8">8마디</option><option value="4">4마디</option><option value="2">2마디</option><option value="all">전체</option></select></label>
+<label>박자<select id="meter"><option value="all">전체</option></select></label>
+<label>작곡가<select id="composer"><option value="all">전체</option></select></label>
+<label><input type="checkbox" id="ending"> 원 프레이즈 끝까지 포함</label></div>
+<p id="match-count" role="status"></p><label>참고 구간<select id="unit"></select></label></section>
+<div id="reference"></div>
+<section class="panel notice"><h2>새 모티프에 활용하기</h2><p>이 구간을 참고 자료로 받아 대화에 전달할 수 있습니다. 어떤 리듬을 유지할지, 어느 지점에서 화성을 바꿀지, 어떤 종지를 목표로 할지는 새 곡의 모티프에 맞춰 별도로 작성합니다. 자료의 선율을 그대로 이어 붙이거나, 내보내기를 곡 선택으로 기록하지 않습니다.</p><div class="actions"><button id="download" disabled>참고 구간 JSON 받기</button><span id="download-status" class="muted" role="status"></span></div></section>
+<details class="panel"><summary>읽지 못한 자료와 범위</summary><p>읽기 실패나 악보·분석 불일치는 자동으로 수정하지 않았습니다. 아래 수는 이번 지정 표본의 처리 범위이며 전체 코퍼스 정확도가 아닙니다.</p><div id="audit"></div></details>
+<footer>TAVERN · Devaney 외 · <a href="https://github.com/jcdevaney/TAVERN">원 자료</a> · CC BY-SA 4.0.<br>기능 T/P/D는 원 분석자의 프레이즈 모형 주석입니다. 개별 화음의 기능 정답이나 확정된 종지 종류를 뜻하지 않습니다.<br>악보 음표와 원 화성 표기를 확인하는 <a href="https://www.humdrum.org/rep/kern.html">Humdrum 규격</a>을 따르며, 지원하지 않는 구조는 미평가로 남깁니다.</footer></main>
+<script>
+const LIB=/*CONTEXT_DATA*/;
+const $=id=>document.getElementById(id);
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=value=>{const [a,b=1]=String(value).split('/').map(Number);return a/b};
+let selected=null;
+const summary=LIB.summary;
+$('coverage').innerHTML=[`프레이즈 ${summary.attempted_phrases}개 확인`,`시각 연결 ${summary.phrases_with_aligned_annotation}개`,`주석 ${summary.aligned_annotations}/${summary.annotation_files}개 연결`,...Object.entries(summary.window_counts).map(([n,count])=>`${n}마디 구간 ${count}개`)].map(s=>`<span>${esc(s)}</span>`).join('');
+for(const field of ['meter','composer'])for(const value of [...new Set(LIB.windows.map(u=>u[field]))].sort()){const o=document.createElement('option');o.value=value;o.textContent=value;$(field).append(o)}
+function choose(){
+ const length=$('length').value,meter=$('meter').value,composer=$('composer').value;
+ const matches=LIB.windows.filter(u=>(length==='all'||u.length_bars===+length)&&(meter==='all'||u.meter===meter)&&(composer==='all'||u.composer===composer)&&(!$('ending').checked||u.ends_source_phrase));
+ $('match-count').textContent=`해당 구간 ${matches.length}개 · 같은 프레이즈의 겹치는 창이 포함됩니다.`;
+ $('unit').replaceChildren();for(const u of matches){const o=document.createElement('option');o.value=u.id;o.textContent=`${u.composer} ${u.phrase_id} · 구절 안 ${u.bar_ordinals[0]+1}–${u.bar_ordinals.at(-1)+1}번째 마디 · ${u.meter}${u.ends_source_phrase?' · 끝 포함':''}`;$('unit').append(o)}
+ render();
+}
+function band(rows,span,cls){return `<div class="band ${cls}">${rows.map(e=>`<div class="segment" style="left:${num(e.onset)/span*100}%;width:${num(e.duration)/span*100}%" title="${esc(e.raw)} · 구간 안 ${esc(e.onset)}박 시작 / ${esc(e.duration)}박"><strong>${esc(e.label)}</strong><small>${esc(e.duration)}박</small></div>`).join('')}</div>`}
+function render(){
+ selected=LIB.windows.find(u=>u.id===$('unit').value);$('download').disabled=!selected;$('download-status').textContent='';
+ if(!selected){$('reference').innerHTML='<section class="panel"><p>이 조건에 맞는 검증된 연결이 없습니다. 다른 박자나 작곡가로 자동 대체하지 않았습니다.</p></section>';return}
+ const u=selected,p=LIB.phrases.find(p=>p.id===u.phrase_id),span=num(u.end)-num(u.start);
+ let out=`<section class="panel"><h2>${esc(u.phrase_id)} · ${u.length_bars}마디 연결</h2><p>${esc(u.meter)} · 원 구절 ${esc(u.start)}–${esc(u.end)}박 · ${u.whole_source_phrase?'원 프레이즈 전체':u.ends_source_phrase?'원 프레이즈의 끝을 포함':'프레이즈 안의 부분 구간'}</p><p class="muted">박 좌표는 4분음표 길이 기준입니다. ${p.grace_events?`장식음 ${p.grace_events}개는 기보 위치만 보존하고 길이를 만들어 넣지 않았습니다.`:''}</p>`;
+ for(const [who,tracks] of Object.entries(u.annotators)){
+  const keys=[...new Set(tracks.keys.map(k=>`${k.raw} (${k.onset}박)`))].join(' · ');
+  out+=`<h3>분석자 ${esc(who.toUpperCase())}</h3><p class="muted">원 조성 표기: ${esc(keys||'없음')} · 좌표는 원 구절 시작 기준</p><div class="scroll"><div style="min-width:${Math.max(600,u.length_bars*105)}px"><div class="bar-row">${u.bar_ordinals.map((ordinal,i)=>`<div class="bar-cell">구절 안 ${ordinal+1}번째<br>악보 ${esc(u.source_bar_labels[i]??'미표기')} / 분석 ${esc(tracks.source_bar_labels[i]??'미표기')}</div>`).join('')}</div><div class="muted">화성 원 주석</div>${band(tracks.harm,span,'')}<div class="muted">프레이즈 기능 주석</div>${band(tracks.function,span,'functions')}</div></div>`;
+ }
+ const endLabels=Object.entries(u.annotators).map(([who,t])=>`${who.toUpperCase()}: ${t.harm.at(-1)?.label??'없음'}`).join(' · ');
+ out+=`<p><strong>구간 끝의 화성:</strong> ${esc(endLabels)}<br><span class="muted">끝 화음만으로 반종지·정격종지 등을 확정하지 않았습니다.</span></p>`;
+ if(u.ends_source_phrase&&p.ending)out+=`<p>원 프레이즈의 마지막 음가 ${esc(p.ending.last_note_duration)}박 · 뒤 쉼 ${esc(p.ending.trailing_rest)}박</p>`;
+ if(u.melody)out+=`<p>이 구간의 선율 후보: 새 발음 ${u.melody.attacks}개 · 쉼 ${esc(u.melody.rest_quarters)}박. 상보표가 단선율일 때만 관찰했습니다.</p>`;
+ const differences=u.comparison.differences;
+ if(u.comparison.status==='two_aligned_annotators_unavailable')out+='<p class="warning panel">분석자 한 명의 주석만 정확히 연결되었습니다. 두 사람의 일치로 해석하지 않습니다.</p>';
+ else if(differences.length)out+=`<details open><summary>분석자 차이 ${differences.length}구간</summary><table><tr><th>층</th><th>시작 / 길이</th><th>A</th><th>B</th></tr>${differences.map(e=>`<tr><td>${e.field==='harm'?'화성':'기능'}</td><td>${esc(e.onset)} / ${esc(e.duration)}</td><td>${esc(e.a)}</td><td>${esc(e.b)}</td></tr>`).join('')}</table></details>`;
+ else out+='<p class="muted">이번 구간의 두 분석자 화성·기능 원 라벨이 일치합니다. 분석의 정답 인증은 아닙니다.</p>';
+ out+=`<details><summary>정확한 화성 시각과 출처</summary><div class="scroll"><table><tr><th>분석자</th><th>시작</th><th>길이</th><th>원 토큰</th><th>원본 행</th><th>창 경계에서 자름</th></tr>${Object.entries(u.annotators).flatMap(([who,t])=>t.harm.map(e=>`<tr><td>${esc(who)}</td><td>${esc(e.onset)}</td><td>${esc(e.duration)}</td><td>${esc(e.raw)}</td><td>${e.line}</td><td>${e.clipped_at_window?'예':'아니요'}</td></tr>`)).join('')}</table></div><p><code>${esc(p.score.path)}</code></p><p class="muted">악보 SHA-256 <code>${esc(p.score.sha256)}</code></p></details></section>`;
+ $('reference').innerHTML=out;
+}
+for(const id of ['length','meter','composer','ending'])$(id).addEventListener('change',choose);
+$('unit').addEventListener('change',render);
+$('download').addEventListener('click',()=>{if(!selected)return;const data=LIB.exports[selected.id];const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=selected.id.replaceAll(':','-')+'-reference.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('download-status').textContent='참고 자료를 내보냈습니다. 작곡 판단이나 사용자 선택은 기록하지 않았습니다.'});
+const reasons={unfinished_duration_at_termination:'끝 표시 이후까지 남는 음가',null_without_sounding_duration:'이어질 음가가 없는 연장 토큰',spine_path_operation:'성부 분기·결합 구조 미지원',score_annotation_note_tokens_mismatch:'악보와 분석의 음표 토큰 불일치',score_annotation_span_mismatch:'악보와 분석의 전체 길이 불일치',source_score_unavailable_for_alignment:'원 악보 시각 확인 불가',score_annotation_meter_mismatch:'악보와 분석의 박자 불일치',overlapping_spine_duration:'같은 성부에서 겹치는 음가',conflicting_meter:'한 파일 안의 서로 다른 박자 표기'};
+const auditRows=counts=>Object.entries(counts).map(([reason,count])=>`<tr><td>${esc(reasons[reason]??'지원하지 않는 자료 구조')}<br><code class="muted">${esc(reason)}</code></td><td>${count}개</td></tr>`).join('');
+$('audit').innerHTML='<h3>악보 처리</h3><table>'+auditRows(summary.score_skip_reasons)+'</table><h3>분석 연결</h3><table>'+auditRows(summary.annotation_skip_reasons)+'</table><p class="muted">파서의 미지원 구조와 실제 원자료 불일치는 별개입니다. 세부 사유는 동반 JSON에 보존되어 있습니다.</p>';
+choose();
+</script></html>
