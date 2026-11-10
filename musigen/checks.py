@@ -104,7 +104,9 @@ def check(piece: Piece, design: dict) -> dict:
         if s["function"] == "return" and first and first not in row["motifs_used"]:
             warnings.append(f"재현 구간 {s['bars'][0]}–{s['bars'][1]}마디에 첫 동기 {first}가 없습니다.")
     last_bar = piece.in_bars(piece.bars, piece.bars)
-    tonic = piece.key.tonic_pc
+    # Explicit local keys are author intent, not inferred modulation. Compare
+    # the ending with that final key; otherwise A-minor -> C-major is misreported.
+    tonic = piece.bar_keys.get(piece.bars, piece.key).tonic_pc
     lh_last = [n for n in last_bar if n.hand == "lh"]
     rh_last = [n for n in last_bar if n.hand == "rh"]
     if lh_last and min(m for m, _ in lh_last[-1].pitches) % 12 != tonic:
