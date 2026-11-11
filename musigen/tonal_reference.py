@@ -82,21 +82,23 @@ def label_states(rows):
         chord=row['chord'];relative=chord.split('/',1)[1] if '/' in chord else ''
         special=row.get('special','')
         if special:
-            if special not in ('It','Ger','Fr') or relative or row['relativeroot']!='V' or not chord.startswith(special):
+            expanded='V'+('/'+relative if relative else '')
+            if special not in ('It','Ger','Fr') or row['relativeroot']!=expanded or not chord.startswith(special):
                 raise ValueError('unsupported_special_expansion')
             # ms3 expands augmented-sixth symbols into /V features. This is
             # not an explicit slash tonicization in the original label.
-            row['special_expansion_target']='V'
+            row['special_expansion_target']=expanded
+            row['special_relative_context']=relative_key(relative,local) if relative else local
         elif relative!=row['relativeroot']:raise ValueError('applied_root_label_mismatch')
         if chord not in parts[-1]:raise ValueError('chord_label_mismatch')
         cadence=parts[-1].split('|',1)[1].rstrip('{}\\') if '|' in parts[-1] else ''
         if cadence!=row['cadence']:raise ValueError('cadence_label_mismatch')
         row['global']=g;row['local']=local
-        row['applied_target']=relative_key(relative,local) if relative else None
+        row['applied_target']=relative_key(relative,local) if relative and not special else None
     return rows
 
 
-def validate_tables(harmonies,measures,notes,score_xml):
+def validate_tables(harmonies,measures,notes,score_xml,verify_score_timing=False):
     bars={};cursor=F(0)
     for m in measures:
         mc=int(m['mc']);duration=4*F(m['act_dur'])
@@ -139,11 +141,18 @@ def validate_tables(harmonies,measures,notes,score_xml):
         for staff in root.findall('./Score/Staff') for i,m in enumerate(staff.findall('Measure'),1)
         for v,voice in enumerate(m.findall('voice'),1) for h in voice.findall('Harmony')
         if h.findtext('harmonyType')=='1')
-    expected=Counter((r['mc'],r['staff'],r['voice'],r['label']) for r in harmonies)
+    from musigen.mscx_timing import raw_label, audit
+    expected=Counter((r['mc'],r['staff'],r['voice'],raw_label(r) if verify_score_timing else r['label']) for r in harmonies)
     if anchors!=expected:raise ValueError('score_annotation_anchor_mismatch')
-    return {'measures':len(bars),'notes':len(notes),'harmonies':len(harmonies),'point_annotations':len(harmonies)-len(sounding),'span':str(cursor),
+    result={'measures':len(bars),'notes':len(notes),'harmonies':len(harmonies),'point_annotations':len(harmonies)-len(sounding),'span':str(cursor),
             'timing_scope':'TSV note/harmony coordinates vs measure table; XML label at MC/staff/voice, not XML note-time reparse',
             'repeat_policy':'written_order_not_unfolded'}
+    if verify_score_timing:
+        checked=audit(score_xml,measures,notes,harmonies)
+        if checked['status']!='validated':raise ValueError('independent_xml_timing_mismatch')
+        result['xml_timing']=checked
+        result['timing_scope']=checked['scope']
+    return result
 
 
 def references(work_id,rows):
@@ -161,8 +170,9 @@ def references(work_id,rows):
                       for r in rows[i:next_change] if r['cadence']]
             result.append({'id':f"{work_id}:{kind}:{row['source_line']}",'kind':kind,
                 'from_key':start_key,'to_key':target,'local_context':local,
-                'source_event':{k:row[k] for k in ('source_line','mc','mn','mc_onset','quarterbeats','duration_qb','duration_exact_qb','label','globalkey','localkey','relativeroot')},
-                'context':[{k:r[k] for k in ('source_line','mc','mn','quarterbeats','duration_qb','duration_exact_qb','label','localkey','relativeroot','cadence')}
+                'source_event':{**{k:row[k] for k in ('source_line','mc','mn','mc_onset','quarterbeats','duration_qb','duration_exact_qb','label','globalkey','localkey','relativeroot')},
+                                'alt_label':row.get('alt_label',''),'raw_label':row['label']+('-'+row['alt_label'] if row.get('alt_label') else '')},
+                'context':[{**{k:r[k] for k in ('source_line','mc','mn','quarterbeats','duration_qb','duration_exact_qb','label','localkey','relativeroot','cadence')},'alt_label':r.get('alt_label','')}
                            for r in rows[max(0,i-2):min(len(rows),i+3)]],
                 'declared_region_end':str(end),'declared_region_remaining_quarters':str(end-F(row['quarterbeats'])),
                 'following_cadence_annotations_in_local_region':cadences,
@@ -172,7 +182,7 @@ def references(work_id,rows):
     return result
 
 
-def observe(root,work_ids,allow_dcml=False):
+def observe(root,work_ids,allow_dcml=False,verify_score_timing=False):
     if not allow_dcml:raise ValueError('DCML은 --allow-dcml 선택 옵션이 필요합니다')
     root=Path(root).resolve();works=[];all_refs=[]
     for work_id in sorted(set(work_ids)):
@@ -191,9 +201,10 @@ def observe(root,work_ids,allow_dcml=False):
                 raise ValueError('unexpected_license')
             harmonies,measures,notes=[read_table(paths[k]) for k in ('harmonies','measures','notes')]
             row['attempted_harmony_rows']=len(harmonies)
-            row['validation']=validate_tables(harmonies,measures,notes,paths['score'].read_text(encoding='utf-8'))
+            row['validation']=validate_tables(harmonies,measures,notes,paths['score'].read_text(encoding='utf-8'),verify_score_timing)
             label_states(harmonies)
             row['validation']['special_expansions_not_counted_as_tonicizations']=sum('special_expansion_target' in r for r in harmonies)
+            row['special_annotations']=[{k:r.get(k,'') for k in ('source_line','mc','mn','quarterbeats','label','alt_label','special','relativeroot','special_expansion_target','special_relative_context')} for r in harmonies if r.get('special')]
             row['status']='validated';row['local_regions']=[]
             for r in harmonies:
                 if not row['local_regions'] or row['local_regions'][-1]['key']!=r['local']:
@@ -226,6 +237,7 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description='명시적 국소 조성과 으뜸화 원 주석 검증')
     p.add_argument('--root',type=Path,required=True);p.add_argument('--works',nargs='+',required=True)
     p.add_argument('--allow-dcml',action='store_true');p.add_argument('--out',type=Path,required=True)
-    a=p.parse_args();result=observe(a.root,a.works,a.allow_dcml);a.out.parent.mkdir(parents=True,exist_ok=True)
+    p.add_argument('--verify-score-timing',action='store_true',help='원 MuseScore의 모든 기보 음표·화성 시각을 독립 대조')
+    a=p.parse_args();result=observe(a.root,a.works,a.allow_dcml,a.verify_score_timing);a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open('x',encoding='utf-8') as f:json.dump(result,f,ensure_ascii=False,indent=2);f.write('\n')
     print(json.dumps(result['summary'],ensure_ascii=False))
