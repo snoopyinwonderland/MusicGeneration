@@ -30,7 +30,7 @@ from fractions import Fraction as F
 FUNCTIONS = {"intro": "도입", "statement": "제시", "development": "발전", "contrast": "대조", "transition": "연결",
              "return": "재현", "coda": "종결"}
 METERS = {"2/4", "3/4", "4/4", "6/8", "9/8", "12/8"}
-TOP = {"title", "request", "given", "impression", "basics", "theme", "form", "climax", "ending", "notes", "credits", "analysis", "phrase_plan"}
+TOP = {"title", "request", "given", "impression", "basics", "theme", "form", "climax", "ending", "notes", "credits", "analysis", "phrase_plan", "accompaniment_plan"}
 
 
 class DesignError(ValueError):
@@ -134,6 +134,10 @@ def validate(d: dict) -> list[str]:
     for g in d.get("given", []):
         if _lookup(d, g) is _MISSING:
             raise DesignError(f"given path {g!r} not in the design")
+    if 'accompaniment_plan' in d:
+        from musigen.accompaniment_context import requirements
+        try:requirements(d,total_bars(d))
+        except ValueError as e:raise DesignError(str(e)) from e
     return warn
 
 
