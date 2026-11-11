@@ -10,7 +10,8 @@ def requirements(design,piece):
     if not isinstance(plan,list):raise ScoreError('반주 계획은 구간 목록이어야 합니다')
     for row in plan:
         if not isinstance(row,dict):raise ScoreError('반주 계획 구간은 객체여야 합니다')
-        if set(row)-{'bars','role','decision','required_degrees','entry_bass_range'}:raise ScoreError('알 수 없는 반주 계획 항목')
+        if set(row)-{'bars','role','decision','required_degrees','entry_bass_range','repair_voicing'}:raise ScoreError('알 수 없는 반주 계획 항목')
+        if 'repair_voicing' in row and type(row['repair_voicing']) is not bool:raise ScoreError('반주 음 배치 수정은 true/false로 지정하세요')
         span=row.get('bars');degrees=row.get('required_degrees',[])
         if not isinstance(span,list) or len(span)!=2 or any(type(b)is not int for b in span) or not 1<=span[0]<=span[1]<=last_bar:
             raise ScoreError('반주 계획의 마디 범위 오류')
