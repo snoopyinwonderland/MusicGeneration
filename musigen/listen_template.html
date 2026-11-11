@@ -88,6 +88,7 @@ function about(p){
   if(d.request) h += `<blockquote>${esc(d.request)}</blockquote>`;
   h += `<div>${esc(b.key)} ${MODE[b.mode] || ''} · ${esc(b.meter)} · 빠르기 ${b.tempo} · ${last}마디(약 ${Math.round(c.stats.seconds)}초) · ${b.grade || 6}급${b.swing ? ' · 스윙(8분음 2:1로 재생)' : ''}</div>`;
   if(imp.arc) h += `<div class="muted">흐름: ${esc(imp.arc)}</div>`;
+  if(p.performance?.balance?.length) h += '<p class="muted">선율과 반주의 구간별 음량 균형을 재생·WAV에 적용했습니다. MusicXML·PDF의 음표와 셈여림은 그대로입니다.</p>';
   if(v.feedback || v.reason || v.parent){
     h += `<h3>이 버전</h3><ul class="checks">`;
     if(v.feedback || v.reason) h += `<li>요청 원문: ${esc(v.feedback || v.reason)}</li>`;
@@ -278,6 +279,11 @@ function qMs(q){
 }
 function applyPerformance(){
   const pf = cur.performance || {}, ds=pf.dynamics || [], ex=pf.expression || [];
+  // Explicit per-section preview balance. No plan means the legacy playback.
+  // Count actual LH piano attacks, including distinct voices, not RH/string notes.
+  const lhAttacks=new Map();
+  for(const n of notes) if(n.instrument==='piano' && n.lh)
+    lhAttacks.set(n.q,(lhAttacks.get(n.q)||0)+1);
   const baseAt = q => ds.filter(d=>d.q<=q).at(-1)?.level ?? .8;
   const ladder=[.25,.35,.5,.65,.8,.95,1.1,1.25]; // ROUND1 provisional loudness, not calibrated audio.
   for(const n of notes){
@@ -299,6 +305,13 @@ function applyPerformance(){
     if(art==='accent') level*=1.3;
     if(art==='staccato') release=n.t+n.d*.5;
     if(art==='tenuto') release=n.t+n.d;
+    if(n.instrument==='piano'){
+      const balance=(pf.balance||[]).find(b=>b.start<=n.q && n.q<b.end);
+      if(balance){
+        level*=n.lh?balance.lh:balance.rh;
+        if(n.lh && balance.reduce_lh_chords) level/=Math.sqrt(lhAttacks.get(n.q)||1);
+      }
+    }
     // Sustain affects the acoustic release, not notation/highlight. tone() retains its decay.
     if(n.instrument==='piano'){
       const keyRelease=release;
@@ -400,7 +413,7 @@ function stringTone(audio,when,dur,pitch,level,instrument){
   gain.gain.exponentialRampToValueAtTime(.00001,when+dur+.12);
   source.start(when); source.stop(when+dur+.15); return [source];
 }
-const audible=n=>n.instrument!=='piano'?$(n.instrument).checked:(n.lh?$('lh').checked:$('rh').checked);
+const audible=n=>n.level>0 && (n.instrument!=='piano'?$(n.instrument).checked:(n.lh?$('lh').checked:$('rh').checked));
 function sampleTone(audio,when,dur,n){
   return n.instrument!=='piano'?stringTone(audio,when,dur,n.p,.075*n.level,n.instrument):pianoTone(audio,when,dur,n.p,(n.lh?.045:.085)*n.level);
 }

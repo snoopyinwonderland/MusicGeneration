@@ -36,6 +36,18 @@ def fixture(root,meter='4/4'):
 
 
 class StudioDeliveryTest(unittest.TestCase):
+    def test_authored_playback_balance_survives_delivery(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);data,_,_,_=fixture(root/'piece');req=save_request(root,data,origin='author_demo')
+            path=root/'piece/solo_score.json';score=json.loads(path.read_text(encoding='utf-8'))
+            score['playback_balance']=[{'bars':'1-4','rh':1,'lh':.8,'reduce_lh_chords':True}]
+            dump(path,score)
+            manifest=publish(root,req['id'],root/'piece')
+            target=root/'requests'/req['id']/'results'/manifest['revision']
+            html=(target/'piano_solo.html').read_text(encoding='utf-8')
+            self.assertIn('"balance": [{"start": 0.0, "end": 16.0, "rh": 1, "lh": 0.8, "reduce_lh_chords": true}]',html)
+            self.assertEqual((target/'piano_solo.musicxml').read_bytes(),(root/'piece/piano_solo.musicxml').read_bytes())
+
     def test_two_scores_roundtrip_immutable_revision_and_integrity(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);data,_,_,_=fixture(root/'piece');req=save_request(root,data,origin='author_demo')

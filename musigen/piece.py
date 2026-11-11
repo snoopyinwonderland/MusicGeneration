@@ -79,6 +79,7 @@ class Piece:
     bar_keys: dict[int, Key] = field(default_factory=dict)
     motifs: dict[str, list[Ev]] = field(default_factory=dict)
     analysis_chords: list = field(default_factory=list)
+    playback_balance: list[dict] = field(default_factory=list)
 
     def bar_start(self, bar: int) -> F:
         return F(0) if bar == 0 else self.pickup + (bar - 1) * self.bar_len
@@ -267,8 +268,9 @@ def build(design: dict, score: dict) -> Piece:
         raise ScoreError(f"blocks end at bar {nxt - 1}, the design has {n_bars} bars")
     for v, (hand, vn) in VOICES.items():
         piece.notes += _place(timeline[v], hand, vn)
-    from musigen.expression import compile_expression
+    from musigen.expression import compile_expression, compile_balance
     piece.expression = compile_expression(piece, score.get("expression", []))
+    piece.playback_balance = compile_balance(piece, score.get("playback_balance", []))
     piece.notes.sort(key=lambda n: (n.onset, n.voice))
     piece.analysis_chords = sorted(piece.chords + piece.analysis_chords, key=lambda c: c[0])
     piece.chords = sorted(piece.chords, key=lambda c: c[0]) if score.get("show_chords", True) else []

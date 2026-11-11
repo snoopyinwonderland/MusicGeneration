@@ -1,5 +1,9 @@
 # 초기 P1–P5 계획의 상태 — 2026-11-11
 
+## 최신 비교판: Count On Me 반주·내성·재생 균형
+
+기존 곡의 “한결 낫네요” 평가 이후 승인한 비교판을 `codex/count-on-me-phrasing`에서 작성했다. [A/B 듣기](http://127.0.0.1:8808/count-on-me-phrasing.html), [변경·검증](COUNT_ON_ME_ACCOMPANIMENT_REVIEW.md). 주선율 121개 음·39개 화성 구간·템포·기보 표현은 보존하고, 왼손 23마디와 선택 재생 균형을 다듬었다. 명시적 내성 17개 연결, 266개 Python 테스트, Node 플레이어 동작, 새 PDF·XML·WAV·A/B 전환을 확인했다. 작성 v005 / 전달 v002이며 새 비교판의 청취 검수 전이다. 기본 생성·main·P3/P4 상태는 유지한다.
+
 ## 최신 요청: Count On Me 주제의 반음계 발전
 
 `codex/count-on-me-lyrical`에서 사용자 지정 작품의 첫 노래 구절을 바탕으로 「네 곁으로 돌아오는 길」 32마디를 작성했다. [감상·두 악보](http://127.0.0.1:8808/count-on-me.html), [실행 범위와 검증](COUNT_ON_ME_LYRICAL_STUDY.md). 실제 musicomp `lyrical` 스타일로 반주를 얻고 구성음·양손 쉼·종결을 다듬었다. 작성 v003 / 전달 v001, 262개 테스트, 두 XML/PDF와 실제 다운로드 확인 완료. 원주제를 보존한 발전곡이며 새 학습·기본 적용·청취 승인을 뜻하지 않는다. 기존 다섯 곡과 P3/P4 중단 판정은 유지한다.
