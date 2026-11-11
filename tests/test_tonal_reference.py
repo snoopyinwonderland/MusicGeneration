@@ -48,6 +48,15 @@ class TonalReferenceTests(unittest.TestCase):
         xml='<museScore><Score><Staff id="2"><Measure><voice><Harmony><harmonyType>1</harmonyType><name>C.I</name></Harmony><Harmony><harmonyType>1</harmonyType><name>{</name></Harmony></voice></Measure></Staff></Score></museScore>'
         return harmonies,bars,notes,xml
 
+    def test_relative_augmented_sixth_keeps_context_without_counting_secondary(self):
+        r=row('.Fr6/III',relative='V/III',chord='Fr6/III');r['special']='Fr'
+        rows=label_states([row(),r])
+        self.assertIsNone(rows[1]['applied_target'])
+        self.assertEqual(rows[1]['special_relative_context']['name'],'E major')
+        self.assertFalse(references('test',rows))
+        r['relativeroot']='III'
+        with self.assertRaises(ValueError):label_states([row(),r])
+
     def test_fractional_notes_and_zero_length_phrase_marker(self):
         h,m,n,x=self.fixture();r=validate_tables(h,m,n,x)
         self.assertEqual(r['point_annotations'],1)
