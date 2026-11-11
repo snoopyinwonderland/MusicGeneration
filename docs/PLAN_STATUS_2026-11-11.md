@@ -1,5 +1,9 @@
 # 초기 P1–P5 계획의 상태 — 2026-11-11
 
+## 최신 수정: 선율의 호흡과 완급
+
+`codex/melody-breath-and-pacing`에서 다섯 곡에 긴 음·쉼·16분음표 움직임과 반주 여백을 작성했다. [수정 내용](MELODY_BREATH_AND_PACING.md), [이전/수정본 비교](http://127.0.0.1:8808/study-report.html)에서 구간별 의도를 확인할 수 있다. 작성 v005, 전달 v002이며 이전 버전은 보존했다. 256개 테스트, 10개 PDF 시각 확인, 67개 HTTP 파일 대조를 마쳤다. 기본 템포 유지, 자동 루바토 미구현, 청취 승인 전이다. P3/P4의 아래 중단 판정과 기본 생성은 그대로다.
+
 ## 최신 추가 요청: 주선율 자료 관찰과 다섯 곡
 
 “나머지 단계 다시 계획”, “샘플 다섯 곡”, “반복을 기계적으로 배제할 필요는 없다” 요청의 실행 범위는 [새 계획](MELODY_RESEARCH_PLAN.md)과 [관찰 결과](MELODY_OBSERVATIONS_2026-11-11.md)에 있다. M1 자료 조사, M2 실제 음표 반복·유사도 검사, M3 새 다섯 곡의 두 악보를 `codex/melody-corpus-evidence`, `codex/melody-repetition-review`, `codex/five-melody-studies`로 나눴다.
