@@ -10,6 +10,25 @@ def degree(m,key): return _index(_ladder(key),m)
 def chord_at(chords,t):
     return next((c for on,c in reversed(chords) if on<=t),None)
 def active(notes,t): return [n for n in notes if n.onset<=t<n.onset+n.dur]
+
+def parallel_events(p):
+    """Existing attack-based outer-voice check, shared with optional LH repair.
+
+    This is not inner-voice tracking; note releases without attacks are not sampled.
+    Return (previous attack, current attack, interval class) without bar deduplication.
+    """
+    chords=p.analysis_chords or p.chords
+    rh=[n for n in p.notes if n.hand=='rh'];lh=[n for n in p.notes if n.hand=='lh']
+    outer=[];events=[]
+    for t in sorted({n.onset for n in p.notes}):
+        rr=active(rh,t);ll=active(lh,t)
+        outer.append((t,max(top(n) for n in rr),min(bottom(n) for n in ll),chord_at(chords,t)) if rr and ll else (t,None,None,None))
+    for a,b in zip(outer,outer[1:]):
+        if a[1] is None or b[1] is None or not a[3] or not b[3] or a[3].symbol==b[3].symbol:continue
+        up,down=b[1]-a[1],b[2]-a[2];iv=(a[1]-a[2])%12
+        if up*down>0 and iv in (0,7) and (b[1]-b[2])%12==iv:events.append((a[0],b[0],iv))
+    return events
+
 def evaluate(p,d):
     warnings=[]; notes=[]; events=[]; sections=[]
     chords=p.analysis_chords or p.chords
@@ -45,19 +64,8 @@ def evaluate(p,d):
                 elif incoming in (-1,1) and out==incoming and resolves: label='경과음'
                 emit('nonchord',bar,'오른손',f"강박 비화성음 {pitch} / {ch.symbol}: {label or '해결 형태 미분류'}",label is None)
             t+=bt
-    # Outer voices at consecutive attacks; held notes participate until their release.
-    outer=[]
-    for t in sorted({n.onset for n in p.notes}):
-        rr=active([n for n in p.notes if n.hand=='rh'],t)
-        ll=active([n for n in p.notes if n.hand=='lh'],t)
-        if rr and ll: outer.append((t,max(top(n) for n in rr),min(bottom(n) for n in ll),chord_at(chords,t)))
-        else: outer.append((t,None,None,None))
-    for a,b in zip(outer,outer[1:]):
-        if a[1] is None or b[1] is None or not a[3] or not b[3] or a[3].symbol==b[3].symbol: continue
-        up,down=b[1]-a[1],b[2]-a[2]
-        iv=(a[1]-a[2])%12
-        if up*down>0 and iv in (0,7) and (b[1]-b[2])%12==iv:
-            emit('parallel',p.bar_of(b[0]),'양손',f"병행 {'8' if iv==0 else '5'}도 ({p.bar_of(a[0])}→{p.bar_of(b[0])}마디)",True)
+    for before,after,iv in parallel_events(p):
+        emit('parallel',p.bar_of(after),'양손',f"병행 {'8' if iv==0 else '5'}도 ({p.bar_of(before)}→{p.bar_of(after)}마디)",True)
     rhythms=[]
     for bar in range(1,p.bars+1):
         ns=[n for n in rh if n.onset<p.bar_end(bar) and n.onset+n.dur>p.bar_start(bar)]
