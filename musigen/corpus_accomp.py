@@ -184,9 +184,16 @@ class PlannedFigures:
     """
     neutral = False
 
-    def __init__(self, piece, sm, index):
+    def __init__(self, piece, sm, index, design=None):
+        from musigen.accompaniment_context import requirements
         self.index = index
         self.figures = {}
+        self.policies=requirements(design or {},piece)
+        self.bar_numbers={m.index:int(m.number) for m in sm.melody.measures}
+        self.targets={}
+        self.piece=piece;self.sm=sm;self.preview_cache={}
+        from musicomp.realize.grades import profile
+        self.profile=profile(int((design or {}).get('basics',{}).get('grade',6)))
         for m in sm.melody.measures:
             bar = int(m.number)
             if _protected(piece, bar):
@@ -198,10 +205,30 @@ class PlannedFigures:
             self.figures[m.index] = index.figure(row)
 
     def prepare(self, sm, bars):
-        pass
+        self.targets={t.index:t for t in bars}
 
     def allows(self, index, source):
-        return index not in self.figures or self.index.figure(source) == self.figures[index]
+        if index not in self.figures:return not bool(self.policies)
+        if self.index.figure(source)!=self.figures[index]:return False
+        policy=self.policies.get(self.bar_numbers[index])
+        if policy:
+            from musigen.accompaniment_context import source_has_degrees
+            if not source_has_degrees(self.targets[index],source,policy['required_degrees']):return False
+            key=(index,source['song'],source['bar'],source.get('_warp'))
+            if key not in self.preview_cache:
+                from musicomp.realize import retrieval
+                from musicomp.realize.voicing import clean_left_hand,inversion_bass,chord_bass
+                from musicomp.analysis.meter import beat_unit
+                from musicomp.theory import spell
+                from musigen.accompaniment_context import missing_requirements,entry_in_range
+                ns,_,_=retrieval.realise(self.sm,[retrieval.Choice(self.targets[index],source,0)])
+                inversion_bass(ns,self.sm.chords,self.sm.key,spell)
+                chord_bass(ns,self.sm.chords,self.sm.key,spell,beat_unit(self.sm.melody))
+                ns,_=clean_left_hand(ns)
+                bar=self.bar_numbers[index]
+                self.preview_cache[key]=not (_reject(ns,self.piece,bar,self.profile) or missing_requirements(ns,self.piece,bar,policy) or not entry_in_range(ns,policy))
+            return self.preview_cache[key]
+        return True
 
     def base_cost(self, target, source, index):
         from musicomp.realize.retrieval import bar_cost
@@ -241,7 +268,7 @@ def select(design, score):
                     name = str(Path(name).with_suffix(""))
                 excluded.add(name)
     grade = int(design["basics"].get("grade", 6))
-    figures = PlannedFigures(piece, sm, index)
+    figures = PlannedFigures(piece, sm, index, design)
     choices = retrieval.choose(sm, plan, pacing=True, grade=grade, exclude=excluded,
                                alternate_selection=figures)
     # Never realise partially known harmony: target_chord would extend the last known slot.
@@ -265,9 +292,14 @@ def select(design, score):
         candidate = [n for n in lh if c.bar.start <= n.onset < c.bar.start+c.bar.length]
         reason = protected[c.bar.index]
         if reason is None and c.source is None:
-            reason = "같은 반주 유형·박자·화성 변화 위치의 자료가 없음"
+            reason = ("지정한 반주 유형·구성음·시작 음역·난이도 조건을 함께 통과한 자료가 없음" if bar in figures.policies
+                      else "같은 반주 유형·박자·화성 변화 위치의 자료가 없음")
         if reason is None:
             reason = _reject(candidate, piece, bar, prof)
+        if reason is None and bar in figures.policies:
+            from musigen.accompaniment_context import missing_requirements,entry_in_range
+            if missing_requirements(candidate,piece,bar,figures.policies[bar]) or not entry_in_range(candidate,figures.policies[bar]):
+                reason='실현 후 명시한 구성음·시작 음역 요구 미충족: 작성 반주 보존'
         source = c.source
         applied = reason is None
         if applied:
@@ -296,4 +328,10 @@ def select(design, score):
                            "section": i.section, "cadence_observation": i.cadence.type} for p, i in zip(sm.phrases, sm.form.phrases)]}
     base[FIELD] = {"version": 1, "input_sha256": fingerprint(design, base),
                    "notes": [_pack(n) for n in notes], "report": report}
+    if figures.policies:
+        from musigen.accompaniment_context import observe
+        actual=build(design,base)
+        report['phrase_context']=observe(actual,design)
+        report['candidate_preflight']={'unique_realizations':len(figures.preview_cache),'passed':sum(figures.preview_cache.values()),
+            'scope':'existing arranger realisation and grade checks plus explicit authored requirements; no changed retrieval weights'}
     return base
