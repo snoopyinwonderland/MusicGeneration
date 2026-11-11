@@ -315,6 +315,13 @@ def select(design, score):
     notes = [n for n in piece.notes if n.hand == "lh" and piece.bar_of(n.onset) not in replacements]
     notes += [n for group in replacements.values() for n in group]
     notes.sort(key=lambda n: (n.onset, n.voice))
+    voicing_report = None
+    if any(p.get('repair_voicing', False) for p in figures.policies.values()):
+        from musigen import accompaniment_voicing, musical_checks
+        from musigen.accompaniment_voicing import repair
+        notes, voicing_report = repair(piece, notes, figures.policies, grade)
+        voicing_report['implementation_sha256'] = {'repair': _file_hash(accompaniment_voicing.__file__),
+                                                   'parallel_check': _file_hash(musical_checks.__file__)}
     model = pacing.load_model()
     report = {"status": "실험 옵션 · 청취 검수 전", "engine": "musicomp.realize.retrieval + pacing",
               "scope": "계획한 반주 유형 안에서 왼손 패턴 변경 · 오른손 전체와 직접 쓴 왼손 보존",
@@ -326,6 +333,8 @@ def select(design, score):
               "applied_bars": sorted(replacements), "bars": rows,
               "phrases": [{"bars": [int(sm.melody.measures[p.first_bar].number), int(sm.melody.measures[p.last_bar].number)],
                            "section": i.section, "cadence_observation": i.cadence.type} for p, i in zip(sm.phrases, sm.form.phrases)]}
+    if voicing_report is not None:
+        report['voicing_repair'] = voicing_report
     base[FIELD] = {"version": 1, "input_sha256": fingerprint(design, base),
                    "notes": [_pack(n) for n in notes], "report": report}
     if figures.policies:
