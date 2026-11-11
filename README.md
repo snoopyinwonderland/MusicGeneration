@@ -228,3 +228,9 @@ python -m musigen listen output/my_viola output/my_cello --out output/strings/in
 `piece --corpus-accompaniment`는 기존 피아노 반주 라이브러리와 밀도 모델을 사용해, 계획한 반주 유형 안에서 왼손 패턴을 선택합니다. 주제·오른손·화성·표현은 보존하고 결과와 출처를 고정 저장합니다. 기본은 꺼짐이며 청취 품질 검수 전입니다. [사용법·자료 범위·제한](docs/CORPUS_ACCOMPANIMENT.md)을 확인하세요.
 
 선택 `accompaniment_plan`으로 구간별 구성음과 시작 음역을 작성하고, 실현된 반주의 쉼·경계·생략을 비교할 수 있습니다. [구간별 반주 계획과 동일 선율 비교](docs/PHRASE_ACCOMPANIMENT_PLAN.md)를 확인하세요. 기존 검색 계수와 자동 스타일 생성 상태는 그대로입니다.
+
+## 주선율 자료 관찰과 다섯 소품
+
+주제의 반복을 허용하면서 지나치게 단순해지는 전개를 살피는 후속 작업입니다. [실행 계획](docs/MELODY_RESEARCH_PLAN.md), [자료·검사 범위와 명령](docs/MELODY_EVIDENCE.md), [실측 관찰과 다섯 곡](docs/MELODY_OBSERVATIONS_2026-11-11.md)을 확인하세요. 반복 수를 삭제·감점 기준으로 사용하지 않으며 기존 생성 기본값은 바꾸지 않습니다.
+
+로컬 [감상 모음](http://127.0.0.1:8808/studies.html)에는 멜로디 + 상세 왼손 화성, 피아노 솔로의 두 악보와 XML/PDF가 있습니다. 대화에서 작성한 청취 검수 전 초안이며 새 자동 모델의 결과가 아닙니다. 자동 P3/P4의 이전 중단 판단은 유지합니다.
