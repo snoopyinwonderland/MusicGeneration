@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[Count On Me 주제 발전](docs/COUNT_ON_ME_LYRICAL_STUDY.md): 보유 악보의 첫 노래 구절에서 반음계와 실제 `lyrical` 반주로 32마디 곡을 작성했습니다. [네 곁으로 돌아오는 길 · 감상과 두 악보](http://127.0.0.1:8808/count-on-me.html)에서 피아노 재생·XML·PDF를 제공합니다. 청취 검수 전이며 기본 생성은 유지합니다.
+
 [양손의 독립과 재즈 색채](docs/INDEPENDENT_VOICES_AND_JAZZ.md): 첫 곡에 반진행·지속 베이스·경과음·보조음·반음 접근과 재즈 화성/엇박 반주를 작성했습니다. [이전/수정본 비교](http://127.0.0.1:8808/study-report.html)에서 들을 수 있으며 다른 네 곡은 기존 수정본을 유지합니다.
 
 [선율의 호흡과 완급](docs/MELODY_BREATH_AND_PACING.md): 다섯 곡에 긴 음·긴 쉼·빠른 음형과 반주의 여백을 작성한 수정본입니다. [당시 전후 비교](http://127.0.0.1:8808/study-report-breath.html)에서 들어 볼 수 있습니다. 기본 템포는 유지했으며 자동 루바토·새 모델 학습과 구별합니다.
