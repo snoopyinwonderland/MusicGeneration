@@ -38,8 +38,9 @@ def validate_request(data):
     return data
 
 
-def save_request(root,data):
+def save_request(root,data,origin='user'):
     validate_request(data)
+    if origin not in ('user','author_demo'):raise ValueError('요청 출처를 확인하세요')
     request_id='request-'+uuid.uuid4().hex
     folder=Path(root)/'requests'/request_id
     folder.mkdir(parents=True)
@@ -51,7 +52,7 @@ def save_request(root,data):
         except (OSError,ValueError) as exc:
             reference={'status':'unavailable','error':str(exc)}
     for name,value in [('request.json',data),('motif.json',data['motif']),
-                       ('status.json',{'status':'awaiting_composer','received_utc':datetime.now(timezone.utc).isoformat()})]:
+                       ('status.json',{'status':'awaiting_composer','origin':origin,'received_utc':datetime.now(timezone.utc).isoformat()})]:
         (folder/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     if reference and reference['status']=='unavailable':
         (folder/'reference-error.json').write_text(json.dumps(reference,ensure_ascii=False),encoding='utf-8')
@@ -80,6 +81,14 @@ def write_studio(out):
 
 
 class StudioHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path=='/api/requests':
+            from musigen.studio_delivery import catalog
+            self.reply(200,{'requests':catalog(self.directory)});return
+        if self.path.startswith('/api/'):
+            self.send_error(404);return
+        super().do_GET()
+
     def do_POST(self):
         if self.path!='/api/requests':self.send_error(404);return
         origin=self.headers.get('Origin')
@@ -98,6 +107,7 @@ class StudioHandler(SimpleHTTPRequestHandler):
     def reply(self,status,data):
         body=json.dumps(data,ensure_ascii=False).encode('utf-8')
         self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8')
+        self.send_header('Cache-Control','no-store')
         self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body)
 
 

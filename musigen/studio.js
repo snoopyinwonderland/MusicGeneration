@@ -108,8 +108,44 @@
       if(result.reference_bars!=null)$('saveStatus').textContent+=` · 같은 박자 참고 ${result.reference_bars}마디`;
       if(result.reference_error)$('saveStatus').textContent+=' · 참고 자료를 준비하지 못했습니다. 요청은 저장했습니다.';
       $('savedLink').href=result.url;$('savedLink').hidden=false;
+      await refreshRequests();
     }finally{$('saveRequest').disabled=!clip;}
   }));
+  function element(tag,text,className){const node=document.createElement(tag);if(text!=null)node.textContent=text;if(className)node.className=className;return node;}
+  function resultLink(text,url,download=false){
+    if(!/^requests\/request-[0-9a-f]{32}\/(?:request\.json|results\/v[0-9]{3,}\/[a-z_]+\.(?:html|json|musicxml|pdf))$/.test(url))throw Error('결과 주소를 확인할 수 없습니다.');
+    const a=element('a',text);a.href=url;if(download)a.download='';return a;
+  }
+  function requestCard(row){
+    const article=element('article',null,'request-card'),ready=row.status==='draft_ready';
+    article.append(element('p',row.origin==='author_demo'?'작성 예제 · 사용자 선택 아님':'저장한 작곡 요청','eyebrow'));
+    article.append(element('h3',row.result?.title||row.motif_name||'확인이 필요한 요청'));
+    article.append(element('p',ready?'완성 초안 · 청취 검수 전':row.status==='awaiting_composer'?'작곡 설계 대기 중':'다시 검증해야 하는 요청','badge'));
+    if(row.preferences){const p=row.preferences;article.append(element('p',`${p.key.replace(' major','장조').replace(' minor','단조')} · ${p.meter} · ♩ = ${p.tempo} · ${p.bars}마디`,'small'));if(p.prompt)article.append(element('p',p.prompt,'request-prompt'));}
+    if(row.error)article.append(element('p',row.error,'error'));
+    if(ready&&row.result){
+      const r=row.result,links=element('div',null,'result-links');links.append(resultLink('작품 전체 보기 →',r.url));if(r.story_url)links.append(resultLink('주제가 발전하는 과정',r.story_url));article.append(links);
+      const scores=element('div',null,'result-scores');
+      for(const [kind,s] of Object.entries(r.outputs)){
+        const block=element('section'),title=kind==='piano_solo'?'피아노 솔로':'멜로디 + 상세 왼손 화성';block.append(element('h4',title));
+        block.append(resultLink('악보 보며 듣기',s.url));const downloads=element('div',null,'result-links');downloads.append(resultLink('XML 받기',s.xml,true),resultLink('PDF 받기',s.pdf,true));block.append(downloads);
+        block.append(element('p',`자동 검사: 오류 ${s.errors.length} · 경고 ${s.warnings.length}`,'small'));
+        if(s.warnings.length){const d=element('details');d.append(element('summary','검사 경고 보기'));for(const warning of s.warnings)d.append(element('p',warning,'small'));block.append(d);}scores.append(block);
+      }article.append(scores,resultLink('상세 왼손 화성 JSON',r.harmony_url,true));
+    }
+    const footer=element('p',`요청 ${row.id.slice(-8)}${row.result?' · '+row.result.revision:''}`,'small');if(row.request_url){footer.append(' · ',resultLink('요청 원문',row.request_url));}article.append(footer);return article;
+  }
+  async function refreshRequests(){
+    $('refreshRequests').disabled=true;$('requestsStatus').textContent='저장한 요청과 결과를 확인하고 있습니다…';
+    try{
+      const response=await fetch('api/requests',{cache:'no-store'});if(!response.ok)throw Error('작곡함 서버를 연결하지 못했습니다. 요청 파일 받기는 계속 사용할 수 있습니다.');
+      const data=await response.json();if(!Array.isArray(data.requests))throw Error('작곡함 응답을 확인하지 못했습니다.');
+      const cards=data.requests.map(requestCard);$('requestList').replaceChildren(...cards);
+      $('requestsStatus').textContent=cards.length?`${cards.length}개 요청 · 목록 새로고침으로 최신 결과를 확인하세요.`:'아직 저장한 요청이 없습니다. 아래에서 모티프를 넣어 시작하세요.';
+    }catch(e){$('requestList').replaceChildren();$('requestsStatus').textContent='작곡함을 불러오지 못했습니다. 서버 연결을 확인하고 목록 새로고침을 눌러 주세요.';}
+    finally{$('refreshRequests').disabled=false;}
+  }
+  $('refreshRequests').addEventListener('click',refreshRequests);refreshRequests();
   $('stopMotif').addEventListener('click',stop);window.addEventListener('pagehide',stop);
   $('listenMotif').addEventListener('click',run(async()=>{
     const data=request();stop();const token=playbackToken;$('stopMotif').disabled=false;status('피아노 음원을 준비하고 있습니다…');audio||=new AudioContext();await audio.resume();
