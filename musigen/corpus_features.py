@@ -142,7 +142,7 @@ def voice_observations(row):
     return result
 
 
-def midi_features(path):
+def midi_features(path, include_notes=False):
     """SMF 0/1 audit. Per track/channel notes; no hand/melody assignment.
 
     Ambiguous same-pitch overlaps are counted and paired FIFO for diagnostics,
@@ -169,6 +169,7 @@ def midi_features(path):
         running, name = None, ''
         active, notes, programs = defaultdict(deque), [], set()
         lyrics = pedal = 0
+        lyric_ticks=[]
         def take(n):
             nonlocal at
             b = tr[at:at+n]
@@ -203,6 +204,7 @@ def midi_features(path):
                     name = payload.decode('utf-8', errors='replace')
                 if kind == 5:
                     lyrics += 1  # never copy lyric text into public reports
+                    if include_notes:lyric_ticks.append(tick)
                 if kind == 88 and len(payload) >= 2:
                     meters.add((tick, payload[0], 2**payload[1]))
                 if kind == 81 and len(payload) == 3:
@@ -243,6 +245,9 @@ def midi_features(path):
                        'mean_velocity': round(sum(n[4] for n in pitched)/len(pitched),3) if pitched else None,
                        'pitch_min': min((n[3] for n in pitched),default=None),
                        'pitch_max': max((n[3] for n in pitched),default=None)})
+        if include_notes:
+            tracks[-1]['note_events']=sorted(notes)
+            tracks[-1]['lyric_ticks']=lyric_ticks
     return {'format': fmt, 'ppq': ppq, 'tracks': tracks, 'meters': sorted(meters),
             'tempos': sorted(tempos), 'warnings': {k:v for k,v in warnings.items() if v},
             'time_basis': 'performance_ticks_not_quantized', 'melody_role': 'unknown',

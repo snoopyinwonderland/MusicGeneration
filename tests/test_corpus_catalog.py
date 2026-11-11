@@ -67,6 +67,10 @@ class CorpusObservationsTest(unittest.TestCase):
         self.assertEqual(x['meters'],[(0,3,4)])
         self.assertEqual(x['warnings'],{})
         self.assertFalse(x['training_eligible'])
+        self.assertNotIn('note_events', track)
+        explicit=midi_features(self.midi([t]),include_notes=True)['tracks'][0]
+        self.assertEqual(explicit['note_events'],[(0,480,0,60,64),(480,600,9,36,80)])
+        self.assertEqual(explicit['lyric_ticks'],[])
 
     def test_midi_bad_header_and_truncation(self):
         with self.assertRaises(ValueError): midi_features(self.midi([],fmt=2))
