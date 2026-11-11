@@ -23,6 +23,8 @@ python -m musigen.development_recipe --work output/my-input --out output/my-piec
 | `expression` | 선택적 셈여림·페달 등 기존 표현 구간 |
 | `request` | 실제 요청 원문. 선택·청취 승인으로 해석하지 않음 |
 
+`design.accompaniment_plan`에 전체 곡의 절대 마디 기준으로 구간별 반주 역할과 구성음·시작 음역 요구를 선택적으로 작성할 수 있습니다. 실제 반주 관찰은 `accompaniment_context.json`에 남습니다. [반주 계획 계약](PHRASE_ACCOMPANIMENT_PLAN.md)을 따르며, 자유 서술을 자동 음표로 번역하는 기능은 아닙니다.
+
 각 stage에는 양의 정수 `length`, `role`, `label`, `reference_ids`, `observation`, `decision`, `blocks`가 필요합니다. role은 statement, response, development, contrast, return, cadence 중 하나입니다. 선택 필드 `cadence`는 계획의 종지 의도입니다. 판정된 종지라는 뜻은 아닙니다.
 
 blocks의 `bars`는 해당 구간 안의 1부터 시작하는 상대 마디입니다. 빈틈과 겹침 없이 구간 끝까지 이어져야 합니다. `copy`도 구간 안의 앞 마디만 참조하며 컴파일 때 절대 마디로 옮깁니다. 기존 `motif`, `pitches`, `ops`, `seq`, 직접 음표, 반주 패턴 문법을 씁니다. 모든 블록에 `lh`가 필요하며, 자료 검색을 하더라도 직접 작성한 종지 반주는 유지할 수 있습니다.
