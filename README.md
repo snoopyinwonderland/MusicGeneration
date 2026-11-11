@@ -1,6 +1,8 @@
 # MUSICANOTE Virtual Composer
 
-[선율의 호흡과 완급](docs/MELODY_BREATH_AND_PACING.md): 다섯 곡에 긴 음·긴 쉼·빠른 음형과 반주의 여백을 작성한 수정본입니다. [전후 비교](http://127.0.0.1:8808/study-report.html)에서 들어 볼 수 있습니다. 기본 템포는 유지했으며 자동 루바토·새 모델 학습과 구별합니다.
+[양손의 독립과 재즈 색채](docs/INDEPENDENT_VOICES_AND_JAZZ.md): 첫 곡에 반진행·지속 베이스·경과음·보조음·반음 접근과 재즈 화성/엇박 반주를 작성했습니다. [이전/수정본 비교](http://127.0.0.1:8808/study-report.html)에서 들을 수 있으며 다른 네 곡은 기존 수정본을 유지합니다.
+
+[선율의 호흡과 완급](docs/MELODY_BREATH_AND_PACING.md): 다섯 곡에 긴 음·긴 쉼·빠른 음형과 반주의 여백을 작성한 수정본입니다. [당시 전후 비교](http://127.0.0.1:8808/study-report-breath.html)에서 들어 볼 수 있습니다. 기본 템포는 유지했으며 자동 루바토·새 모델 학습과 구별합니다.
 
 [모티프 입력부터 두 악보 받기](docs/STUDIO_COMPLETE_FLOW.md): 저장한 요청과 완성 초안을 대조해 작곡함에 연결합니다. 피아노 재생·XML·PDF·상세 화성·발전 근거를 한곳에서 열며, 대화에서 작성한 설계와 자동 모델 생성을 구별합니다.
 
