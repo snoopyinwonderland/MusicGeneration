@@ -1,6 +1,6 @@
 import copy
 import unittest
-from musigen.accompaniment_trial import controlled_inputs,fixed_sources
+from musigen.accompaniment_trial import controlled_inputs,controlled_voicing_inputs,fixed_sources
 
 
 def inputs():
@@ -12,6 +12,22 @@ def inputs():
 
 
 class AccompanimentTrialTests(unittest.TestCase):
+    def test_voicing_trial_allows_only_explicit_off_on_flag(self):
+        _,a=inputs();b=copy.deepcopy(a)
+        b['development']['design']['accompaniment_plan'][0]['repair_voicing']=True
+        saved=copy.deepcopy((a,b));r=controlled_voicing_inputs(a,b)
+        self.assertEqual((a,b),saved);self.assertIn('repair_voicing',r['changed_input'])
+        for x,y in [(a,a),(b,b),(b,a)]:
+            with self.assertRaises(ValueError):controlled_voicing_inputs(x,y)
+        b['development']['design']['accompaniment_plan'][0]['required_degrees']=[3]
+        with self.assertRaises(ValueError):controlled_voicing_inputs(a,b)
+
+    def test_voicing_trial_rejects_manual_note_changes(self):
+        _,a=inputs();b=copy.deepcopy(a)
+        b['development']['design']['accompaniment_plan'][0]['repair_voicing']=True
+        b['realization']['score']['lh']='E3/q'
+        with self.assertRaises(ValueError):controlled_voicing_inputs(a,b)
+
     def test_only_policy_changes_with_no_input_mutation(self):
         a,b=inputs();saved=copy.deepcopy((a,b));r=controlled_inputs(a,b)
         self.assertEqual((a,b),saved);self.assertEqual(r['changed_input'],'design.accompaniment_plan')
