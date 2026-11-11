@@ -51,6 +51,9 @@ def write_page(report,out):
     for token,value in [('CARDS',''.join(cards)),('CHANGED',esc('·'.join(map(str,report['changed_lh_bars'])))),('PLANS',''.join(plans)),('ROWS',''.join(rows))]:page=page.replace(token,value)
     if not (out/'planned/tonal_development.html').is_file():
         page=page.replace(' · <a href="planned/tonal_development.html">국소 조성 근거</a>','')
+    if report.get('voicing_repair'):
+        page=page.replace('B · 구간별 반주 계획','B · 음 배치 수정')
+        page=page.replace('자료를 적용하지 못한 마디는 작성한 반주를 유지하고 이유를 남겼습니다.','자료가 없는 마디도 작성 패턴의 리듬을 유지하면서 필요한 음높이만 수정했습니다. 변경음과 미해결 조건은 반주 기록에 남겼습니다.')
     (out/'index.html').write_text(page,encoding='utf-8')
 
 
