@@ -140,6 +140,9 @@ def run(work,out,corpus=False,pages_only=False):
     for name in ('motif.json','development.json','realization.json'):shutil.copyfile(work/name,out/name)
     dump(out/'solo_score.json',frozen);dump(out/'harmony.json',details)
     dump(out/'performed_harmony.json',performed_harmony(solo,details))
+    if plan['design'].get('accompaniment_plan'):
+        from musigen.accompaniment_context import observe
+        dump(out/'accompaniment_context.json',observe(solo,plan['design']))
     dump(out/'feedback.json',realization['feedback'])
     if FIELD in frozen:
         dump(out/'accompaniment_report.json',frozen[FIELD]['report'])
