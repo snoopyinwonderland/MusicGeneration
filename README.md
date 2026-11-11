@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[Uptown Girl 메인 테마 · 작은 소나티나](docs/UPTOWN_MOZART_STUDY.md): 전주를 제외한 9–10마디 모티프를 모차르트 소나타·변주 자료를 참고해 32마디 피아노 소품으로 발전시켰습니다. [피아노 재생·두 악보·XML/PDF](http://127.0.0.1:8808/uptown-mozart.html). 직접 작성한 참조 시험이며 자동 스타일 모델의 완료를 뜻하지 않습니다.
+
 [같은 선율, 더 유연한 반주](docs/COUNT_ON_ME_ACCOMPANIMENT_REVIEW.md): Count On Me 발전곡의 선율·화성을 보존하고 반주의 호흡·내성·재생 균형을 다듬었습니다. [A/B 비교와 악보 받기](http://127.0.0.1:8808/count-on-me-phrasing.html). 구간별 음량 계획은 선택 옵션이며 기본 재생은 유지합니다.
 
 [Count On Me 주제 발전](docs/COUNT_ON_ME_LYRICAL_STUDY.md): 보유 악보의 첫 노래 구절에서 반음계와 실제 `lyrical` 반주로 32마디 곡을 작성했습니다. [네 곁으로 돌아오는 길 · 감상과 두 악보](http://127.0.0.1:8808/count-on-me.html)에서 피아노 재생·XML·PDF를 제공합니다. 청취 검수 전이며 기본 생성은 유지합니다.
