@@ -79,7 +79,8 @@ def write_page(trace,library,out):
     names={'local_key_change':'국소 조성 변화','tonicization':'일시적 으뜸화'}
     cards=[]
     for row in trace:
-        r=row['reference'];source=r['source_event'];w=row['source']
+        r=row['reference'];source=dict(r['source_event']);w=row['source']
+        source['label']=source.get('raw_label',source['label'])
         pivot=row['evidence'].get('pivot');confirm=row['evidence'].get('confirmation')
         evidence=(f'<p>공통화음: {pivot["bar"]}마디 · {esc(pivot["from_figure"])} → {esc(pivot["to_figure"])} · {esc(" · ".join(pivot["tones"]))}. 구성음·철자·베이스 일치.</p>' if pivot else '')
         if confirm:evidence+=f'<p>도착 조성의 {confirm["bar"]}마디 종지 계획: {esc(confirm["cadence"])}. 독립적인 종지 판정은 아닙니다.</p>'
@@ -87,4 +88,7 @@ def write_page(trace,library,out):
     s=library['summary'];excluded=''.join(f'<li>{esc(w["id"])}: {esc(w.get("reason"))}</li>' for w in library['works'] if w['status']!='validated')
     page='''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>조성 이동과 모티프 발전 | MUSICANOTE</title><style>*{box-sizing:border-box}body{background:#f3f1e9;color:#243b32;font:16px/1.75 system-ui;margin:0}main{max-width:1000px;padding:38px 24px;margin:auto}h1{font-size:clamp(30px,5vw,42px);line-height:1.3}h2{font-size:23px}.brand{font-size:12px;letter-spacing:.13em}article{background:#fffefa;padding:24px;border:1px solid #d3dccd;border-radius:16px;margin:24px 0}.keys{font-size:25px;color:#315c43}a{color:#315c43}nav{display:flex;flex-wrap:wrap;gap:22px}details{font-size:14px}footer{font-size:14px;overflow-wrap:anywhere}</style><main><div class="brand">MUSICANOTE VIRTUAL COMPOSER</div><h1>조성 이동을 모티프 발전에 연결했습니다</h1><p>세컨더리 화음은 현재 조성 안에서 잠시 다른 화음을 향하고, 국소 조성 변화는 별도 구간으로 설계합니다. 아래 참조 관계와 실제 악보의 조성·화성·공통화음을 대조했습니다.</p><nav><a href="index.html">작품과 두 악보</a><a href="tonal_references.json" download>검증한 참조 JSON</a><a href="development_trace.json" download>발전 설계 검증 JSON</a></nav>CARDS<footer><p>COVERAGE</p><p>검증 범위: 표의 마디·음표·화성 시각 일치 및 원 MuseScore의 마디/보표/성부별 주석 일치. 원 악보의 모든 음표 시각을 재해석하거나 전조의 청취 타당성을 인증한 것은 아닙니다.</p><details><summary>보류한 자료</summary><ul>EXCLUDED</ul></details><p>DCML 저자 · CC BY-NC-SA 4.0 · 선택 참조 기능. 기본 생성·자동 스타일 학습·사용자 선택 기록은 바꾸지 않았습니다.</p></footer></main></html>'''
     page=page.replace('CARDS',''.join(cards)).replace('COVERAGE',esc(f"지정 {s['attempted_works']}악장 중 {s['validated_works']}개 검증 · 국소 조성 변화 {s['reference_counts'].get('local_key_change',0)}곳 · 으뜸화 {s['reference_counts'].get('tonicization',0)}곳. 이번 곡에는 작성자가 위 {len(trace)}곳을 참조했습니다.")).replace('EXCLUDED',excluded)
+    if all(w.get('validation',{}).get('xml_timing',{}).get('status')=='validated' for w in library['works'] if w['status']=='validated') and s['validated_works']:
+        page=page.replace('표의 마디·음표·화성 시각 일치 및 원 MuseScore의 마디/보표/성부별 주석 일치. 원 악보의 모든 음표 시각을 재해석하거나 전조의 청취 타당성을 인증한 것은 아닙니다.',
+            '원 MuseScore XML을 독립적으로 읽어 음표의 철자·시각·음가, 마디 길이, 대안 해석을 포함한 화성 주석의 시각을 표와 대조했습니다. 반복은 펼치지 않았으며 전조의 청취 타당성을 인증한 것은 아닙니다.')
     (out/'tonal_development.html').write_text(page,encoding='utf-8')
