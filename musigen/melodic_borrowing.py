@@ -71,9 +71,10 @@ def motifs_from_chart(manifest):
 
 
 def fit_options(placements, progression, motifs):
-    """Find transpositions that fit each target position and keep a shortlist per donor."""
+    """Shortlist transpositions per donor. A None chord leaves the bar open for later harmony."""
     options, baseline, bars = defaultdict(list), [], []
-    chords = [set(pc for pc, _ in parse_chord(symbol).tones) for symbol in progression]
+    chords = [{pc for pc, _ in parse_chord(symbol).tones} if symbol is not None else None
+              for symbol in progression]
     for placement in placements:
         pattern = placement["pattern"]
         rhythm, original = events(pattern), placement["pitches"]
@@ -104,7 +105,8 @@ def fit_options(placements, progression, motifs):
                             continue
                         if first_bar == len(chords)-2 and index+length == len(rhythm) and pitches[-1] % 12:
                             continue
-                        cost = sum(w for p,c,w in zip(pitches,local_chords,accent) if p % 12 not in c)
+                        cost = sum(w for p,c,w in zip(pitches,local_chords,accent)
+                                   if c is not None and p % 12 not in c)
                         cost += .12*sum(abs(a-b) for a,b in zip(pitches,reference))
                         cost += .12*sum(max(0,abs(a-b)-4) for a,b in zip(pitches,pitches[1:]))
                         old = by_donor.get(motif.work)
