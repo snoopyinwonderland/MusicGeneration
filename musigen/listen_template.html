@@ -245,6 +245,7 @@ function prepare(){
   }
   notes = [];
   const swing = !!cur.design.basics.swing;
+  const grid = swing && cur.design.basics.swing_timing==='shared_grid' ? sharedSwingGrid(timeMap, qMs) : null;
   for(const e of timeMap){
     for(const id of (e.on || [])){
       if(tieEnds.has(id)) continue;
@@ -253,7 +254,14 @@ function prepare(){
       let end = v.time + v.duration, x = id, guard = 0;
       while(tieNext.has(x) && guard++ < 64){ x = tieNext.get(x); const u = tk.getMIDIValuesForElement(x); if(u && u.duration > 0) end = Math.max(end, u.time + u.duration); }
       let t=v.time, d=end-v.time;
-      if(swing){
+      if(grid){
+        const releaseQ=grid.releases.get(x);
+        if(releaseQ!==undefined){
+          const shift=grid.shift(e.qstamp);
+          t+=shift;
+          d+=grid.shift(releaseQ)-shift;
+        }
+      } else if(swing){
         const frac=((e.qstamp%1)+1)%1;
         const beatStart=Math.floor(e.qstamp), quarter=qMs(beatStart+1)-qMs(beatStart), late=quarter/6;
         if(Math.abs(frac-.5)<1e-3){ t+=late; d=Math.max(quarter/8,d-late); }
@@ -266,6 +274,27 @@ function prepare(){
   }
   notes.sort((a, b) => a.t - b.t);
   applyPerformance();
+}
+
+// Map attacks and releases through the same clock. Keep any quarter beat
+// with finer subdivisions straight for both hands, even when a hand is muted.
+function sharedSwingGrid(points, toMs){
+  const straight=new Set(), releases=new Map();
+  for(const point of points){
+    const q=point.qstamp;
+    if(!Number.isFinite(q)) continue;
+    for(const id of point.off || []) releases.set(id,q);
+    if(!point.on?.length && !point.off?.length) continue;
+    const phase=q-Math.floor(q);
+    if(Math.abs(phase-.5)>1e-6 && Math.min(phase,1-phase)>1e-6)
+      straight.add(Math.floor(q));
+  }
+  function shift(q){
+    const beat=Math.floor(q);
+    if(straight.has(beat) || Math.abs(q-beat-.5)>1e-6) return 0;
+    return (toMs(beat+1)-toMs(beat))/6;
+  }
+  return {shift,releases};
 }
 
 // Quarter positions are mapped using Verovio, including pickup and tempo changes.

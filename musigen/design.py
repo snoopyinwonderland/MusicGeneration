@@ -19,7 +19,9 @@ the checks hold the score to (musigen/checks.py).  Bars are 1-based and inclusiv
   }
 
 tempo counts the meter's beat (6/8: dotted quarters).  basics.swing true: eighths are written straight and played
-long-short (the listening page); write "Swing" as the first block's text so the score says so too.  'given' entries are dotted paths; a path covers everything under
+long-short (the listening page); write "Swing" as the first block's text so the score says so too.
+The optional basics.swing_timing "shared_grid" moves attacks and releases together and keeps beats with finer subdivisions straight.
+'given' entries are dotted paths; a path covers everything under
 it ("form" marks all sections as the user's, "form.1" only the second).  The notes of each motif are in the score
 (score.json), the design only describes them.
 """
@@ -82,6 +84,8 @@ def validate(d: dict) -> list[str]:
             raise DesignError(f"basics.{k} missing")
     if b["meter"] not in METERS:
         raise DesignError(f"basics.meter one of {sorted(METERS)}")
+    if "swing_timing" in b and (b["swing_timing"] != "shared_grid" or b.get("swing") is not True):
+        raise DesignError("basics.swing_timing의 shared_grid는 swing이 true일 때 사용할 수 있습니다")
     pickup(b)
     if b["mode"] not in ("major", "minor"):
         raise DesignError("basics.mode major | minor")
