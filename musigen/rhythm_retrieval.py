@@ -105,13 +105,19 @@ def arrange(patterns, density_targets, width=48):
     return eligible[0]
 
 
-def fit_pitches(pattern, chords, previous=None, final=False):
+def fit_pitches(pattern, chords, previous=None, final=False, *, register=None, direction_weight=1.8,
+                repetition_cost=0.0):
     """Dynamic programming on scale pitches, preserving source direction as a soft cost."""
     rhythm = events(pattern)
     scale = [m for m in range(62, 80) if m % 12 in (0, 2, 4, 5, 7, 9, 11)]
-    states = {previous: (0.0, [])}
+    states = {(previous, 0): (0.0, [])}
     for index, (onset, duration) in enumerate(rhythm):
         chord = chords[min(int(onset//4), len(chords)-1)]
+        center, weight = 70, .025
+        if register is not None:
+            start, end = register
+            progress = float((onset-rhythm[0][0])/(rhythm[-1][0]-rhythm[0][0]))
+            center, weight = start + progress*(end-start), .18
         next_states = {}
         for pitch in scale:
             local = 0.0
@@ -121,15 +127,16 @@ def fit_pitches(pattern, chords, previous=None, final=False):
                 local += 2.0 * (pitch % 12 not in chord)
                 if final:
                     local += 6 * (pitch % 12 != 0)
-            options = []
-            for last, (cost, path) in states.items():
+            for (last, run), (cost, path) in states.items():
                 step = pitch-last if last is not None else 0
                 direction = (step > 0)-(step < 0)
                 mismatch = index > 0 and direction != pattern["directions"][index]
-                motion = abs(step)*.08 + max(0, abs(step)-5)*.8 + 1.8*mismatch
-                register = abs(pitch-70)*.025
-                options.append((cost+local+motion+register, path+[pitch]))
-            next_states[pitch] = min(options, key=lambda item: (item[0], item[1]))
+                motion = abs(step)*.08 + max(0, abs(step)-5)*.8 + direction_weight*mismatch
+                motion += repetition_cost * (last == pitch and run == 2)
+                key = (pitch, min(run+1, 2) if last == pitch else 1) if repetition_cost else (pitch, 0)
+                candidate = (cost+local+motion+abs(pitch-center)*weight, path+[pitch])
+                if key not in next_states or candidate < next_states[key]:
+                    next_states[key] = candidate
         states = next_states
     return min(states.values(), key=lambda item: (item[0], item[1]))
 
