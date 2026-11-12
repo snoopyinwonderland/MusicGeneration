@@ -46,4 +46,5 @@ $env:PYTHONUTF8 = '1'
 ```
 
 선택 보고서 `report.json`, 악보 입력 `score.json`, 중복 검사 입력 `queries.json`을 생성한다. 이번 MusicXML·PDF·청취판을 출력한 로컬 스크립트는 `output/rhythm-first/render.py`와 `publish.py`다.
-\n새 출력 폴더에서 재실행한 악보와 검사 입력이 동일하고, 함께 생성한 design.json과 score.json을 기존 piece.build가 읽어 16마디를 구성하는 것을 확인했다.
+
+새 출력 폴더에서 재실행한 악보와 검사 입력이 동일하고, 함께 생성한 design.json과 score.json을 기존 piece.build가 읽어 16마디를 구성하는 것을 확인했다.
