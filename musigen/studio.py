@@ -11,6 +11,7 @@ from pathlib import Path
 
 from musigen.motif_clip import read_events
 from musigen.listen import VEROVIO_CDN
+from musigen.studio_library import library_html
 
 KEYS=('C major','G major','D major','F major','Bb major','Eb major','A minor','E minor','D minor','G minor','C minor')
 
@@ -76,6 +77,10 @@ def write_studio(out):
     src=VEROVIO_CDN
     if runtime.is_file():shutil.copyfile(runtime,assets/'verovio.js');src='assets/verovio.js'
     text=(source/'studio.html').read_text(encoding='utf-8').replace('/*VEROVIO_SRC*/',src)
+    library = library_html(out)
+    if library:
+        text = text.replace('<title>모티프에서 시작하기', '<title>작품 라이브러리')
+    text = text.replace('<!-- STUDIO_LIBRARY -->', library)
     (out/'index.html').write_text(text,encoding='utf-8')
     return out.resolve()
 

@@ -146,6 +146,29 @@
     finally{$('refreshRequests').disabled=false;}
   }
   $('refreshRequests').addEventListener('click',refreshRequests);refreshRequests();
+  const librarySearch = $('library-search');
+  if(librarySearch){
+    librarySearch.hidden = false;
+    librarySearch.previousElementSibling.hidden = false;
+    const groups = [...document.querySelectorAll('.library-group')].map(group => ({
+      group,
+      works: [...group.querySelectorAll('li')],
+    }));
+    librarySearch.addEventListener('input', () => {
+      const terms = librarySearch.value.trim().toLocaleLowerCase().split(/\s+/);
+      let matches = 0;
+      for(const {group, works} of groups){
+        let visible = false;
+        for(const work of works){
+          const text = work.textContent.toLocaleLowerCase();
+          work.hidden = !terms.every(term => text.includes(term));
+          if(!work.hidden){ visible = true; matches++; }
+        }
+        group.hidden = !visible;
+      }
+      $('library-empty').hidden = matches > 0;
+    });
+  }
   $('stopMotif').addEventListener('click',stop);window.addEventListener('pagehide',stop);
   $('listenMotif').addEventListener('click',run(async()=>{
     const data=request();stop();const token=playbackToken;$('stopMotif').disabled=false;status('피아노 음원을 준비하고 있습니다…');audio||=new AudioContext();await audio.resume();

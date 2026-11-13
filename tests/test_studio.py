@@ -41,3 +41,20 @@ class StudioTest(unittest.TestCase):
             core=(root/'assets/motif-core.js').read_text(encoding='utf-8')
             self.assertIn('parseMusicXML',core)
             self.assertNotIn("el('openMotifStudio')",core)
+
+    def test_library_links_to_available_local_scores(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root/'piece.html').write_text('score', encoding='utf-8')
+            works = [
+                {'title': 'A & B', 'detail': '피아노', 'url': 'piece.html#version=v002',
+                 'versions': [{'label': '이전판', 'url': 'missing.html'}]},
+                {'title': '외부곡', 'detail': '피아노', 'url': '//example.com/score.html'},
+            ]
+            (root/'library.json').write_text(json.dumps([{'title':'피아노곡','works':works}]), encoding='utf-8')
+            write_studio(root)
+            page = (root/'index.html').read_text(encoding='utf-8')
+            self.assertIn('작품 라이브러리', page)
+            self.assertIn('href="piece.html#version=v002">A &amp; B', page)
+            self.assertNotIn('missing.html', page)
+            self.assertNotIn('example.com', page)
