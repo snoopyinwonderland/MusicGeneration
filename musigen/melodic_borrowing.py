@@ -1,11 +1,12 @@
 """Fit short transposed motifs to an existing rhythm and accompaniment."""
 from collections import defaultdict
+from bisect import bisect_right
 from dataclasses import dataclass
 from fractions import Fraction as F
 import hashlib
 from pathlib import Path
 
-from musigen.accomp import parse_chord
+from musigen.accomp import parse_chords
 from musigen.pop_rhythm import rhythm_window, source_windows
 from musigen.rhythm_retrieval import events
 
@@ -73,8 +74,15 @@ def motifs_from_chart(manifest):
 def fit_options(placements, progression, motifs):
     """Shortlist transpositions per donor. A None chord leaves the bar open for later harmony."""
     options, baseline, bars = defaultdict(list), [], []
-    chords = [{pc for pc, _ in parse_chord(symbol).tones} if symbol is not None else None
-              for symbol in progression]
+    chord_times, chord_tones = [], []
+    for bar, symbols in enumerate(progression):
+        if symbols is None:
+            chord_times.append(F(4*bar))
+            chord_tones.append(None)
+            continue
+        for onset, _, chord in parse_chords(symbols, F(4), F(1)):
+            chord_times.append(4*bar+onset)
+            chord_tones.append({pc for pc, _ in chord.tones})
     for placement in placements:
         pattern = placement["pattern"]
         rhythm, original = events(pattern), placement["pitches"]
@@ -90,7 +98,8 @@ def fit_options(placements, progression, motifs):
                 if any(b[0] - sum(a) > 1 for a,b in zip(target,target[1:])):
                     continue
                 shape = rhythm_shape(target)
-                local_chords = [chords[first_bar+int(on//4)] for on,_ in target]
+                local_chords = [chord_tones[bisect_right(chord_times, 4*first_bar+on)-1]
+                                for on,_ in target]
                 accent = [2.0 if on % 1 == 0 or d >= 1 else .35 for on,d in target]
                 reference = tuple(original[index:index+length])
                 by_donor = {}
@@ -103,7 +112,7 @@ def fit_options(placements, progression, motifs):
                             continue
                         if any(p < 64 or p > 81 or p % 12 not in MAJOR for p in pitches):
                             continue
-                        if first_bar == len(chords)-2 and index+length == len(rhythm) and pitches[-1] % 12:
+                        if first_bar == len(progression)-2 and index+length == len(rhythm) and pitches[-1] % 12:
                             continue
                         cost = sum(w for p,c,w in zip(pitches,local_chords,accent)
                                    if c is not None and p % 12 not in c)
