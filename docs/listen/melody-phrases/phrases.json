@@ -1,0 +1,52 @@
+[
+  {
+    "id": "01", "title": "느린 인사", "key": "D", "keyLabel": "D장조", "time": "4/4", "quarterBpm": 78,
+    "description": "짧은 들머리로 말을 건네고, 한 박 쉰 뒤 높은 D에서 답합니다.",
+    "bars": ["r/e F#4/e A4/q. B4/e A4/q", "F#4/q E4/e D4/e E4/q. F#4/e", "r/q A4/e B4/e D5/q C#5/e B4/e", "A4/e G4/e F#4/q D4/q. r/e"]
+  },
+  {
+    "id": "02", "title": "한 박 먼저", "key": "e", "keyLabel": "E단조", "time": "4/4", "quarterBpm": 94,
+    "description": "같은 음 두 번을 짧게 던진 뒤, 뒤박에서 시작한 음을 다음 마디까지 끕니다.",
+    "bars": ["r/q B4/e B4/s A4/s G4/e B4/q.~", "B4/e A4/e G4/q F#4/e D#4/e E4/q", "G4/e A4/s B4/s D5/q. B4/e A4/e G4/e", "F#4/q G4/e F#4/e E4/q. r/e"]
+  },
+  {
+    "id": "03", "title": "잔물결", "key": "F", "keyLabel": "F장조", "time": "6/8", "quarterBpm": 87,
+    "description": "첫 마디의 큰 도약 뒤 낮게 답하고, E♭을 스쳐 마지막 F에 머뭅니다.",
+    "bars": ["r/e A4/e C5/e F5/q E5/e", "D5/e C5/e A4/e Bb4/q G4/e", "A4/e C5/e D5/e Eb5/e D5/e C5/e", "Bb4/e G4/e E4/e F4/q."]
+  },
+  {
+    "id": "04", "title": "유리창 왈츠", "key": "b", "keyLabel": "B단조", "time": "3/4", "quarterBpm": 84,
+    "description": "높은 음에서 먼저 떨어지고, 뒤에서 짧은 꾸밈을 붙여 장단을 바꿉니다.",
+    "bars": ["F#5/q. B4/e D5/q", "C#5/e D5/e C#5/q A4/q", "r/e B4/e E5/e F#5/s E5/s D5/q", "C#5/q A#4/e B4/q r/e"]
+  },
+  {
+    "id": "05", "title": "블루 노트", "key": "C", "keyLabel": "C장조", "time": "4/4", "quarterBpm": 112,
+    "description": "엇박으로 시작해 E♭을 거쳐 휘어 내려옵니다. 짧은 쉼 뒤 높은 A로 다시 튑니다.",
+    "bars": ["r/e E5/e G5/e E5/q D#5/e E5/q", "A4/q C5/e D5/e Eb5/e D5/q r/e", "r/e D5/s E5/s F5/e A5/e G5/q. F5/e", "E5/e Eb5/e D5/e B4/e C5/q. r/e"]
+  },
+  {
+    "id": "06", "title": "긴 숨", "key": "a", "keyLabel": "A단조", "time": "4/4", "quarterBpm": 68,
+    "description": "두 음을 짧게 내려온 뒤 길게 머물고, 한 박의 쉼을 지나 더 촘촘하게 답합니다.",
+    "bars": ["r/q E5/e D5/e A4/h", "C5/q. B4/e G#4/q r/q", "r/e E5/e F5/q D5/e C5/e B4/q", "C5/q. B4/e A4/h"]
+  },
+  {
+    "id": "07", "title": "후렴의 문", "key": "Eb", "keyLabel": "E♭장조", "time": "4/4", "quarterBpm": 104,
+    "description": "낮은 E♭에서 시작해 높은 G를 세 박 끈 뒤, 처음 음으로 돌아옵니다.",
+    "bars": ["r/e Eb4/e G4/q. Bb4/e C5/e Bb4/e", "G4/e Bb4/e Eb5/q. F5/e Eb5/q", "G5/h. F5/e C5/e", "Bb4/q. C5/e Bb4/e G4/e Eb4/q"]
+  },
+  {
+    "id": "08", "title": "골목의 춤", "key": "g", "keyLabel": "G단조", "time": "6/8", "quarterBpm": 114,
+    "description": "세 음씩 나아가다 짧은 16분음표를 몰아치고, 마지막 음 뒤에는 4분쉼표를 둡니다.",
+    "bars": ["G4/e Bb4/e D5/e C5/q Bb4/e", "G4/e A4/e Bb4/e Eb5/e D5/e r/e", "D5/e Eb5/s D5/s C5/e Bb4/e C5/s Bb4/s A4/e", "F#4/e G4/q. r/q"]
+  },
+  {
+    "id": "09", "title": "햇살 한 칸", "key": "A", "keyLabel": "A장조", "time": "3/4", "quarterBpm": 92,
+    "description": "짧은 상승 음형에 높은 E로 응답하고, 잠깐 빨라졌다가 끝음을 늘입니다.",
+    "bars": ["r/e E4/e A4/e C#5/e B4/q", "A4/e E5/q. C#5/e B4/e", "r/e D5/s E5/s F#5/e E5/e C#5/e B4/e", "G#4/e B4/e A4/q. r/e"]
+  },
+  {
+    "id": "10", "title": "열린 질문", "key": "d", "keyLabel": "D단조", "time": "4/4", "quarterBpm": 94,
+    "description": "반음 아래로 미끄러지는 둘째 마디를 지나, 마지막에 위로 도약해 끝냅니다.",
+    "bars": ["A4/q D5/q. C5/e A4/q", "Ab4/e G4/e Bb4/q F4/e G4/e A4/q", "r/e A4/e D5/e E5/s F5/s E5/e C#5/e A4/q", "Bb4/q G#4/e A4/e D5/h"]
+  }
+]
