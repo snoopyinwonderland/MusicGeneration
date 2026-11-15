@@ -1,0 +1,52 @@
+[
+  {
+    "id": "11", "title": "낮은 천장", "key": "b-", "keyLabel": "B♭단조", "time": "3/4", "quarterBpm": 82,
+    "description": "높은 F에서 크게 떨어진 뒤, 짧은 꺾임을 지나 낮은 B♭에 닿습니다.",
+    "bars": ["F5/q Ab4/e Bb4/e Db5/q", "C5/e Db5/e C5/q Gb4/e r/e", "Bb4/e Ab4/e Db5/e Eb5/s Db5/s Bb4/q", "C5/e A4/e Bb4/q. r/e"]
+  },
+  {
+    "id": "12", "title": "느슨한 블루스", "key": "F", "keyLabel": "F장조", "time": "4/4", "quarterBpm": 102,
+    "description": "E♭–E–F를 짧게 밀어 올립니다. 중간에 멈췄다가 A♭–A로 다시 말을 잇습니다.",
+    "bars": ["r/e C5/e Eb5/s E5/s F5/q. A4/e C5/e", "Bb4/q Db5/e C5/e A4/q. r/e", "r/q Ab4/e A4/e C5/e F5/s Eb5/s C5/q", "Bb4/q G4/e Ab4/e A4/e F4/q."]
+  },
+  {
+    "id": "13", "title": "잔향만 남아", "key": "e-", "keyLabel": "E♭단조", "time": "4/4", "quarterBpm": 66,
+    "description": "첫 낮은 E♭을 두 박 남겨 둡니다. 긴 여백 뒤 짧게 몰아 내려와 다시 E♭에서 쉽니다.",
+    "bars": ["Bb4/e Ab4/e Eb4/h r/q", "Gb4/q. F4/e Db4/q Eb4/e r/e", "r/e Bb4/e Cb5/q Bb4/s Ab4/s Gb4/e F4/q", "Ab4/q Gb4/e F4/e Eb4/h"]
+  },
+  {
+    "id": "14", "title": "돌계단", "key": "d", "keyLabel": "D단조", "time": "6/8", "quarterBpm": 102,
+    "description": "첫 마디의 짧은 꺾임이 다른 음에서 돌아옵니다. 끝에는 높은 D와 쉼이 남습니다.",
+    "bars": ["D5/e F5/s E5/s D5/e A4/q Bb4/e", "C5/q D5/e E5/e G5/e r/e", "r/e F5/e E5/s F5/s D5/e C#5/s A4/s Bb4/e", "A4/e D5/q. r/q"]
+  },
+  {
+    "id": "15", "title": "저녁의 틈", "key": "G", "keyLabel": "G장조", "time": "3/4", "quarterBpm": 90,
+    "description": "낮게 내려앉은 뒤 E♭–E로 방향을 틀고, 잠깐 열린 높은 음에서 부드럽게 내려옵니다.",
+    "bars": ["D5/q. G4/e B4/e D5/e", "Eb5/e D5/e B4/q A4/e r/e", "r/e C5/e Eb5/s E5/s G5/e F#5/e D5/e", "B4/q A4/e G4/q."]
+  },
+  {
+    "id": "16", "title": "다시 잠깐", "key": "f#", "keyLabel": "F♯단조", "time": "4/4", "quarterBpm": 84,
+    "description": "첫 도약 뒤 내려오고, 한 박 반을 쉰 뒤 짧은 두 음을 끼워 같은 높은 F♯로 돌아갑니다.",
+    "bars": ["r/e C#5/e F#5/q E5/e D5/e A4/q", "B4/e C#5/e B4/q G#4/q r/q", "r/e A4/e C#5/s D5/s E5/e F#5/q. C#5/e", "D5/e B4/e G#4/e E#4/e F#4/q. r/e"]
+  },
+  {
+    "id": "17", "title": "흐린 오후", "key": "B-", "keyLabel": "B♭장조", "time": "6/8", "quarterBpm": 90,
+    "description": "낮은 곳에서 천천히 오르다가, 쉼 뒤 높은 F에서 짧게 꺾어 내려옵니다.",
+    "bars": ["r/e F4/e Bb4/e D5/q C5/e", "Ab4/q Bb4/e F4/q r/e", "r/e F5/e Eb5/s D5/s C5/e Db5/s C5/s Ab4/e", "G4/e A4/e Bb4/q. r/e"]
+  },
+  {
+    "id": "18", "title": "어깨를 돌려", "key": "a", "keyLabel": "A단조", "time": "3/4", "quarterBpm": 98,
+    "description": "짧은 두 음 뒤 B를 길게 끌고, 뒤에서 높이 튀어오른 다음 한 박 일찍 말을 놓습니다.",
+    "bars": ["C5/e E5/e B4/q. A4/e", "F4/q G#4/e B4/e E5/e r/e", "r/e C5/e F5/s E5/s D5/e C5/q", "B4/e G#4/e A4/q r/q"]
+  },
+  {
+    "id": "19", "title": "건너편 불빛", "key": "D", "keyLabel": "D장조", "time": "4/4", "quarterBpm": 80,
+    "description": "같은 A를 긁듯 되풀이하고, 긴 숨 뒤 위로 뻗습니다. 마지막 D는 두 박 남겨 둡니다.",
+    "bars": ["r/e A4/e B4/s A4/s F#4/q A4/q.", "C5/e B4/e G4/q F#4/q r/q", "r/e F#4/e G4/e A4/s B4/s D5/q. C#5/e", "A4/e G4/e F#4/q D4/h"]
+  },
+  {
+    "id": "20", "title": "닫히기 전", "key": "c", "keyLabel": "C단조", "time": "4/4", "quarterBpm": 92,
+    "description": "E♭ 주변을 맴도는 첫 음형에 반음으로 답합니다. 마지막 C 뒤에는 한 박 반의 여백이 있습니다.",
+    "bars": ["Eb5/q D5/e Eb5/e G4/q. Bb4/e", "r/e Db5/e C5/q Ab4/e G4/e F4/e r/e", "G4/e C5/e D5/s Eb5/s F5/e Eb5/q. D5/e", "Bb4/e B4/e C5/q. r/q."]
+  }
+]
