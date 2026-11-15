@@ -16,7 +16,7 @@ from musigen.melody_evidence import packed
 WEIGHTS = {"gap": 1.0, "pulse": 1.0, "density": 1.0, "repeated_rhythm": 0.5}
 
 
-def extract(path, meter="4/4", bars=2):
+def extract(path, meter="4/4", bars=2, *, include_melody=False):
     """Preserve source onset/duration and beat phase on annotated phrase boundaries."""
     beat_length = F(4, int(meter.split("/")[1]))
     span = F(int(meter.split("/")[0])) * beat_length * bars
@@ -58,6 +58,9 @@ def extract(path, meter="4/4", bars=2):
                         "rhythm": [[str(t), str(d)] for t, d, _ in notes],
                         "directions": directions, "padded_tail": str(span-length),
                     })
+                    if include_melody:
+                        patterns[-1].update(pitches=[p for _, _, p in notes],
+                                            tonic=f["tonic"][start], mode=f["mode"][start])
                 start = end + 1
     return patterns, dict(excluded)
 
