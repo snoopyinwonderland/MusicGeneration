@@ -1,0 +1,82 @@
+{
+  "title": "말하지 못한 오후",
+  "id": "51",
+  "key": "G",
+  "keyLabel": "G장조",
+  "quarterBpm": 88,
+  "blocks": [
+    {
+      "rhythm": {
+        "title": "사랑의 바보",
+        "path": "Q:\\KY Data\\MIDI\\KYSing_MIDI\\64438.mid",
+        "sha256": "9ade2cfc1ebab36097c27ee53117d3e7b069e2fcf8aa204957ea2d0983b9ab62",
+        "start": "67",
+        "position": "tick 8040"
+      },
+      "melody": {
+        "title": "My Love (And)",
+        "path": "Q:\\KY Data\\MIDI\\KYSing_MIDI\\85066.mid",
+        "sha256": "7f6e0894f7304256a149a6519ebf8fe782ee02dde2b5dfa1127e03de110687dc",
+        "start": "20",
+        "position": "tick 2400"
+      },
+      "shift": 0,
+      "role": "제시"
+    },
+    {
+      "rhythm": {
+        "title": "My Love (And)",
+        "path": "Q:\\KY Data\\MIDI\\KYSing_MIDI\\85066.mid",
+        "sha256": "7f6e0894f7304256a149a6519ebf8fe782ee02dde2b5dfa1127e03de110687dc",
+        "start": "28",
+        "position": "tick 3360"
+      },
+      "melody": {
+        "title": "천상연 (웹툰\"선녀외전\")",
+        "path": "Q:\\KY Data\\MIDI\\KYSing_MIDI\\82628.mid",
+        "sha256": "bda2882fdea841d27a1fc4f467db5e00ce43cfefdfa4ee2404665b829eeedf89",
+        "start": "20",
+        "position": "tick 2400"
+      },
+      "shift": -4,
+      "role": "응답과 호흡"
+    },
+    {
+      "rhythm": {
+        "title": "사랑의 바보",
+        "path": "Q:\\KY Data\\MIDI\\KYSing_MIDI\\64438.mid",
+        "sha256": "9ade2cfc1ebab36097c27ee53117d3e7b069e2fcf8aa204957ea2d0983b9ab62",
+        "start": "67",
+        "position": "tick 8040"
+      },
+      "melody": {
+        "title": "나는 반딧불",
+        "path": "Q:\\KY Data\\MIDI\\KYSing_MIDI\\55791.mid",
+        "sha256": "6116e68938e0d634ffb22b7166ca9c224fce6e1c861ec36e004a96bd1bfd27f3",
+        "start": "224",
+        "position": "tick 26880"
+      },
+      "shift": 2,
+      "role": "첫 리듬의 재현과 음역 상승"
+    },
+    {
+      "rhythm": {
+        "title": "Golden",
+        "path": "K:\\Music Analysis\\MusicXML\\Golden Melody.musicxml.xml",
+        "sha256": "d1e3709f80a6f474712726ef19ec8cabcc35fcc7a1def6a3da5a62f4b6ae2a79",
+        "start": "295",
+        "position": "56–57"
+      },
+      "authored_pitches": [
+        71,
+        71,
+        69,
+        67,
+        66,
+        69,
+        67
+      ],
+      "role": "새로 쓴 종결 선율"
+    }
+  ]
+}
