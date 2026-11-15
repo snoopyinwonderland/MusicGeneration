@@ -1,0 +1,52 @@
+[
+  {
+    "id": "21", "title": "물가의 문장", "key": "e", "keyLabel": "E단조", "time": "4/4", "quarterBpm": 82,
+    "description": "짧게 올린 첫 구절에 높은 E를 두 박 길게 두어 답합니다. 끝에서는 세 음으로 내려옵니다.",
+    "bars": ["G4/q B4/q C5/e B4/e G4/q", "E5/h D5/e C5/e A4/q", "B4/q G4/e A4/e B4/q F#4/q", "G4/q F#4/q E4/h"]
+  },
+  {
+    "id": "22", "title": "창을 닫고", "key": "d", "keyLabel": "D단조", "time": "4/4", "quarterBpm": 70,
+    "description": "길게 부른 첫 D가 아래로 내려앉습니다. 셋째 마디에서 한 박 쉰 뒤 다시 올라갑니다.",
+    "bars": ["D5/h F5/q E5/q", "A4/q Bb4/e A4/e F4/h", "r/q A4/q C5/q E5/e D5/e", "C#5/q E5/q D5/h"]
+  },
+  {
+    "id": "23", "title": "느린 파랑", "key": "B-", "keyLabel": "B♭장조", "time": "4/4", "quarterBpm": 92,
+    "description": "고른 박 사이에 D♭–D와 A–A♭을 놓아 블루스 색을 냅니다. 마지막 음은 길게 남깁니다.",
+    "bars": ["F4/q Bb4/q Db5/e D5/e F5/q", "Eb5/h C5/e Db5/e C5/q", "Bb4/q A4/e Ab4/e G4/q F4/q", "Eb4/q D4/e F4/e Bb4/h"]
+  },
+  {
+    "id": "24", "title": "늦은 산책", "key": "b", "keyLabel": "B단조", "time": "3/4", "quarterBpm": 84,
+    "description": "높은 F♯에서 내려온 뒤 셋째 마디에서 G까지 다시 오릅니다. 고른 세 박 위에서 방향이 바뀝니다.",
+    "bars": ["F#5/q D5/q C#5/e B4/e", "E5/q C#5/e D5/e A4/q", "B4/q D5/e E5/e G5/q", "F#5/e E5/e C#5/q B4/q"]
+  },
+  {
+    "id": "25", "title": "모서리에 앉아", "key": "F", "keyLabel": "F장조", "time": "6/8", "quarterBpm": 93,
+    "description": "한 마디를 두 덩어리로 느낄 수 있는 6/8입니다. 세 음씩 흘러가다가 마지막 F에서 머뭅니다.",
+    "bars": ["A4/q C5/e F5/e E5/e D5/e", "C5/q. Bb4/q A4/e", "G4/e A4/e Bb4/e D5/q C5/e", "Bb4/q G4/e F4/q."]
+  },
+  {
+    "id": "26", "title": "밑줄", "key": "a", "keyLabel": "A단조", "time": "4/4", "quarterBpm": 96,
+    "description": "첫 네 음의 리듬이 셋째 마디에서 다시 들립니다. 이번에는 더 높은 F로 이어집니다.",
+    "bars": ["E5/q C5/e D5/e E5/q A4/q", "G4/q A4/q C5/e B4/e F4/q", "C5/q A4/e B4/e C5/q F5/q", "E5/q D5/e B4/e A4/h"]
+  },
+  {
+    "id": "27", "title": "흰 벽에 비친 빛", "key": "G", "keyLabel": "G장조", "time": "4/4", "quarterBpm": 77,
+    "description": "짧은 하행에서 긴 D로 떠오릅니다. 중간에는 B♭에서 B로 한 박씩 움직입니다.",
+    "bars": ["B4/q A4/e G4/e D5/h", "C5/q E5/e D5/e Bb4/q B4/q", "A4/q B4/e C5/e E5/h", "D5/q A4/q G4/h"]
+  },
+  {
+    "id": "28", "title": "안개가 걷히고", "key": "c", "keyLabel": "C단조", "time": "3/4", "quarterBpm": 78,
+    "description": "첫 도약 뒤 높은 음 주변을 돌고, D♭–C를 지나 낮은 E♭에 닿습니다.",
+    "bars": ["G4/q Eb5/q D5/e Eb5/e", "Bb4/h Ab4/e G4/e", "F4/q Ab4/q C5/e Db5/e", "C5/q G4/q Eb4/q"]
+  },
+  {
+    "id": "29", "title": "한낮의 그림자", "key": "E-", "keyLabel": "E♭장조", "time": "4/4", "quarterBpm": 100,
+    "description": "낮은 E♭에서 시작해 가운데서 한 번 내려오고, 마지막 마디에서 높은 E♭으로 올라갑니다.",
+    "bars": ["Eb4/q G4/e Bb4/e C5/q G4/q", "Ab4/h Bb4/e C5/e Eb5/e Db5/e", "C5/q Ab4/e G4/e F4/h", "Bb4/e C5/e D5/q Eb5/h"]
+  },
+  {
+    "id": "30", "title": "걸음을 늦춰", "key": "f#", "keyLabel": "F♯단조", "time": "4/4", "quarterBpm": 86,
+    "description": "한 번 길게 들려준 C♯로 돌아온 뒤, 마지막 세 음을 넉넉하게 내려놓습니다.",
+    "bars": ["C#5/h E5/e D5/e C#5/q", "A4/q G#4/e B4/e D5/q B4/q", "F#4/q G#4/q A4/e B4/e C#5/q", "B4/q A4/q F#4/h"]
+  }
+]
