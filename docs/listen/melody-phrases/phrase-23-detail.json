@@ -1,0 +1,15 @@
+{
+  "id": "23b",
+  "title": "세분화",
+  "key": "B-",
+  "keyLabel": "B♭장조",
+  "time": "4/4",
+  "quarterBpm": 92,
+  "description": "기존 음이 시작하는 자리를 살리고 사이에 짧은 음 여섯 개를 넣었습니다. 마지막 B♭의 두 박은 그대로 들립니다.",
+  "bars": [
+    "F4/s G4/s A4/e Bb4/q Db5/e D5/e F5/q",
+    "Eb5/q D5/e Eb5/e C5/e Db5/e C5/q",
+    "Bb4/e C5/e A4/e Ab4/e G4/q F4/q",
+    "Eb4/e C4/e D4/e F4/e Bb4/h"
+  ]
+}
