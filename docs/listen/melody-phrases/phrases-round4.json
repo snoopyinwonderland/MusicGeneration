@@ -1,0 +1,52 @@
+[
+  {
+    "id": "31", "title": "멀리 부르면", "key": "d", "keyLabel": "D단조", "time": "4/4", "quarterBpm": 80,
+    "description": "A에서 높은 F로 뛰어 길게 머뭅니다. 셋째 마디에서 비슷한 몸짓을 낮은 F에서 다시 시작합니다.",
+    "bars": ["A4/q F5/h E5/e D5/e", "C5/q A4/q Bb4/q G4/q", "F4/q D5/h C5/e Bb4/e", "A4/q E4/q D4/h"]
+  },
+  {
+    "id": "32", "title": "바람의 방향", "key": "F", "keyLabel": "F장조", "time": "3/4", "quarterBpm": 94,
+    "description": "첫 두 음이 아래로 5도 떨어집니다. 셋째 마디에서 같은 간격을 더 높은 자리에서 되풀이합니다.",
+    "bars": ["C5/q F4/q A4/e G4/e", "E4/q Bb4/q A4/q", "F5/q Bb4/q D5/e C5/e", "G4/q A4/e E4/e F4/q"]
+  },
+  {
+    "id": "33", "title": "저 멀리 항구", "key": "E-", "keyLabel": "E♭장조", "time": "4/4", "quarterBpm": 76,
+    "description": "낮은 E♭을 길게 낸 다음 D♭으로 7도 뜁니다. 셋째 마디에서는 5도 도약으로 다시 위를 봅니다.",
+    "bars": ["Eb4/h Db5/q C5/q", "G4/q Bb4/e G4/e F4/h", "Ab4/q Eb5/h D5/e C5/e", "Bb4/q G4/q Eb4/h"]
+  },
+  {
+    "id": "34", "title": "두 층의 불빛", "key": "a", "keyLabel": "A단조", "time": "4/4", "quarterBpm": 94,
+    "description": "낮은 A에서 높은 A로 한 옥타브 올라 출발합니다. 끝에서는 같은 두 음을 거꾸로 밟습니다.",
+    "bars": ["A3/q A4/h G4/q", "C5/h B4/q E4/q", "G4/q E5/h D5/q", "C5/q A4/q A3/h"]
+  },
+  {
+    "id": "35", "title": "푸른 모퉁이", "key": "B-", "keyLabel": "B♭장조", "time": "4/4", "quarterBpm": 96,
+    "description": "낮은 B♭에서 D까지 두 번에 걸쳐 뛰어오릅니다. 곧 D♭으로 꺾고, 마지막에는 A♭–A–B♭으로 닫습니다.",
+    "bars": ["Bb3/q F4/q D5/q Db5/e C5/e", "Ab4/q D5/q G4/h", "F4/q C5/q Eb5/e D5/e G4/q", "Ab4/q A4/q Bb4/h"]
+  },
+  {
+    "id": "36", "title": "되묻는 말", "key": "e", "keyLabel": "E단조", "time": "3/4", "quarterBpm": 82,
+    "description": "첫 마디의 짧은 두 음은 내려가고 셋째 마디의 짧은 두 음은 올라갑니다. 둘 다 끝에서 크게 방향을 바꿉니다.",
+    "bars": ["B4/e G4/e E4/q B4/q", "F#4/q A4/q D5/q", "G4/e B4/e E5/q G4/q", "F#4/q B3/e D#4/e E4/q"]
+  },
+  {
+    "id": "37", "title": "열린 골목", "key": "G", "keyLabel": "G장조", "time": "4/4", "quarterBpm": 104,
+    "description": "첫 마디의 리듬이 셋째 마디에서 돌아옵니다. 셋째 마디의 두 짧은 음은 더 높은 곳에 닿습니다.",
+    "bars": ["D4/q G4/e B4/e D5/q A4/q", "B4/q G4/q D4/h", "A4/q D5/e F#5/e E5/q C5/q", "B4/q D5/q G4/h"]
+  },
+  {
+    "id": "38", "title": "깊은 창", "key": "c", "keyLabel": "C단조", "time": "4/4", "quarterBpm": 68,
+    "description": "낮은 C에서 두 번 뛰어오릅니다. 한 박을 온전히 쉰 뒤 높은 C에서 새로 말을 잇습니다.",
+    "bars": ["C4/h G4/q Eb5/q", "D5/q Bb4/e G4/e F4/q r/q", "C5/h Ab4/q Eb5/q", "D5/q G4/q C4/h"]
+  },
+  {
+    "id": "39", "title": "바람을 건너", "key": "D", "keyLabel": "D장조", "time": "6/8", "quarterBpm": 96,
+    "description": "높은 음으로 6/8의 첫 박을 엽니다. 셋째 마디 첫 박에서 7도 위의 G에 닿습니다.",
+    "bars": ["F#5/q A4/e D5/q C#5/e", "E5/q. B4/e G4/e A4/e", "G5/q D5/e B4/q A4/e", "F#4/e A4/e F#4/e D4/q."]
+  },
+  {
+    "id": "40", "title": "낮은 대답", "key": "f#", "keyLabel": "F♯단조", "time": "4/4", "quarterBpm": 88,
+    "description": "높은 E가 7도 아래로 떨어집니다. 셋째 마디에서도 높은 음과 낮은 음이 한 박씩 교대합니다.",
+    "bars": ["E5/q F#4/q A4/h", "C#5/q A4/e G#4/e D5/h", "C#5/q E5/q G#4/q B4/q", "A4/q C#5/q F#4/h"]
+  }
+]
