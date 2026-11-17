@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+[노래방 전체 주선율·화성 통계](docs/KARAOKE_CORPUS_STATISTICS.md): 50,874개 MIDI를 전수 조사하고 랩 의심 구간을 제외한 음형·리듬·contour·반복·명시 화음 관계를 집계했습니다. 약 153만 개의 2/4마디 검색 구간과 분모별 결과를 남겼으며, 실제 장단조 표기의 한계와 생성 적용 전 상태를 구별합니다. 이후 작업은 [개발 기록](docs/DEVELOPMENT_LOG.md)에 누적합니다.
+
 [Uptown Girl 메인 테마 · 작은 소나티나](docs/UPTOWN_MOZART_STUDY.md): 전주를 제외한 9–10마디 모티프를 모차르트 소나타·변주 자료를 참고해 32마디 피아노 소품으로 발전시켰습니다. [피아노 재생·두 악보·XML/PDF](http://127.0.0.1:8808/uptown-mozart.html). 직접 작성한 참조 시험이며 자동 스타일 모델의 완료를 뜻하지 않습니다.
 
 [같은 선율, 더 유연한 반주](docs/COUNT_ON_ME_ACCOMPANIMENT_REVIEW.md): Count On Me 발전곡의 선율·화성을 보존하고 반주의 호흡·내성·재생 균형을 다듬었습니다. [A/B 비교와 악보 받기](http://127.0.0.1:8808/count-on-me-phrasing.html). 구간별 음량 계획은 선택 옵션이며 기본 재생은 유지합니다.
