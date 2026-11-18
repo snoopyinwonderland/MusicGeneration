@@ -16,12 +16,14 @@ from xml.etree import ElementTree as ET
 from musicomp.theory import spell
 from musigen import MUSICOMP_ROOT
 from musigen.harmony import make_chord, progression, tonic_pc
+from musigen.karaoke_neighbors import state
 from musigen.motif_clip import pitch_name, read_events
 from musigen.score_io import _key, write_leadsheet
 from musigen.spec import Section, Spec
 from musigen.studio import KEYS
 
 PROFILE = json.loads(Path(__file__).with_name('data').joinpath('karaoke_gestures.json').read_text('utf8'))
+NEIGHBORS = json.loads(Path(__file__).with_name('data').joinpath('karaoke_neighbors.json').read_text('utf8'))['transitions']
 STAGES = {'piano':'stage1_piano_solo','guitar':'stage1_guitar_solo','gayageum':'stage1_gayageum_solo',
           'duet':'stage2_duet','trio':'stage3_trio','quartet':'stage4_piano_quartet'}
 ARRANGING = Lock()
@@ -189,6 +191,63 @@ def develop(spec,theme):
     return result
 
 
+def develop_neighbors(spec, theme):
+    """Keep the opening; choose each answer against an observed successor state."""
+    rng = random.Random(spec.seed)
+    bar = bar_length(spec)
+    remaining = spec.total_bars * bar - sum(d for d, _ in theme)
+    if remaining < bar:
+        raise ValueError('마지막 발전·종결을 위해 한 마디 이상 남겨 주세요.')
+    result = list(theme)
+    pitches = scale(spec)
+    tonic = [p for p in pitches if p % 12 == tonic_pc(spec)]
+    first = next(i for i, (_, p) in enumerate(theme) if p is not None)
+    hook = fit(theme[first:first+3], bar)
+    while remaining:
+        previous = fit(reversed(result), 2*bar)[::-1]
+        prior = [p for _,p in previous if p is not None]
+        last = next(p for _,p in reversed(result) if p is not None)
+        distribution = NEIGHBORS[state(len(prior), prior[0] if prior else last, last)]
+        target, entry = rng.choices(list(distribution), weights=distribution.values())[0].split(':')
+        direction, density = target.split('/')
+        start = nearest(last + int(entry), pitches)
+        span = remaining % (2*bar) or 2*bar
+        closing = span == remaining
+        landing = min(bar/2, span/2) if closing else 0
+        # Recall the short incipit around the midpoint; leave room for a new answer.
+        recall = hook if remaining == spec.total_bars*bar/2 and span == 2*bar else []
+        candidates = []
+        for _ in range(16):
+            answer = list(recall)
+            left = span - landing - sum(d for d,_ in answer)
+            pitch = next((p for _,p in reversed(answer) if p is not None), start)
+            while left > 0:
+                intervals = [int(v) for v in draw('interval_pattern_4',rng).split(',')]
+                gaps, durations = ([F(x) for x in s.split(',')] for s in draw('rhythm_4',rng).split('|'))
+                gesture = []
+                for i,d in enumerate(durations):
+                    step = intervals[i-1] if i else 0
+                    if i == 0 and answer:
+                        step = rng.choice((-3,-2,0,2,3))
+                    pitch = nearest(max(0,min(127,max(start-12,min(start+12,pitch+step)))),pitches)
+                    gesture.append((d,pitch))
+                    if i < len(gaps) and gaps[i] > d:
+                        gesture.append((gaps[i]-d,None))
+                chunk = fit(gesture,left)
+                answer.extend(chunk)
+                left -= sum(d for d,_ in chunk)
+            if closing:
+                answer.append((landing,nearest(pitch,tonic)))
+            notes = [p for _,p in answer if p is not None]
+            actual = state(round(len(notes)*2*bar/span), notes[0], notes[-1]).split('/')
+            cost = 2*(actual[0]!=direction) + (actual[1]!=density)
+            cost += 2*([d for d,_ in answer] == [d for d,_ in previous])
+            candidates.append((cost+rng.random(),answer))
+        result.extend(min(candidates,key=lambda c:c[0])[1])
+        remaining -= span
+    return result
+
+
 def harmonize(spec,timeline):
     initial=progression(spec)
     length=bar_length(spec)
@@ -212,7 +271,9 @@ def compose(root,data):
     # A very short incipit needs enough material for the ensuing phrase variations.
     if sum(d for d,_ in theme)<bar_length(spec):
         theme=unpack(extend_motif(spec,clip))
-    events=develop(spec,theme)
+    method=data.get('development','classic')
+    if method not in ('classic','neighbors'):raise ValueError('선율 발전 방식을 확인하세요.')
+    events=develop_neighbors(spec,theme) if method=='neighbors' else develop(spec,theme)
     time=F(0)
     timeline=[]
     for duration,pitch in events:
@@ -223,7 +284,7 @@ def compose(root,data):
     works.mkdir(exist_ok=True)
     identity=uuid.uuid4().hex
     metadata={'id':identity,'title':spec.title,'key':data['key'],'meter':spec.meter,'tempo':spec.tempo,
-              'bars':spec.total_bars,'seed':spec.seed,'clip':clip,'chords':[c.token for c in chords]}
+              'bars':spec.total_bars,'seed':spec.seed,'clip':clip,'development':method,'chords':[c.token for c in chords]}
     with tempfile.TemporaryDirectory(dir=works) as tmp:
         stage=Path(tmp)/'score'
         write_leadsheet(spec,chords,timeline,stage/'melody.musicxml')

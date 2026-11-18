@@ -78,6 +78,7 @@ import {mount} from './motif-input/motif-input.js';
     const xml=await r.text();$('score').hidden=false;render(xml);
     piece=work;setClip(work.clip);
     for(const k of ['title','key','meter','tempo','bars'])$(k).value=work[k];
+    $('development').value=work.development||'classic';
     editor.configure(work.meter,work.key);$('scoreTitle').textContent=work.title;
     $('scoreKind').textContent=kind==='melody'?'원 선율 + 화성':$('instrument').selectedOptions[0].text;
     $('download').href=xmlPath;$('download').hidden=$('print').hidden=$('arranger').hidden=false;
@@ -144,7 +145,7 @@ import {mount} from './motif-input/motif-input.js';
   });
   $('compose').onclick=()=>run(async()=>{
     const clip=readClip();status('구절을 발전시키고 화성을 붙이고 있습니다…');
-    const work=await json('api/compose',{...settings(),clip});await showScore(work,'melody');await library();
+    const work=await json('api/compose',{...settings(),clip,development:$('development').value});await showScore(work,'melody');await library();
   });
   $('arrange').onclick=()=>run(()=>showScore(piece,$('instrument').value));
   $('original').onclick=()=>run(()=>showScore(piece,'melody'));

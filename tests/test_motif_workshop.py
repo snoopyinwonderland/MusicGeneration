@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from music21 import converter
-from musigen.motif_workshop import compose, motif, rerhythm, unpack
+from musigen.motif_workshop import compose, develop_neighbors, motif, rerhythm, settings, unpack
 
 
 class MotifWorkshopTests(unittest.TestCase):
@@ -29,6 +29,19 @@ class MotifWorkshopTests(unittest.TestCase):
             first=motif(dict(self.data,mode='auto'))
             self.assertEqual(first,motif(dict(self.data,mode='auto')))
             self.assertGreater(len(set(n for _,n in unpack(first))),1)
+
+    def test_neighbor_answers_keep_the_theme_and_change_two_bar_rhythms(self):
+        for bars in [8,16]:
+            for meter,beat in [('4/4',4),('3/4',3),('6/8',3)]:
+                spec=settings(dict(self.data,bars=bars,meter=meter))
+                spec.seed=42
+                theme=[(F(1),60+i%3) for i in range(2*beat)]
+                line=develop_neighbors(spec,theme)
+                self.assertEqual(line[:len(theme)],theme)
+                self.assertEqual(sum(d for d,_ in line),beat*bars)
+                self.assertTrue(all(d>0 for d,_ in line))
+                self.assertNotEqual(line[len(theme):len(theme)*2],theme)
+                self.assertTrue(any(d!=1 for d,_ in line[len(theme):]))
 
     def test_repeated_rhythm_changes_keep_notes_rests_and_total(self):
         current=self.clip

@@ -14,6 +14,7 @@
 <label>제목<input id="title" maxlength="80" placeholder="모티프 습작"></label>
 <div class="pair"><label>조성<select id="key"></select></label><label>박자<select id="meter"><option>4/4</option><option>3/4</option><option>6/8</option></select></label>
 <label>빠르기 · ♩/분<input type="number" min="40" max="180" value="88" id="tempo"></label><label>길이<select id="bars"><option value="8">8마디</option><option value="16">16마디</option></select></label></div>
+<label>선율 발전 방식<select id="development"><option value="classic">기존 모티프 변형</option><option value="neighbors">노래방 인접 두 마디 통계</option></select></label>
 <button id="compose" class="primary">이 모티프로 곡 만들기 →</button></section>
 <section class="paper"><div class="paper-head"><div><p id="scoreKind">모티프 재생</p><h2 id="scoreTitle">나의 모티프</h2></div><button id="preview">마디별 입력 악보 보기</button></div>
 <p id="status" role="status" aria-live="polite">음을 입력하거나 자동 모티프 생성을 눌러 주세요.</p>
