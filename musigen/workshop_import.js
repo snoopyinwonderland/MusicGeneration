@@ -1,11 +1,11 @@
 function workshopImport(request,accept){
   const $=id=>document.getElementById(id);
   const dialog=$('xmlDialog'),view=$('xmlScore');
-  let xml='',title='',dbId=null,score,voice,engine,page=1,anchor=null,loadId=0,searchId=0,limited=false;
+  let xml='',title='',dbId=null,score,voice,engine,page=1,anchor=null,loadId=0,searchId=0,limited=false,format='musicxml';
   const message=text=>{$('importStatus').textContent=text};
   const populate=(id,rows)=>$(id).replaceChildren(...rows.map(([v,label])=>new Option(label,String(v))));
   function reset(){
-    score=null;voice=null;anchor=null;$('rangePane').hidden=true;view.replaceChildren();
+    score=null;voice=null;anchor=null;$('rangePane').hidden=true;$('manualCopy').hidden=true;view.replaceChildren();
   }
   function selectPart(preferred){
     score=null;voice=null;view.replaceChildren();
@@ -17,7 +17,7 @@ function workshopImport(request,accept){
     engine.setOptions({pageWidth:1750,pageHeight:2100,scale:42,svgViewBox:true,adjustPageHeight:true,header:'none',footer:'none',breaks:'auto'});
     if(!engine.loadData(score.xml))throw Error('선택한 파트를 악보로 표시하지 못했습니다.');
     page=1;chooseVoice();display();
-    message(title+(limited?' · DB 제공 미리보기 구간':''));
+    message(title+(format==='midi'?' · 16분음표·셋잇단음표 기준으로 기보한 MIDI':'')+(limited?' · DB 제공 미리보기 구간':''));
   }
   function chooseVoice(){
     voice=score.voices[Number($('xmlVoice').value)];
@@ -28,6 +28,7 @@ function workshopImport(request,accept){
     anchor=null;highlight();
   }
   function highlight(){
+    $('manualCopy').hidden=true;
     view.querySelectorAll('.range-picked').forEach(el=>el.classList.remove('range-picked'));
     if(!voice)return;
     const a=+$('rangeA').value,b=+$('rangeB').value;
@@ -52,13 +53,13 @@ function workshopImport(request,accept){
     $('xmlPage').textContent=page+' / '+engine.getPageCount();
     $('prevXml').disabled=page<=1;$('nextXml').disabled=page>=engine.getPageCount();
   }
-  function load(text,name,preferred='',identity=null,restricted=false){
+  function load(text,name,preferred='',identity=null,restricted=false,kind='musicxml'){
     reset();
     const doc=new DOMParser().parseFromString(text,'application/xml');
     if(doc.documentElement.localName!=='score-partwise')throw Error('MusicXML(.xml, .musicxml) 파일을 선택하세요.');
     const parts=[...doc.querySelectorAll('score-partwise > part')].filter(p=>p.querySelector('note > pitch'));
     if(!parts.length)throw Error('선율이 있는 파트가 없습니다.');
-    xml=text;title=name;dbId=identity;limited=restricted;
+    xml=text;title=name;dbId=identity;limited=restricted;format=kind;
     const names=new Map([...doc.querySelectorAll('score-part')].map(p=>[p.id,p.querySelector('part-name')?.textContent]));
     populate('xmlPart',parts.map(p=>[p.id,names.get(p.id)||p.id]));
     if(parts.some(p=>p.id===preferred.split(':')[0]))$('xmlPart').value=preferred.split(':')[0];
@@ -101,7 +102,13 @@ function workshopImport(request,accept){
       clip.source.end={measure:end.number,offset:end.end.sub(end.start).toString()};
     }
     if(dbId)clip.source.workId=dbId;
-    MotifTools.validate(clip);accept(clip);dialog.close();
+    clip.source.format=format;
+    clip.source.part_name=voice.name;
+    if(format==='midi'){
+      clip.source.quantization='sixteenth-and-eighth-triplet';
+      clip.warnings.push('MIDI 연주 시각을 16분음표·셋잇단음표 기준으로 기보했습니다.');
+    }
+    MotifTools.validate(clip);return clip;
   }
   function action(fn){return async()=>{try{await fn()}catch(e){message(e.message)}}}
   $('openImport').onclick=()=>dialog.showModal();$('closeImport').onclick=()=>dialog.close();
@@ -109,8 +116,17 @@ function workshopImport(request,accept){
   $('xmlFile').onchange=action(async()=>{
     const file=$('xmlFile').files[0];if(!file)return;
     const ticket=++loadId;reset();message('파일을 여는 중입니다…');
-    if(file.size>16*1024*1024)throw Error('16MB 이하의 MusicXML 파일을 열어 주세요.');
-    const text=await file.text();if(ticket===loadId)load(text,file.name);
+    if(file.size>16*1024*1024)throw Error('16MB 이하의 악보 파일을 열어 주세요.');
+    const kind=/\.midi?$/i.test(file.name)?'midi':/\.mxl$/i.test(file.name)?'mxl':'musicxml';
+    let text;
+    if(kind==='musicxml')text=await file.text();
+    else{
+      const res=await fetch('api/import-'+kind,{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:file});
+      const result=await res.json().catch(()=>({}));if(ticket!==loadId)return;
+      if(!res.ok)throw Error(result.error||'악보를 불러오지 못했습니다.');
+      text=result.xml;
+    }
+    if(ticket===loadId)load(text,file.name,'',null,false,kind);
   });
   $('catalogForm').onsubmit=async e=>{
     e.preventDefault();const ticket=++searchId;$('dbItems').replaceChildren();message('DB에서 검색 중입니다…');
@@ -147,5 +163,15 @@ function workshopImport(request,accept){
     anchor=anchor===null?index:null;highlight();message(anchor===null?'구간을 선택했습니다.':'끝 위치를 눌러 주세요.');
   };
   $('prevXml').onclick=()=>{page--;display()};$('nextXml').onclick=()=>{page++;display()};
-  $('useRange').onclick=action(extract);
+  $('useRange').onclick=action(()=>{accept(extract());dialog.close()});
+  $('copyRange').onclick=action(async()=>{
+    const json=JSON.stringify(extract(),null,2);
+    try{
+      await navigator.clipboard.writeText(json);
+      message('선택 구간을 복사했습니다. 창을 닫고 모티프 입력 칸에 붙여넣으세요.');
+    }catch{
+      $('manualCopy').hidden=false;$('copyText').value=json;$('copyText').focus();$('copyText').select();
+      message('선택된 JSON을 Ctrl+C로 복사한 뒤 모티프 입력 칸에 붙여넣으세요.');
+    }
+  });
 }

@@ -113,16 +113,22 @@ class StudioHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        if self.path not in ('/api/requests','/api/motif','/api/compose','/api/arrange','/api/rhythm','/api/catalog','/api/score'):self.send_error(404);return
+        binary=self.path in ('/api/import-midi','/api/import-mxl')
+        if not binary and self.path not in ('/api/requests','/api/motif','/api/compose','/api/arrange','/api/rhythm','/api/catalog','/api/score'):self.send_error(404);return
         origin=self.headers.get('Origin')
         allowed={f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'}
         if origin not in allowed or self.headers.get('Sec-Fetch-Site')=='cross-site':self.send_error(403);return
-        if self.headers.get_content_type()!='application/json':self.send_error(415);return
+        if self.headers.get_content_type()!=('application/octet-stream' if binary else 'application/json'):self.send_error(415);return
         try:
             size=int(self.headers.get('Content-Length','0'))
-            if not 0<size<=1024*1024:self.send_error(413);return
-            data=json.loads(self.rfile.read(size))
-            if self.path=='/api/requests':
+            limit=16*1024*1024 if binary else 1024*1024
+            if not 0<size<=limit:self.send_error(413);return
+            raw=self.rfile.read(size)
+            data=None if binary else json.loads(raw)
+            if binary:
+                from musigen.workshop_file import compressed_score,midi_score
+                result=(midi_score if self.path=='/api/import-midi' else compressed_score)(raw)
+            elif self.path=='/api/requests':
                 result=save_request(self.directory,data)
             elif self.path in ('/api/catalog','/api/score'):
                 from musigen.workshop_catalog import catalog,score

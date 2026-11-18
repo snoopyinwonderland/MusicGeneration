@@ -122,6 +122,19 @@
     }
   };
   $('tokens').oninput=()=>{sourceClip=null;clear();try{syncNotes(readClip().events)}catch{syncNotes([])}};
+  $('tokens').addEventListener('paste',event=>{
+    const raw=event.clipboardData?.getData('text/plain')?.trim();
+    if(!raw?.startsWith('{'))return;
+    let clip;try{clip=JSON.parse(raw)}catch{return}
+    if(clip?.format!=='musicanote-motif')return;
+    event.preventDefault();
+    try{
+      MotifTools.validate(clip);
+      if(clip.events.some(e=>e.pitches.length>1))throw Error('한 성부의 선율을 붙여넣으세요.');
+      sourceClip=clip;$('tokens').value=raw;syncNotes(clip.events);preview();
+      status('모티프를 붙여넣었습니다. '+clip.events.length+'개 음·쉼 · '+MotifTools.validate(clip)+'박');
+    }catch(e){status(e.message,true)}
+  });
   for(const id of ['title','key','meter','tempo','bars'])$(id).onchange=clear;
   $('undo').onclick=()=>{try{
     let raw=$('tokens').value.trim();if(raw.startsWith('{'))raw=notation(readClip());
