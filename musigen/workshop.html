@@ -3,15 +3,17 @@
 <title>작곡 작업실 | MUSICANOTE Virtual Composer</title><link rel="stylesheet" href="assets/workshop.css"></head>
 <body><header><a class="brand" href="index.html">MUSICANOTE <span>Virtual Composer</span></a><a href="index.html#library">작품 라이브러리 ↗</a></header>
 <main><div class="heading"><h1>작곡 작업실</h1><a href="#recent">저장한 곡 ↓</a></div>
+<section class="keyboard-panel" aria-label="피아노 입력기">
+<div class="keyboard-head"><h2>피아노 입력기</h2><div class="accidentals" aria-label="검은 건반 표기"><button id="sharp" aria-pressed="true">♯</button><button id="flat" aria-pressed="false">♭</button></div></div>
+<div class="keyboard-scroll"><div id="keys" role="group" aria-label="C2부터 E6까지의 피아노 건반"></div></div>
+<div class="rhythm-tools"><div id="durations" role="group" aria-label="입력 음가"></div>
+<button id="dot" aria-pressed="false">점음표</button><button id="rest">쉼표 입력</button><label>음가 적용 <select id="editNote"><option value="">다음 입력음</option></select></label></div></section>
 <div class="desk"><section class="controls"><h2>모티프</h2>
 <p>음을 직접 넣거나 시스템이 제안하는 두 마디로 시작하세요.</p>
 <label for="tokens">음이름 또는 모티프 JSON <small>4분음표 = 1박</small></label>
 <textarea id="tokens" rows="3" spellcheck="false" placeholder="예: C4:1 D4:1/2 E4:1/2 쉼:1"></textarea>
-<div class="pair"><label>옥타브<select id="octave"><option>3</option><option selected>4</option><option>5</option><option>6</option></select></label>
-<label>음가<select id="duration"><option value="1/4">16분음표</option><option value="1/2">8분음표</option><option value="1" selected>4분음표</option><option value="3/2">점4분음표</option><option value="2">2분음표</option><option value="4">온음표</option></select></label></div>
-<div id="keys" class="keys" aria-label="음표 입력"></div>
-<div class="small-actions"><button id="undo">마지막 음 지우기</button><a href="index.html#newMotif">MusicXML 구간 가져오기 ↗</a></div>
-<div class="actions"><button id="auto">↻ 자동 모티프 생성</button><button id="complete">입력한 뒤 이어쓰기</button></div>
+<div class="small-actions"><button id="undo">마지막 음 지우기</button><button id="openImport">XML 구간 가져오기</button></div>
+<div class="actions"><button id="auto">↻ 자동 모티프 생성</button><button id="randomRhythm">음가 랜덤 생성</button><button id="complete">입력한 뒤 이어쓰기</button></div>
 <h2 class="sub">곡 설정</h2>
 <label>제목<input id="title" maxlength="80" placeholder="모티프 습작"></label>
 <div class="pair"><label>조성<select id="key"></select></label><label>박자<select id="meter"><option>4/4</option><option>3/4</option><option>6/8</option></select></label>
@@ -26,4 +28,14 @@
 <a id="permalink">현재 악보 고유 주소</a></div></section></div>
 <section id="recent"><h2>저장한 곡</h2><div id="works"></div></section></main>
 <footer>연주 음원 · FluidR3 GM, Frank Wen · CC BY 3.0 · 가야금 재생에는 고토 대체 음색을 사용합니다.</footer>
-<script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/workshop.js"></script></body></html>
+<dialog id="xmlDialog" aria-labelledby="xmlHeading"><div class="keyboard-head"><h2 id="xmlHeading">XML 구간 가져오기</h2><button id="closeImport">닫기</button></div>
+<div class="import-layout"><aside><label>내 MusicXML 파일 열기<input id="xmlFile" type="file" accept=".xml,.musicxml"></label>
+<form id="catalogForm"><label>음악 검색 DB<input id="dbQuery" type="search" maxlength="120" placeholder="곡명 또는 작곡가"></label><button>검색</button></form>
+<div id="dbItems"></div></aside><section><p id="importStatus" role="status">파일을 열거나 DB에서 악보를 선택하세요.</p>
+<div id="rangePane" hidden><div class="import-fields"><label>파트<select id="xmlPart"></select></label><label>보표 · 성부<select id="xmlVoice"></select></label>
+<label>동시 화음<select id="chordMode"><option value="one">단선율만</option><option value="high">윗음 가져오기</option><option value="low">아랫음 가져오기</option></select></label>
+<label>구간 단위<select id="rangeMode"><option value="measure">마디</option><option value="note">음표</option></select></label>
+<label>시작<select id="rangeA"></select></label><label>끝<select id="rangeB"></select></label></div>
+<div class="small-actions"><span>악보에서 시작과 끝을 차례로 누르세요.</span><button id="useRange">선택 구간 가져오기</button></div>
+<div id="xmlScore"></div><div class="page-steps"><button id="prevXml">이전 쪽</button><span id="xmlPage"></span><button id="nextXml">다음 쪽</button></div></div></section></div></dialog>
+<script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/workshop_keyboard.js"></script><script src="assets/workshop_import.js"></script><script src="assets/workshop.js"></script></body></html>

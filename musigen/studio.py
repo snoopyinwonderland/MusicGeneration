@@ -67,7 +67,7 @@ def write_studio(out):
     assets=out/'assets';assets.mkdir(exist_ok=True)
     source=Path(__file__).parent
     from musigen import MUSICOMP_ROOT
-    for name in ('studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js'):
+    for name in ('studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js','workshop_import.js','workshop_keyboard.js'):
         shutil.copyfile(source/name,assets/name)
     banks=MUSICOMP_ROOT/'workbench/public/samples'
     if (banks/'manifest.json').is_file():
@@ -113,7 +113,7 @@ class StudioHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        if self.path not in ('/api/requests','/api/motif','/api/compose','/api/arrange'):self.send_error(404);return
+        if self.path not in ('/api/requests','/api/motif','/api/compose','/api/arrange','/api/rhythm','/api/catalog','/api/score'):self.send_error(404);return
         origin=self.headers.get('Origin')
         allowed={f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'}
         if origin not in allowed or self.headers.get('Sec-Fetch-Site')=='cross-site':self.send_error(403);return
@@ -124,9 +124,13 @@ class StudioHandler(SimpleHTTPRequestHandler):
             data=json.loads(self.rfile.read(size))
             if self.path=='/api/requests':
                 result=save_request(self.directory,data)
+            elif self.path in ('/api/catalog','/api/score'):
+                from musigen.workshop_catalog import catalog,score
+                result=(catalog if self.path=='/api/catalog' else score)(data)
             else:
-                from musigen.motif_workshop import arrangements, compose, motif
+                from musigen.motif_workshop import arrangements, compose, motif, rerhythm
                 if self.path=='/api/motif':result=motif(data)
+                elif self.path=='/api/rhythm':result=rerhythm(data.get('clip'))
                 elif self.path=='/api/compose':result=compose(self.directory,data)
                 else:result=arrangements(self.directory,data)
         except (ValueError,KeyError,TypeError,AttributeError) as exc:

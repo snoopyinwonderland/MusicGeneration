@@ -48,13 +48,19 @@ const MotifTools = (() => {
     return total.toString();
   }
 
-  function parseMusicXML(text, filename = '붙여넣은 악보') {
+  function parseMusicXML(text, filename = '붙여넣은 악보', selectedPart = null) {
     const doc = new DOMParser().parseFromString(text, 'application/xml');
     if (doc.querySelector('parsererror') || doc.documentElement.localName !== 'score-partwise') {
       throw Error('score-partwise MusicXML(.xml/.musicxml)을 열어 주세요.');
     }
     const names = new Map([...doc.querySelectorAll('score-part')].map(p => [p.getAttribute('id'), value(p, 'part-name')]));
     const streams = new Map();
+    const measures = [];
+    if(selectedPart!==null){
+      for(const el of doc.querySelectorAll('part-list > score-part,score-partwise > part'))
+        if(el.getAttribute('id')!==selectedPart)el.remove();
+      for(const group of doc.querySelectorAll('part-list > part-group'))group.remove();
+    }
     let uid = 0;
     for (const part of children(doc.documentElement, 'part')) {
       const partId = part.getAttribute('id');
@@ -117,13 +123,19 @@ const MotifTools = (() => {
             extent = max(extent, on.add(dur));
           }
         }
-        base = base.add(measure.getAttribute('implicit') === 'yes' ? extent : max(extent, nominal));
+        const end=base.add(measure.getAttribute('implicit') === 'yes' ? extent : max(extent, nominal));
+        if(selectedPart!==null){
+          const id='import-measure-'+index;
+          measure.setAttribute('id',id);
+          measures.push({id,number,start:base,end});
+        }
+        base=end;
       }
     }
     const voices = [...streams.values()].filter(s => s.events.length);
     for (const s of voices) s.events.sort((a,b) => a.on.cmp(b.on));
     if (!voices.length) throw Error('가져올 음을 찾지 못했습니다.');
-    return {filename, voices, xml:new XMLSerializer().serializeToString(doc)};
+    return {filename, voices, measures, xml:new XMLSerializer().serializeToString(doc)};
   }
 
   function clipRange(score, stream, first, last, name = 'a') {
@@ -159,13 +171,13 @@ const MotifTools = (() => {
     const [b,u]=meter.split('/').map(Number), bar=b*4/u*24;
     let used=0, measure=1, xml='', row='';
     const close=()=>{xml+=`<measure number="${measure}">${measure===1?`<attributes><divisions>24</divisions><time><beats>${b}</beats><beat-type>${u}</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes><direction><sound tempo="${Number(tempo)}"/></direction>`:''}${row}</measure>`;measure++;row='';used=0;};
-    for(const e of value.events){
-      const d=F.read(e.duration);let left=d.n*24/d.d, tied=false;
+    for(const [index,e] of value.events.entries()){
+      const d=F.read(e.duration);let left=d.n*24/d.d, tied=false,segment=0;
       while(left>0){const take=Math.min(left,bar-used), continues=left>take;
         let pitch='<rest/>';
         if(e.pitches.length){const [,step,acc='',oct]=e.pitches[0].match(/^([A-G])(#{1,2}|b{1,2})?(-?\d)$/);pitch=`<pitch><step>${step}</step><alter>${acc.includes('#')?acc.length:-acc.length}</alter><octave>${oct}</octave></pitch>`;}
         const ties=e.pitches.length?(tied?'<tie type="stop"/>':'')+(continues?'<tie type="start"/>':''):'';
-        row+=`<note>${pitch}<duration>${take}</duration>${ties}</note>`;
+        row+=`<note id="motif-edit-${index}-${segment++}">${pitch}<duration>${take}</duration>${ties}</note>`;
         left-=take;used+=take;tied=true;if(used===bar)close();
       }
     }

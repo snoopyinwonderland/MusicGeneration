@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from music21 import converter
-from musigen.motif_workshop import compose, motif, unpack
+from musigen.motif_workshop import compose, motif, rerhythm, unpack
 
 
 class MotifWorkshopTests(unittest.TestCase):
@@ -29,6 +29,24 @@ class MotifWorkshopTests(unittest.TestCase):
             first=motif(dict(self.data,mode='auto'))
             self.assertEqual(first,motif(dict(self.data,mode='auto')))
             self.assertGreater(len(set(n for _,n in unpack(first))),1)
+
+    def test_repeated_rhythm_changes_keep_notes_rests_and_total(self):
+        current=self.clip
+        for _ in range(20):
+            varied=rerhythm(current)
+            self.assertNotEqual(varied['events'],current['events'])
+            original,changed=unpack(current),unpack(varied)
+            self.assertEqual([p for _,p in original],[p for _,p in changed])
+            self.assertEqual(sum(d for d,_ in original),sum(d for d,_ in changed))
+            self.assertTrue(varied['rhythm_variation']['same_length'])
+            current=varied
+        self.assertEqual(self.clip['events'][0]['duration'],'1/2')
+
+    def test_single_note_reroll_changes_its_duration(self):
+        clip={**self.clip,'events':self.clip['events'][:1]}
+        varied=rerhythm(clip)
+        self.assertNotEqual(varied['events'][0]['duration'],'1/2')
+        self.assertFalse(varied['rhythm_variation']['same_length'])
 
     def test_manual_incipit_survives_published_score_and_reload(self):
         with tempfile.TemporaryDirectory() as tmp:

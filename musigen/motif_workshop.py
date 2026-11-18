@@ -46,6 +46,43 @@ def bar_length(spec):
     return F(4*beats,unit)
 
 
+def rerhythm(clip):
+    """Revoice adjacent durations without changing the ordered notes or rests."""
+    old=[duration for duration,_ in unpack(clip)]
+    seed=secrets.randbits(32)
+    rng=random.Random(seed)
+    lengths=old.copy()
+    # Weighted by the document support of the observed four-note rhythm shapes.
+    weights={v:1 for v in map(F,('1/12','1/6','1/4','1/3','1/2','2/3','3/4','1','3/2','2','3','4'))}
+    for shape,support in PROFILE['rhythm_4'].items():
+        for value in shape.split('|')[1].split(','):
+            weights[F(value)]=weights.get(F(value),0)+support
+    indices=list(range(len(old)-1))
+    rng.shuffle(indices)
+    used=set()
+    for i in indices:
+        if i in used or i+1 in used:continue
+        total=old[i]+old[i+1]
+        choices=[d for d in weights if total-d in weights and d!=old[i]]
+        if choices:
+            d=rng.choices(choices,weights=[(weights[d]*weights[total-d])**.5 for d in choices])[0]
+        elif old[i]!=old[i+1]:d=old[i+1]
+        else:
+            # Long held notes may lie outside the observed four-note palette.
+            changes=[v for v in (F(1),F(1,2),F(1,4),F(1,12),F(1,24))
+                     if old[i]-v>=F(1,12) and old[i]+v<=256]
+            if not changes:continue
+            d=old[i]+rng.choice((-1,1))*rng.choice(changes)
+        lengths[i:i+2]=[d,total-d]
+        used.update((i,i+1))
+    if lengths==old:
+        # A single note or a group entirely at the smallest grid value has no redistribution.
+        i=rng.randrange(len(old))
+        lengths[i]=rng.choice([d for d in weights if d!=old[i] and F(1,4)<=d<=2])
+    return {**clip,'events':[{**e,'duration':str(d)} for e,d in zip(clip['events'],lengths)],
+            'rhythm_variation':{'seed':seed,'same_length':sum(old)==sum(lengths)}}
+
+
 def unpack(clip):
     events=read_events(clip)
     if any(len(e.pitches)>1 for e in events):

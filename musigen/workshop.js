@@ -25,7 +25,7 @@
     return clip;
   }
   function notation(c){return c.events.map(e=>(e.pitches[0]||'쉼')+':'+e.duration).join(' ')}
-  function setClip(c){sourceClip=c;$('tokens').value=notation(c)}
+  function setClip(c){sourceClip=c;$('tokens').value=notation(c);syncNotes(c.events)}
   function settings(){return {title:$('title').value,key:$('key').value,meter:$('meter').value,tempo:Number($('tempo').value),bars:Number($('bars').value)}}
   async function json(url,data){
     const res=await fetch(url,data?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}:{cache:'no-store'});
@@ -34,7 +34,7 @@
   }
   async function run(task){
     if(busy)return;busy=true;stop();
-    const controls=[...document.querySelectorAll('.controls button,.controls input,.controls select,.controls textarea'),...buttons.map($)];
+    const controls=[...document.querySelectorAll('.controls button,.controls input,.controls select,.controls textarea,.keyboard-panel button,.keyboard-panel select'),...buttons.map($)];
     for(const el of controls)el.disabled=true;
     try{await task()}catch(e){status(e.message,true)}
     finally{busy=false;for(const el of controls)el.disabled=false}
@@ -57,6 +57,12 @@
   function preview(){
     const clip=readClip();clear();
     render(MotifTools.previewXML(clip,$('meter').value,$('tempo').value));
+    for(const note of $('score').querySelectorAll('g[id^="motif-edit-"]')){
+      const box=note.getBBox(),hit=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      for(const [key,value] of Object.entries({x:box.x-15,y:box.y-15,width:box.width+30,height:box.height+30,
+        fill:'transparent','pointer-events':'all'}))hit.setAttribute(key,value);
+      note.prepend(hit);
+    }
     status(clip.events.length+'개의 음·쉼 · '+MotifTools.validate(clip)+'박');
   }
   async function showScore(work,kind){
@@ -86,13 +92,46 @@
   for(const key of ['C major','G major','D major','F major','Bb major','Eb major','A minor','E minor','D minor','G minor','C minor']){
     $('key').add(new Option(key.replace(' major','장조').replace(' minor','단조'),key));
   }
-  for(const tone of ['C','D','E','F','G','A','B','C#','D#','F#','G#','A#','쉼']){
-    const b=document.createElement('button');b.textContent=tone;if(tone.includes('#'))b.className='black';
-    b.onclick=()=>{const prefix=$('tokens').value.trim();$('tokens').value=(prefix?prefix+' ':'')+tone+(tone==='쉼'?'':$('octave').value)+':'+$('duration').value;sourceClip=null;clear()};$('keys').append(b);
+  function refreshEditor(){
+    try{preview();syncNotes(readClip().events)}catch(e){syncNotes([]);status(e.message,true)}
   }
-  $('tokens').oninput=()=>{sourceClip=null;clear()};
+  const syncNotes=workshopKeyboard({
+    append(pitch,duration){
+      try{
+        let prefix=$('tokens').value.trim();
+        if(prefix.startsWith('{'))prefix=notation(readClip());
+        $('tokens').value=(prefix?prefix+' ':'')+(pitch||'쉼')+':'+duration;
+        sourceClip=null;clear();refreshEditor();return true;
+      }catch(e){status(e.message,true);return false}
+    },
+    edit(index,duration){
+      try{
+        const clip=structuredClone(readClip());clip.events[index].duration=duration;
+        setClip(clip);preview();syncNotes(clip.events,String(index));
+      }catch(e){status(e.message,true)}
+    },
+    audition(midi){WorkshopAudio.play([{start:0,end:.35,pitch:midi,bank:'piano'}],()=>{}).catch(e=>status(e.message,true))}
+  });
+  workshopImport(json,c=>{setClip(c);preview();status('선택 구간을 모티프로 가져왔습니다. '+(c.warnings||[]).join(' '))});
+  $('score').onclick=e=>{
+    if(piece||busy)return;
+    const match=e.target.closest('g.note,g.rest,g.mRest')?.id.match(/^motif-edit-(\d+)-/);
+    if(match){
+      $('editNote').value=match[1];$('editNote').dispatchEvent(new Event('change'));
+      status((Number(match[1])+1)+'번째 음·쉼을 선택했습니다. 적용할 음가를 눌러 주세요.');
+    }
+  };
+  $('tokens').oninput=()=>{sourceClip=null;clear();try{syncNotes(readClip().events)}catch{syncNotes([])}};
   for(const id of ['title','key','meter','tempo','bars'])$(id).onchange=clear;
-  $('undo').onclick=()=>{const tokens=$('tokens').value.trim().split(/[\s,]+/);tokens.pop();$('tokens').value=tokens.join(' ');sourceClip=null;clear()};
+  $('undo').onclick=()=>{try{
+    let raw=$('tokens').value.trim();if(raw.startsWith('{'))raw=notation(readClip());
+    const tokens=raw.split(/[\s,]+/);tokens.pop();$('tokens').value=tokens.join(' ');
+    sourceClip=null;clear();if(tokens.length)refreshEditor();else syncNotes([]);
+  }catch(e){status(e.message,true)}};
+  $('randomRhythm').onclick=()=>run(async()=>{
+    const clip=await json('api/rhythm',{clip:readClip()});setClip(clip);preview();
+    status(clip.rhythm_variation.same_length?'음높이와 전체 길이를 유지해 새 리듬을 만들었습니다.':'새 리듬을 만들었습니다. 이 입력은 전체 길이도 함께 바뀝니다.');
+  });
   $('preview').onclick=()=>run(preview);
   for(const mode of ['auto','complete'])$(mode).onclick=()=>run(async()=>{
     const clip=mode==='complete'?readClip():null;
