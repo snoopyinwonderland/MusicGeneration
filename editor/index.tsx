@@ -1,105 +1,187 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { MotifEditor } from './Editor';
-import { fromClip, normalizeTies, pitchMidi, toClip, type Clip, type QueryEvent } from './model';
+import { MelodyQueryInput, type Meter, type Query } from '@musicanote/melody-query-input';
+import '@musicanote/melody-query-input/style.css';
+import { fromClip, workshopEvents, pitchMidi, toClip, type Clip } from './model';
+import { toMEI } from './mei';
 
 type Options = {
-  onChange: (clip: Clip) => void;
+  onChange: (clip: Clip, meter: Meter) => void;
   audition: (pitch: number) => void;
-  error: (s: string) => void;
+  preview: () => void;
+  error: (message: string) => void;
 };
-type Snapshot = { events: QueryEvent[]; clip: Clip };
+const signatures: Record<string, number> = {
+  'C major': 0,
+  'G major': 1,
+  'D major': 2,
+  'F major': -1,
+  'Bb major': -2,
+  'Eb major': -3,
+  'A minor': 0,
+  'E minor': 1,
+  'D minor': -1,
+  'G minor': -2,
+  'C minor': -3,
+};
+
 export function mount(host: HTMLElement, options: Options) {
   const root = createRoot(host);
-  const empty: Clip = {
+  // In 0.1.0 the black button is nested in the white key's keyboard handler.
+  function activateBlackKey(event: KeyboardEvent) {
+    const key = event.target;
+    if (
+      key instanceof HTMLButtonElement &&
+      key.matches('.keyboard .black-key') &&
+      (event.key === 'Enter' || event.key === ' ')
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!event.repeat) key.click();
+    }
+  }
+  host.addEventListener('keydown', activateBlackKey, true);
+  const blank: Clip = {
     format: 'musicanote-motif',
     version: 1,
     name: '나의 모티프',
-    source: { kind: 'user' },
     events: [],
+    source: { kind: 'user' },
   };
-  let current: Snapshot = { events: [], clip: empty };
-  const past: Snapshot[] = [],
-    future: Snapshot[] = [];
-  let meter = '4/4',
-    key = 'C major',
-    clef = 'auto';
-  function remember() {
-    past.push(current);
-    if (past.length > 100) past.shift();
-    future.length = 0;
-  }
-  function restore(from: Snapshot[], into: Snapshot[]) {
-    if (!from.length) return;
-    into.push(current);
-    current = from.pop()!;
-    draw();
-    options.onChange(current.clip);
-  }
-  function change(edited: QueryEvent[]) {
-    const events = normalizeTies(edited);
-    const clip = toClip(events, current.clip);
-    if (
-      events.length > 4096 ||
-      clip.events.some((r) => {
-        const [n, d = '1'] = r.duration.split('/');
-        return +n / +d > 256;
-      })
-    ) {
-      options.error('모티프는 음·쉼 4096개까지, 붙인 음은 256박까지 지원합니다.');
-      return;
+  let clip = blank;
+  let query: Query = { version: 1, mode: 'melody_rhythm', meter: '4/4', startsOnDownbeat: true, events: [] };
+  let key = 'C major',
+    clef = 'auto',
+    revision = 0,
+    error = '';
+  let previous: { clip: Clip; query: Query } | null = null;
+  const origins = new WeakMap<Query['events'], Clip>();
+  let displayed: Query['events'];
+
+  function change(next: Query) {
+    try {
+      if (!['3/4', '4/4', '6/8'].includes(next.meter))
+        throw Error('이 작업실에서 작곡할 수 있는 박자는 3/4, 4/4, 6/8입니다.');
+      if (next.events === displayed) {
+        const meterChanged = query.meter !== next.meter;
+        query = { ...query, mode: next.mode, meter: next.meter };
+        error = '';
+        draw();
+        if (meterChanged) options.onChange(clip, query.meter);
+        return;
+      }
+      const events = workshopEvents(next.events);
+      const oldIDs = new Set(query.events.map((e) => e.id));
+      const origin = origins.get(next.events) ?? (events.some((e) => oldIDs.has(e.id)) ? clip : blank);
+      const updated = toClip(events, origin);
+      const addedNote = events.length === oldIDs.size + 1 && events.find((e) => !oldIDs.has(e.id));
+      query = { ...next, events };
+      clip = updated;
+      error = '';
+      draw();
+      options.onChange(clip, query.meter);
+      if (addedNote && addedNote.pitchMidi !== null) options.audition(addedNote.pitchMidi);
+    } catch (reason) {
+      error = reason instanceof Error ? reason.message : String(reason);
+      draw();
+      options.error(error);
     }
-    remember();
-    current = { events, clip };
-    draw();
-    options.onChange(clip);
   }
+
   function draw() {
+    // The packaged engraver also accepts score context on its controlled query.
+    const [count, unit] = query.meter.split('/').map(Number);
+    const bar = (count * 4) / unit;
+    let elapsed = 0;
+    const value = {
+      ...query,
+      keyFifths: signatures[key] ?? 0,
+      clefShape: clef === 'auto' ? undefined : clef,
+      events: query.events.map((e) => {
+        const measure = Math.floor((elapsed + 1e-8) / bar) + 1;
+        elapsed += e.durationRatio;
+        return { ...e, measure };
+      }),
+    };
+    displayed = value.events;
+    origins.set(displayed, clip);
     root.render(
-      <MotifEditor
-        value={current.events}
-        onChange={change}
-        meter={meter}
-        tonality={key}
-        clef={clef}
-        setClef={(s) => {
-          clef = s;
-          draw();
-        }}
-        audition={options.audition}
-        undo={() => restore(past, future)}
-        redo={() => restore(future, past)}
-        canUndo={!!past.length}
-        canRedo={!!future.length}
-      />,
+      <>
+        <div className="motif-input-head">
+          <h2>모티프 악보 입력기</h2>
+          <label>
+            음자리표{' '}
+            <select
+              value={clef}
+              onChange={(e) => {
+                clef = e.target.value;
+                draw();
+              }}
+            >
+              <option value="auto">음역에 맞게</option>
+              <option value="G">높은음자리표</option>
+              <option value="F">낮은음자리표</option>
+            </select>
+          </label>
+          {previous && (
+            <button
+              onClick={() => {
+                const restored = previous!;
+                previous = { clip, query };
+                clip = restored.clip;
+                query = restored.query;
+                revision++;
+                error = '';
+                draw();
+                options.onChange(clip, query.meter);
+              }}
+            >
+              이전 모티프와 전환
+            </button>
+          )}
+        </div>
+        {error && (
+          <p className="motif-input-error" role="alert">
+            {error}
+          </p>
+        )}
+        <MelodyQueryInput key={revision} value={value} onChange={change} onPreview={options.preview} />
+      </>,
     );
   }
   draw();
   return {
-    replace(clip: Clip) {
-      if (clip === current.clip || JSON.stringify(clip) === JSON.stringify(current.clip)) return;
-      const events = fromClip(clip);
-      remember();
-      current = { clip, events };
+    replace(next: Clip) {
+      if (next === clip || JSON.stringify(next) === JSON.stringify(clip)) return;
+      const events = fromClip(next);
+      previous = { clip, query };
+      clip = next;
+      query = { ...query, mode: 'melody_rhythm', events };
+      revision++;
+      error = '';
       draw();
     },
-    configure(newMeter: string, newKey: string) {
-      meter = newMeter;
-      key = newKey;
+    configure(meter: Meter, tonality: string) {
+      query = { ...query, meter };
+      key = tonality;
       draw();
+    },
+    score() {
+      return toMEI(query.events, query.meter, key, clef);
     },
     performance(tempo: number) {
       let time = 0;
-      return current.clip.events.flatMap((row) => {
+      return clip.events.flatMap((row) => {
         const [a, b = '1'] = row.duration.split('/'),
-          beats = Number(a) / Number(b),
           start = time;
-        time += (beats * 60) / tempo;
-        if (!row.pitches.length) return [];
-        return [{ pitch: pitchMidi(row.pitches[0]), start, end: time, bank: 'piano' }];
+        time += ((Number(a) / Number(b)) * 60) / tempo;
+        return row.pitches.length
+          ? [{ pitch: pitchMidi(row.pitches[0]), start, end: time, bank: 'piano' }]
+          : [];
       });
     },
     destroy() {
+      host.removeEventListener('keydown', activateBlackKey, true);
       root.unmount();
     },
   };

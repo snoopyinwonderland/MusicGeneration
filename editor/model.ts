@@ -1,15 +1,6 @@
-export type QueryEvent = {
-  id: string;
-  kind: 'note' | 'rest';
-  pitchMidi: number | null;
-  spelling?: string;
-  durationRatio: number;
-  writtenDuration?: number;
-  tieGroup?: string;
-  tupletGroup?: string;
-  actualNotes?: number;
-  normalNotes?: number;
-};
+import type { QueryEvent } from '@musicanote/melody-query-input';
+import { pitchName } from './pitch.ts';
+export type { QueryEvent };
 
 export type Row = { duration: string; pitches: string[] };
 export type Clip = { format: string; version: number; events: Row[]; [field: string]: unknown };
@@ -91,8 +82,25 @@ function rows(events: QueryEvent[], merge = true): Row[] {
 }
 
 export function toClip(events: QueryEvent[], base: Clip): Clip {
+  if (events.length > 4096) throw Error('모티프는 음·쉼 4096개까지 지원합니다.');
+  for (const event of events) {
+    const beats = event.durationRatio;
+    if (
+      !Number.isFinite(beats) ||
+      beats < 1 / 12 ||
+      beats > 256 ||
+      Math.abs(ticks(beats) - beats * 24) > 1e-7
+    )
+      throw Error('이 음가는 작곡 악보에서 지원하지 않습니다. 일반 음가나 셋잇단음표를 선택하세요.');
+  }
   const { editorNotation, ...metadata } = base;
   const clip = { ...metadata, events: rows(events) };
+  if (
+    clip.events.some(
+      (row) => Number(row.duration.split('/')[0]) / Number(row.duration.split('/')[1] || 1) > 256,
+    )
+  )
+    throw Error('한 음의 길이는 붙임줄을 포함해 256박까지 지원합니다.');
   if (!events.some((e) => e.tieGroup || e.tupletGroup)) return clip;
   const raw = rows(events, false);
   return {
@@ -101,6 +109,8 @@ export function toClip(events: QueryEvent[], base: Clip): Clip {
       ...raw[i],
       tie: event.tieGroup,
       triplet: event.tupletGroup,
+      actualNotes: event.actualNotes,
+      normalNotes: event.normalNotes,
     })),
   };
 }
@@ -125,13 +135,18 @@ export function fromClip(clip: Clip): QueryEvent[] {
         clip.editorNotation.map((row) => {
           const event = fromRow(row);
           if (typeof row.tie === 'string') event.tieGroup = row.tie;
-          if (typeof row.triplet === 'string')
+          if (typeof row.triplet === 'string') {
+            const actual = row.actualNotes ?? 3,
+              normal = row.normalNotes ?? 2;
+            if (!Number.isSafeInteger(actual) || !Number.isSafeInteger(normal) || actual < 1 || normal < 1)
+              throw Error('잇단음표 비율을 확인하세요.');
             Object.assign(event, {
               tupletGroup: row.triplet,
-              writtenDuration: event.durationRatio * 1.5,
-              actualNotes: 3,
-              normalNotes: 2,
+              writtenDuration: (event.durationRatio * actual) / normal,
+              actualNotes: actual,
+              normalNotes: normal,
             });
+          }
           return event;
         }),
       );
@@ -149,4 +164,21 @@ export function fromClip(clip: Clip): QueryEvent[] {
     }
   }
   return clip.events.map(fromRow);
+}
+
+// Query JSON can omit spelling. MIDI pitch is authoritative in the package.
+export function workshopEvents(events: QueryEvent[]) {
+  return normalizeTies(
+    events.map((event) => {
+      const id = /^[A-Za-z_][\w.-]*$/.test(event.id) ? event.id : 'q-' + crypto.randomUUID();
+      if (event.kind === 'rest') return { ...event, id, pitchMidi: null, spelling: undefined };
+      const midi = event.pitchMidi;
+      if (midi === null || !Number.isInteger(midi) || midi < 0 || midi > 127)
+        throw Error('음높이를 확인하세요.');
+      const spelling = event.spelling?.replaceAll('♯', '#').replaceAll('♭', 'b') || pitchName(midi);
+      if (pitchMidi(spelling.replaceAll('♯', '#').replaceAll('♭', 'b')) !== midi)
+        throw Error('입력한 음이름과 MIDI 음높이가 다릅니다.');
+      return { ...event, id, spelling };
+    }),
+  );
 }

@@ -1,5 +1,7 @@
 # MUSICANOTE Virtual Composer
 
+작곡 작업실을 처음 실행하는 체크아웃에서는 저장소 루트에서 `pnpm --dir editor install --frozen-lockfile`을 한 번 실행하세요. MusicSearch의 공유 악보 입력기 0.1.0과 Verovio를 설치합니다. [입력기 검수 요청서](docs/handoff/review/2026-11-18_shared-melody-query-input.md)
+
 [작곡 작업실 열기](http://127.0.0.1:8808/compose.html) · 음을 입력하거나 두 마디를 자동 생성하고, 짧은 앞부분은 이어쓸 수 있습니다. 선율과 화성을 8·16마디로 완성한 뒤 같은 곡을 피아노·기타·25현 가야금·실내악 악보로 열어 보세요. 로컬 실행과 검증은 [작곡 작업실 검수 요청서](docs/handoff/review/2026-11-18_motif-arrangement-studio.md)에 있습니다.
 
 [노래방 전체 주선율·화성 통계](docs/KARAOKE_CORPUS_STATISTICS.md): 50,874개 MIDI를 전수 조사하고 랩 의심 구간을 제외한 음형·리듬·contour·반복·명시 화음 관계를 집계했습니다. 약 153만 개의 2/4마디 검색 구간과 분모별 결과를 남겼으며, 실제 장단조 표기의 한계와 생성 적용 전 상태를 구별합니다. 이후 작업은 [개발 기록](docs/DEVELOPMENT_LOG.md)에 누적합니다.

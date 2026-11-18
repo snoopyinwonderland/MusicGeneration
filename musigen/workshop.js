@@ -1,3 +1,5 @@
+import {mount} from './motif-input/motif-input.js';
+
 (() => {
   const $=id=>document.getElementById(id);
   const buttons=['auto','complete','compose','arrange','original','preview'];
@@ -39,11 +41,14 @@
     try{await task()}catch(e){status(e.message,true)}
     finally{busy=false;$('motifEditor').inert=false;for(const el of controls)el.disabled=false}
   }
-  function render(xml){
+  function drawScore(xml){
     if(!engine){try{engine=new verovio.toolkit()}catch{throw Error('악보를 준비하고 있습니다. 잠시 후 다시 눌러 주세요.')}}
     engine.setOptions({pageWidth:1900,pageHeight:2700,scale:40,svgViewBox:true,breaks:'auto',adjustPageHeight:true,header:'none',footer:'none'});
     if(!engine.loadData(xml))throw Error('악보를 표시할 수 없습니다.');
     $('score').innerHTML=Array.from({length:engine.getPageCount()},(_,i)=>engine.renderToSVG(i+1)).join('');
+  }
+  function render(xml){
+    drawScore(xml);
     activeNotes=WorkshopAudio.events(engine,xml);
     $('play').disabled=!activeNotes.length;
   }
@@ -88,12 +93,18 @@
   for(const key of ['C major','G major','D major','F major','Bb major','Eb major','A minor','E minor','D minor','G minor','C minor']){
     $('key').add(new Option(key.replace(' major','장조').replace(' minor','단조'),key));
   }
-  const editor=MotifEditorApp.mount($('motifEditor'),{
-    onChange(clip){
-      sourceClip=clip;$('tokens').value=notation(clip);clear();
+  const editor=mount($('motifEditor'),{
+    onChange(clip,meter){
+      sourceClip=clip;$('meter').value=meter;$('tokens').value=notation(clip);clear();
       activeNotes=editor.performance(Number($('tempo').value));
       $('play').disabled=!activeNotes.length;
       status(clip.events.length?'모티프를 수정했습니다.':'건반을 눌러 모티프를 시작하세요.');
+    },
+    preview(){
+      const notes=editor.performance(Number($('tempo').value));
+      if(!notes.length){status('먼저 소리 나는 음을 입력하세요.');return}
+      $('stop').disabled=false;
+      WorkshopAudio.play(notes,stop).catch(e=>{stop();status(e.message,true)});
     },
     audition(midi){WorkshopAudio.play([{start:0,end:.35,pitch:midi,bank:'piano'}],()=>{}).catch(e=>status(e.message,true))},
     error(message){status(message,true)}
@@ -124,7 +135,7 @@
     const clip=await json('api/rhythm',{clip:readClip()});setClip(clip);preview();
     status(clip.rhythm_variation.same_length?'음높이와 전체 길이를 유지해 새 리듬을 만들었습니다.':'새 리듬을 만들었습니다. 이 입력은 전체 길이도 함께 바뀝니다.');
   });
-  $('preview').onclick=()=>run(()=>{preview();$('motifEditor').scrollIntoView({block:'start'})});
+  $('preview').onclick=()=>run(()=>{preview();$('score').hidden=false;drawScore(editor.score())});
   for(const mode of ['auto','complete'])$(mode).onclick=()=>run(async()=>{
     const clip=mode==='complete'?readClip():null;
     const generated=await json('api/motif',{...settings(),mode,clip});

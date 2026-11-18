@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { fromClip, makeEvent, normalizeTies, toClip } from './model.ts';
+import { fromClip, makeEvent, normalizeTies, toClip, workshopEvents } from './model.ts';
 import { toMEI } from './mei.ts';
 
 test('binary rhythms do not acquire unnecessary triplet brackets', () => {
@@ -11,6 +11,40 @@ test('binary rhythms do not acquire unnecessary triplet brackets', () => {
 const base = { format: 'musicanote-motif', version: 1, events: [] };
 const note = (name, duration = 1) => makeEvent(name, duration);
 const engrave = (events) => toMEI(events, '4/4', 'Eb major', 'auto');
+
+test('a native query without spelling uses its MIDI pitch and preserves rests', () => {
+  const notes = workshopEvents([
+    { id: 'a', kind: 'note', pitchMidi: 61, durationRatio: 0.5 },
+    { id: 'b', kind: 'rest', pitchMidi: null, durationRatio: 1, spelling: 'D4' },
+  ]);
+  assert.deepEqual(toClip(notes, base).events, [
+    { duration: '1/2', pitches: ['C#4'] },
+    { duration: '1', pitches: [] },
+  ]);
+});
+
+test('the adapter rejects unsupported durations before rounding', () => {
+  for (const duration of [1 / 16, 4 / 5, Infinity])
+    assert.throws(() => toClip([note('C4', duration)], base), /지원/);
+});
+
+test('a native duplet restores its written duration and ratio', () => {
+  const pair = ['C4', 'Eb4'].map((p) => ({
+    ...note(p, 0.75),
+    tupletGroup: 'duplet',
+    writtenDuration: 0.5,
+    actualNotes: 2,
+    normalNotes: 3,
+  }));
+  const events = fromClip(toClip(pair, base));
+  assert.deepEqual(
+    events.map((e) => [e.durationRatio, e.writtenDuration, e.actualNotes, e.normalNotes]),
+    [
+      [0.75, 0.5, 2, 3],
+      [0.75, 0.5, 2, 3],
+    ],
+  );
+});
 
 test('tied written notes round-trip through the sounding motif', () => {
   const pair = [note('Bb3'), note('Bb3')].map((e) => ({ ...e, tieGroup: 'legato' }));

@@ -66,11 +66,11 @@ def save_request(root,data,origin='user'):
 
 @lru_cache(maxsize=1)
 def editor_bundle():
-    from musigen import MUSICOMP_ROOT
     build=Path(__file__).resolve().parents[1]/'editor/build.mjs'
     with tempfile.TemporaryDirectory() as tmp:
-        subprocess.run(['node',str(build),tmp,str(MUSICOMP_ROOT)],check=True,timeout=90)
-        return (Path(tmp)/'motif-editor.js').read_bytes()
+        subprocess.run(['node',str(build),tmp],check=True,timeout=90)
+        root=Path(tmp)
+        return {file.relative_to(root):file.read_bytes() for file in root.rglob('*') if file.is_file()}
 
 
 def write_studio(out):
@@ -78,7 +78,10 @@ def write_studio(out):
     assets=out/'assets';assets.mkdir(exist_ok=True)
     source=Path(__file__).parent
     from musigen import MUSICOMP_ROOT
-    (assets/'motif-editor.js').write_bytes(editor_bundle())
+    for relative,content in editor_bundle().items():
+        target=assets/'motif-input'/relative
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_bytes(content)
     for name in ('studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js','workshop_import.js'):
         shutil.copyfile(source/name,assets/name)
     banks=MUSICOMP_ROOT/'workbench/public/samples'

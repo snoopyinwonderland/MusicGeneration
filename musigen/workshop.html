@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>작곡 작업실 | MUSICANOTE Virtual Composer</title><link rel="stylesheet" href="assets/workshop.css"></head>
+<title>작곡 작업실 | MUSICANOTE Virtual Composer</title><link rel="stylesheet" href="assets/workshop.css"><link rel="stylesheet" href="assets/motif-input/motif-input.css"></head>
 <body><header><a class="brand" href="index.html">MUSICANOTE <span>Virtual Composer</span></a><a href="index.html#library">작품 라이브러리 ↗</a></header>
 <main><div class="heading"><h1>작곡 작업실</h1><a href="#recent">저장한 곡 ↓</a></div>
 <div id="motifEditor"></div>
@@ -15,7 +15,7 @@
 <div class="pair"><label>조성<select id="key"></select></label><label>박자<select id="meter"><option>4/4</option><option>3/4</option><option>6/8</option></select></label>
 <label>빠르기 · ♩/분<input type="number" min="40" max="180" value="88" id="tempo"></label><label>길이<select id="bars"><option value="8">8마디</option><option value="16">16마디</option></select></label></div>
 <button id="compose" class="primary">이 모티프로 곡 만들기 →</button></section>
-<section class="paper"><div class="paper-head"><div><p id="scoreKind">모티프 재생</p><h2 id="scoreTitle">나의 모티프</h2></div><button id="preview">입력 악보 보기</button></div>
+<section class="paper"><div class="paper-head"><div><p id="scoreKind">모티프 재생</p><h2 id="scoreTitle">나의 모티프</h2></div><button id="preview">마디별 입력 악보 보기</button></div>
 <p id="status" role="status" aria-live="polite">음을 입력하거나 자동 모티프 생성을 눌러 주세요.</p>
 <div class="transport"><button id="play" disabled>▶ 듣기</button><button id="stop" disabled>정지</button><a id="download" hidden download>MusicXML 받기</a><button id="print" hidden>인쇄 / PDF</button></div>
 <div id="score" aria-label="완성 악보" hidden></div>
@@ -35,4 +35,4 @@
 <div class="small-actions"><span>악보에서 시작과 끝을 차례로 누르세요.</span><button id="copyRange">모티프 JSON 복사</button><button id="useRange">선택 구간 바로 쓰기</button></div>
 <label id="manualCopy" hidden>클립보드에 복사할 JSON<textarea id="copyText" rows="4" readonly></textarea></label>
 <div id="xmlScore"></div><div class="page-steps"><button id="prevXml">이전 쪽</button><span id="xmlPage"></span><button id="nextXml">다음 쪽</button></div></div></section></div></dialog>
-<script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/motif-editor.js"></script><script src="assets/workshop_import.js"></script><script src="assets/workshop.js"></script></body></html>
+<script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/workshop_import.js"></script><script type="module" src="assets/workshop.js"></script></body></html>

@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .env
 .venv/
+editor/node_modules/

@@ -83,7 +83,7 @@ export function toMEI(events: QueryEvent[], meter: string, key: string, clef: st
       const budget = Math.min(left, bar - used);
       const v = values.find((value) => {
         if (value.size > budget) return false;
-        if (e.tupletGroup) return value.triplet;
+        if (e.tupletGroup && e.actualNotes === 3 && e.normalNotes === 2) return value.triplet;
         // Even a plain dotted rhythm could otherwise be split into two
         // unusual tuplets by a longest-duration-first search.
         return budget % 3 !== 0 || !value.triplet;
