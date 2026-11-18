@@ -28,7 +28,7 @@ import {mount} from './motif-input/motif-input.js';
   }
   function notation(c){return c.events.map(e=>(e.pitches[0]||'쉼')+':'+e.duration).join(' ')}
   function setClip(c){sourceClip=c;$('tokens').value=notation(c);editor.replace(c)}
-  function settings(){return {title:$('title').value,key:$('key').value,meter:$('meter').value,tempo:Number($('tempo').value),bars:Number($('bars').value)}}
+  function settings(){return {title:$('title').value,key:$('keySpelling').value,meter:$('meter').value,tempo:Number($('tempo').value),bars:Number($('bars').value)}}
   async function json(url,data){
     const res=await fetch(url,data?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}:{cache:'no-store'});
     if(!res.ok){const problem=await res.json().catch(()=>({}));throw Error(problem.error||'작곡 서버에 연결할 수 없습니다.')}
@@ -62,7 +62,7 @@ import {mount} from './motif-input/motif-input.js';
   }
   function preview(){
     const clip=readClip();editor.replace(clip);clear();
-    editor.configure($('meter').value,$('key').value);
+    editor.configure($('meter').value,$('keySpelling').value);
     activeNotes=editor.performance(Number($('tempo').value));
     $('play').disabled=!activeNotes.length;
     status(clip.events.length+'개의 음·쉼 · '+MotifTools.validate(clip)+'박');
@@ -78,7 +78,8 @@ import {mount} from './motif-input/motif-input.js';
     const r=await fetch(xmlPath);if(!r.ok)throw Error('저장된 악보를 열 수 없습니다.');
     const xml=await r.text();$('score').hidden=false;render(xml);
     piece=work;setClip(work.clip);
-    for(const k of ['title','key','meter','tempo','bars'])$(k).value=work[k];
+    for(const k of ['title','meter','tempo','bars'])$(k).value=work[k];
+    KeyPicker.restore(work.key);
     $('development').value=work.development||'classic';
     editor.configure(work.meter,work.key);$('scoreTitle').textContent=work.title;
     $('scoreKind').textContent=kind==='melody'?'원 선율 + 화성':$('instrument').selectedOptions[0].text;
@@ -127,8 +128,8 @@ import {mount} from './motif-input/motif-input.js';
       status('모티프를 붙여넣었습니다. '+clip.events.length+'개 음·쉼 · '+MotifTools.validate(clip)+'박');
     }catch(e){status(e.message,true)}
   });
-  for(const id of ['title','key','meter','tempo','bars'])$(id).onchange=()=>{
-    clear();editor.configure($('meter').value,$('key').value);
+  for(const id of ['title','key','keySpelling','meter','tempo','bars'])$(id).onchange=()=>{
+    clear();editor.configure($('meter').value,$('keySpelling').value);
     if($('tokens').value.trim())try{preview()}catch(e){status(e.message,true)}
   };
   $('randomRhythm').onclick=()=>run(async()=>{

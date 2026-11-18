@@ -15,7 +15,8 @@ from musigen.motif_clip import read_events
 from musigen.listen import VEROVIO_CDN
 from musigen.studio_library import library_html
 
-KEYS=tuple(json.loads(Path(__file__).with_name('key_signatures.json').read_text(encoding='utf8')))
+KEY_SIGNATURES=json.loads(Path(__file__).with_name('key_signatures.json').read_text(encoding='utf8'))
+KEYS=tuple(KEY_SIGNATURES)
 
 
 def validate_request(data):
@@ -73,6 +74,24 @@ def editor_bundle():
         return {file.relative_to(root):file.read_bytes() for file in root.rglob('*') if file.is_file()}
 
 
+def key_picker_options():
+    groups = {'major': {}, 'minor': {}}
+    for key, fifths in KEY_SIGNATURES.items():
+        mode = key.split()[1]
+        # Twelve steps around the circle of fifths return to the same sounding key.
+        groups[mode].setdefault(fifths % 12, []).append(key)
+    options = []
+    for mode, label in [('major', '장조'), ('minor', '단조')]:
+        options.append(f'<optgroup label="{label}">')
+        for keys in groups[mode].values():
+            names = sorted(keys, key=lambda k: abs(KEY_SIGNATURES[k]))
+            caption = ' / '.join(k.split()[0].replace('#', '♯').replace('b', '♭') for k in names)
+            alternate = f' data-alternate="{names[1]}"' if len(names) > 1 else ''
+            options.append(f'<option value="{names[0]}"{alternate}>{caption} {label}</option>')
+        options.append('</optgroup>')
+    return ''.join(options)
+
+
 def write_studio(out):
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     assets=out/'assets';assets.mkdir(exist_ok=True)
@@ -82,7 +101,7 @@ def write_studio(out):
         target=assets/'motif-input'/relative
         target.parent.mkdir(parents=True,exist_ok=True)
         target.write_bytes(content)
-    for name in ('studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js','workshop_import.js'):
+    for name in ('key_picker.js','studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js','workshop_import.js'):
         shutil.copyfile(source/name,assets/name)
     banks=MUSICOMP_ROOT/'workbench/public/samples'
     if (banks/'manifest.json').is_file():
@@ -99,7 +118,7 @@ def write_studio(out):
     runtime=Path(os.environ.get('MUSICOMP_ROOT',str(source.parent.parent/'Music Composition')))/'node_modules/verovio/dist/verovio-toolkit-wasm.js'
     src=VEROVIO_CDN
     if runtime.is_file():shutil.copyfile(runtime,assets/'verovio.js');src='assets/verovio.js'
-    key_options=''.join(f'<option value="{key}">{key.replace(" major","장조").replace(" minor","단조")}</option>' for key in KEYS)
+    key_options = key_picker_options()
     workshop=(source/'workshop.html').read_text(encoding='utf8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)
     (out/'compose.html').write_text(workshop,encoding='utf8')
     text=(source/'studio.html').read_text(encoding='utf-8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)

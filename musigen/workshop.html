@@ -12,7 +12,7 @@
 <div class="actions"><button id="auto">↻ 자동 모티프 생성</button><button id="randomRhythm">음가 랜덤 생성</button><button id="complete">입력한 뒤 이어쓰기</button></div>
 <h2 class="sub">곡 설정</h2>
 <label>제목<input id="title" maxlength="80" placeholder="모티프 습작"></label>
-<div class="pair"><label>조성<select id="key"><!-- KEY_OPTIONS --></select></label><label>박자<select id="meter"><option>4/4</option><option>3/4</option><option>6/8</option></select></label>
+<div class="pair"><label>조성<select id="key"><!-- KEY_OPTIONS --></select></label><label id="spellingField" hidden>악보 표기<select id="keySpelling"></select></label><label>박자<select id="meter"><option>4/4</option><option>3/4</option><option>6/8</option></select></label>
 <label>빠르기 · ♩/분<input type="number" min="40" max="180" value="88" id="tempo"></label><label>길이<select id="bars"><option value="8">8마디</option><option value="16">16마디</option></select></label></div>
 <label>선율 발전 방식<select id="development"><option value="neighbors" selected>MOTIFIND 작곡 시스템</option><option value="classic">기존 모티프 변형</option></select></label>
 <button id="compose" class="primary">이 모티프로 곡 만들기 →</button></section>
@@ -37,4 +37,4 @@
 <div class="small-actions"><span>악보에서 시작과 끝을 차례로 누르세요.</span><button id="copyRange">모티프 JSON 복사</button><button id="useRange">선택 구간 바로 쓰기</button></div>
 <label id="manualCopy" hidden>클립보드에 복사할 JSON<textarea id="copyText" rows="4" readonly></textarea></label>
 <div id="xmlScore"></div><div class="page-steps"><button id="prevXml">이전 쪽</button><span id="xmlPage"></span><button id="nextXml">다음 쪽</button></div></div></section></div></dialog>
-<script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/workshop_import.js"></script><script type="module" src="assets/workshop.js"></script></body></html>
+<script src="assets/key_picker.js"></script><script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/workshop_import.js"></script><script type="module" src="assets/workshop.js"></script></body></html>

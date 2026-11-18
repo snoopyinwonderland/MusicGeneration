@@ -55,7 +55,8 @@
       if(value.format==='musicanote-composition-request'){
         const p=value.preferences;
         $('composer').value=p.composer||'none';
-        for(const id of ['prompt','key','meter','tempo','bars'])$(id).value=p[id];
+        for(const id of ['prompt','meter','tempo','bars'])$(id).value=p[id];
+        KeyPicker.restore(p.key);
         for(const id of ['secondary','modulation'])$(id).checked=!!p[id];
         $('augmentedSixth').checked=!!p.augmented_sixth;$('solo').checked=p.outputs.includes('piano_solo');accept(value.motif);
       }else accept(value);
@@ -66,7 +67,7 @@
     const tempo=+$('tempo').value;
     if(!Number.isInteger(tempo)||tempo<40||tempo>180)throw Error('빠르기는 40–180 사이 정수로 지정해 주세요.');
     const motif=structuredClone(clip);motif.name=$('motifName').value.trim()||'나의 모티프';
-    return {format:'musicanote-composition-request',version:1,motif,preferences:{prompt:$('prompt').value,composer:$('composer').value,key:$('key').value,meter:$('meter').value,tempo,bars:+$('bars').value,
+    return {format:'musicanote-composition-request',version:1,motif,preferences:{prompt:$('prompt').value,composer:$('composer').value,key:$('keySpelling').value,meter:$('meter').value,tempo,bars:+$('bars').value,
       secondary:$('secondary').checked,augmented_sixth:$('augmentedSixth').checked,modulation:$('modulation').checked,
       outputs:$('solo').checked?['melody_harmony','piano_solo']:['melody_harmony']}};
   }
@@ -80,7 +81,7 @@
   for(const id of ['rangeStart','rangeEnd'])$(id).addEventListener('change',selectRange);
   $('sourceScore').addEventListener('click',e=>{const n=e.target.closest('g.note,g.rest,g.mRest');if(!n||!stream)return;const i=stream.events.findIndex(v=>v.ids.includes(n.id));if(i<0){status('선택한 성부의 음을 눌러 주세요.');return;}$(pickEnd?'rangeEnd':'rangeStart').value=String(i);if(!pickEnd&&+$('rangeEnd').value<i)$('rangeEnd').value=String(i);pickEnd=!pickEnd;selectRange();});
   $('extract').addEventListener('click',run(()=>{invalidate();accept(MotifTools.clipRange(source,stream,+$('rangeStart').value,+$('rangeEnd').value,$('motifName').value));}));
-  for(const id of ['prompt','composer','key','meter','tempo','bars','secondary','augmentedSixth','modulation','solo','motifName'])$(id).addEventListener('change',dirty);
+  for(const id of ['prompt','composer','key','keySpelling','meter','tempo','bars','secondary','augmentedSixth','modulation','solo','motifName'])$(id).addEventListener('change',dirty);
   $('meter').addEventListener('change',run(()=>{stop();if(clip)render('motifPreview',MotifTools.previewXML(clip,$('meter').value),getEngine());}));
   $('downloadMotif').addEventListener('click',run(()=>download(request().motif,'motif.json')));
   $('downloadRequest').addEventListener('click',run(()=>download(request(),'composition-request.json')));
