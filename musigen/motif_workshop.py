@@ -271,7 +271,7 @@ def compose(root,data):
     # A very short incipit needs enough material for the ensuing phrase variations.
     if sum(d for d,_ in theme)<bar_length(spec):
         theme=unpack(extend_motif(spec,clip))
-    method=data.get('development','classic')
+    method=data.get('development','neighbors')
     if method not in ('classic','neighbors'):raise ValueError('선율 발전 방식을 확인하세요.')
     events=develop_neighbors(spec,theme) if method=='neighbors' else develop(spec,theme)
     time=F(0)

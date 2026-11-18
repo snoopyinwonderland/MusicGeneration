@@ -64,6 +64,7 @@ class MotifWorkshopTests(unittest.TestCase):
     def test_manual_incipit_survives_published_score_and_reload(self):
         with tempfile.TemporaryDirectory() as tmp:
             result=compose(tmp,dict(self.data,clip=self.clip))
+            self.assertEqual(result['development'],'neighbors')
             dest=Path(tmp)/'compositions'/result['id']
             self.assertEqual(json.loads((dest/'piece.json').read_text('utf8'))['clip'],self.clip)
             score=converter.parse(dest/'melody.musicxml')

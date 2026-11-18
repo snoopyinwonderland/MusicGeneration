@@ -38,4 +38,4 @@ button:hover:not(:disabled){background:#ecf4ed}button:disabled{opacity:.5;cursor
 .motif-input-head h2{margin-right:auto}.motif-input-head label{display:flex;align-items:center;gap:6px;white-space:nowrap;margin:0}
 .motif-input-head select,.mq-controls select{width:auto}
 .motif-input-error{color:#9c3423;padding:5px 0}.mq-duration-cell input[type=range]{padding:0}
-@media print{#motifEditor{display:none}}
+@media print{#motifEditor,#nativePane{display:none}}

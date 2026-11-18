@@ -53,6 +53,7 @@ import {mount} from './motif-input/motif-input.js';
     $('play').disabled=!activeNotes.length;
   }
   function clear(){
+    $('nativePane').hidden=true;
     stop();piece=null;activeNotes=[];$('play').disabled=true;
     $('arranger').hidden=$('download').hidden=$('print').hidden=true;
     $('score').hidden=true;$('score').replaceChildren();$('scoreKind').textContent='모티프 재생';$('scoreTitle').textContent='나의 모티프';
@@ -148,6 +149,14 @@ import {mount} from './motif-input/motif-input.js';
     const work=await json('api/compose',{...settings(),clip,development:$('development').value});await showScore(work,'melody');await library();
   });
   $('arrange').onclick=()=>run(()=>showScore(piece,$('instrument').value));
+  async function openWorkbench(){
+    const {url}=await json('api/workbench',{id:piece.id});
+    if($('nativeFrame').src!==url)$('nativeFrame').src=url;
+    $('nativeTab').href=url;$('nativePane').hidden=false;$('nativePane').scrollIntoView();
+    const link=new URL(location.href);link.searchParams.set('workspace','arranger');
+    history.replaceState(null,'',link);$('permalink').href=link.href;
+  }
+  $('openWorkbench').onclick=()=>run(openWorkbench);
   $('original').onclick=()=>run(()=>showScore(piece,'melody'));
   $('print').onclick=()=>window.print();
   $('play').onclick=async()=>{try{$('stop').disabled=false;await WorkshopAudio.play(activeNotes,stop)}catch(e){stop();status(e.message,true)}};
@@ -159,6 +168,7 @@ import {mount} from './motif-input/motif-input.js';
     if(id){
       if(!/^[a-f0-9]{32}$/.test(id))throw Error('작품 주소를 확인하세요.');
       await showScore(await json('compositions/'+id+'/piece.json'),params.get('voice')||'melody');
+      if(params.get('workspace')==='arranger')await openWorkbench();
     }else if(params.get('import')==='clip'){
       const raw=sessionStorage.getItem('workshop-input');
       if(!raw)throw Error('가져올 구간이 없습니다. 모티프 입력에서 구간을 선택해 주세요.');

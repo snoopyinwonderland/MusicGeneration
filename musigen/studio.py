@@ -129,7 +129,7 @@ class StudioHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         binary=self.path in ('/api/import-midi','/api/import-mxl')
-        if not binary and self.path not in ('/api/requests','/api/motif','/api/compose','/api/arrange','/api/rhythm','/api/catalog','/api/score'):self.send_error(404);return
+        if not binary and self.path not in ('/api/requests','/api/motif','/api/compose','/api/arrange','/api/workbench','/api/rhythm','/api/catalog','/api/score'):self.send_error(404);return
         origin=self.headers.get('Origin')
         allowed={f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'}
         if origin not in allowed or self.headers.get('Sec-Fetch-Site')=='cross-site':self.send_error(403);return
@@ -143,6 +143,9 @@ class StudioHandler(SimpleHTTPRequestHandler):
             if binary:
                 from musigen.workshop_file import compressed_score,midi_score
                 result=(midi_score if self.path=='/api/import-midi' else compressed_score)(raw)
+            elif self.path=='/api/workbench':
+                from musigen.workshop_arranger import open_workbench
+                result=open_workbench(self.directory,data.get('id'))
             elif self.path=='/api/requests':
                 result=save_request(self.directory,data)
             elif self.path in ('/api/catalog','/api/score'):
