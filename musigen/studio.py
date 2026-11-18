@@ -66,8 +66,16 @@ def write_studio(out):
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     assets=out/'assets';assets.mkdir(exist_ok=True)
     source=Path(__file__).parent
-    for name in ('studio.js','studio.css'):
+    from musigen import MUSICOMP_ROOT
+    for name in ('studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js'):
         shutil.copyfile(source/name,assets/name)
+    banks=MUSICOMP_ROOT/'workbench/public/samples'
+    if (banks/'manifest.json').is_file():
+        samples=assets/'samples'
+        samples.mkdir(exist_ok=True)
+        shutil.copyfile(banks/'manifest.json',samples/'manifest.json')
+        for bank in ('piano','guitar','gayageum','violin','viola','cello'):
+            if (banks/bank).is_dir():shutil.copytree(banks/bank,samples/bank,dirs_exist_ok=True)
     # Share the tested parser without attaching the listening-page UI handlers.
     core=(source/'motif_tools.js').read_text(encoding='utf-8').split('\n(() => {',1)[0]
     (assets/'motif-core.js').write_text(core,encoding='utf-8')
@@ -76,6 +84,8 @@ def write_studio(out):
     runtime=Path(os.environ.get('MUSICOMP_ROOT',str(source.parent.parent/'Music Composition')))/'node_modules/verovio/dist/verovio-toolkit-wasm.js'
     src=VEROVIO_CDN
     if runtime.is_file():shutil.copyfile(runtime,assets/'verovio.js');src='assets/verovio.js'
+    workshop=(source/'workshop.html').read_text(encoding='utf8').replace('/*VEROVIO_SRC*/',src)
+    (out/'compose.html').write_text(workshop,encoding='utf8')
     text=(source/'studio.html').read_text(encoding='utf-8').replace('/*VEROVIO_SRC*/',src)
     library = library_html(out)
     if library:
@@ -87,6 +97,14 @@ def write_studio(out):
 
 class StudioHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
+        if self.path=='/api/compositions':
+            works=Path(self.directory)/'compositions'
+            rows=[]
+            for path in sorted(works.glob('*/piece.json'),key=lambda p:p.stat().st_mtime,reverse=True):
+                if len(path.parent.name)!=32:continue
+                item=json.loads(path.read_text('utf8'))
+                rows.append({k:item[k] for k in ('id','title','bars','key')})
+            self.reply(200,{'works':rows});return
         if self.path=='/api/requests':
             from musigen.studio_delivery import catalog
             self.reply(200,{'requests':catalog(self.directory)});return
@@ -95,7 +113,7 @@ class StudioHandler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
-        if self.path!='/api/requests':self.send_error(404);return
+        if self.path not in ('/api/requests','/api/motif','/api/compose','/api/arrange'):self.send_error(404);return
         origin=self.headers.get('Origin')
         allowed={f'http://127.0.0.1:{self.server.server_port}',f'http://localhost:{self.server.server_port}'}
         if origin not in allowed or self.headers.get('Sec-Fetch-Site')=='cross-site':self.send_error(403);return
@@ -104,9 +122,17 @@ class StudioHandler(SimpleHTTPRequestHandler):
             size=int(self.headers.get('Content-Length','0'))
             if not 0<size<=1024*1024:self.send_error(413);return
             data=json.loads(self.rfile.read(size))
-            result=save_request(self.directory,data)
+            if self.path=='/api/requests':
+                result=save_request(self.directory,data)
+            else:
+                from musigen.motif_workshop import arrangements, compose, motif
+                if self.path=='/api/motif':result=motif(data)
+                elif self.path=='/api/compose':result=compose(self.directory,data)
+                else:result=arrangements(self.directory,data)
         except (ValueError,KeyError,TypeError,AttributeError) as exc:
             self.reply(400,{'error':str(exc)});return
+        except (OSError,RuntimeError,TimeoutError) as exc:
+            self.reply(503,{'error':str(exc)});return
         self.reply(201,result)
 
     def reply(self,status,data):

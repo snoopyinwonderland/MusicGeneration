@@ -154,7 +154,25 @@ const MotifTools = (() => {
     validate(clip);
     return clip;
   }
-  return {parseMusicXML, clipRange, validate, F};
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+  function previewXML(value,meter,tempo=84){
+    const [b,u]=meter.split('/').map(Number), bar=b*4/u*24;
+    let used=0, measure=1, xml='', row='';
+    const close=()=>{xml+=`<measure number="${measure}">${measure===1?`<attributes><divisions>24</divisions><time><beats>${b}</beats><beat-type>${u}</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes><direction><sound tempo="${Number(tempo)}"/></direction>`:''}${row}</measure>`;measure++;row='';used=0;};
+    for(const e of value.events){
+      const d=F.read(e.duration);let left=d.n*24/d.d, tied=false;
+      while(left>0){const take=Math.min(left,bar-used), continues=left>take;
+        let pitch='<rest/>';
+        if(e.pitches.length){const [,step,acc='',oct]=e.pitches[0].match(/^([A-G])(#{1,2}|b{1,2})?(-?\d)$/);pitch=`<pitch><step>${step}</step><alter>${acc.includes('#')?acc.length:-acc.length}</alter><octave>${oct}</octave></pitch>`;}
+        const ties=e.pitches.length?(tied?'<tie type="stop"/>':'')+(continues?'<tie type="start"/>':''):'';
+        row+=`<note>${pitch}<duration>${take}</duration>${ties}</note>`;
+        left-=take;used+=take;tied=true;if(used===bar)close();
+      }
+    }
+    if(used){row+=`<note><rest/><duration>${bar-used}</duration></note>`;close();}
+    return `<score-partwise version="4.0"><work><work-title>${esc(value.name||'모티프')}</work-title></work><part-list><score-part id="P1"><part-name>피아노</part-name></score-part></part-list><part id="P1">${xml}</part></score-partwise>`;
+  }
+  return {parseMusicXML, clipRange, validate, previewXML, F};
 })();
 
 (() => {

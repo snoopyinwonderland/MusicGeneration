@@ -4,11 +4,14 @@
   let clip=null, source=null, stream=null, engine=null, sourceEngine=null, pickEnd=false;
   let audio=null, nodes=[], timer=null, sampleBank=null, playbackToken=0;
   const buffers=new Map();
-  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
   const status=(message,error=false)=>{$('inputStatus').textContent=message;$('inputStatus').classList.toggle('error',error);};
   const run=fn=>async()=>{try{await fn();}catch(e){status(e.message,true);}};
   const option=(v,t)=>{const o=document.createElement('option');o.value=v;o.textContent=t;return o;};
-  function enable(value){for(const id of ['listenMotif','downloadMotif','saveRequest','downloadRequest'])$(id).disabled=!value;}
+  function enable(value){for(const id of ['listenMotif','downloadMotif','saveRequest','downloadRequest','useInWorkshop'])$(id).disabled=!value;}
+  $('useInWorkshop').addEventListener('click',run(()=>{
+    sessionStorage.setItem('workshop-input',JSON.stringify(clip));
+    location.href='compose.html?import=clip';
+  }));
   function dirty(){ $('savedLink').hidden=true; $('saveStatus').textContent=clip?'조건을 정한 뒤 작곡 요청을 저장해 주세요.':'모티프를 먼저 입력해 주세요.'; }
   function stop(){playbackToken++;clearTimeout(timer);for(const n of nodes)try{n.stop();}catch{}nodes=[];$('stopMotif').disabled=true;}
   function invalidate(){stop();clip=null;enable(false);$('motifPreview').replaceChildren();dirty();}
@@ -18,28 +21,11 @@
     if(!renderer.loadData(xml))throw Error('악보를 표시하지 못했습니다.');
     $(target).innerHTML=Array.from({length:renderer.getPageCount()},(_,i)=>renderer.renderToSVG(i+1)).join('');
   }
-  function previewXML(value){
-    const [b,u]=$('meter').value.split('/').map(Number), bar=b*4/u*24;
-    let used=0, measure=1, xml='', row='';
-    const close=()=>{xml+=`<measure number="${measure}">${measure===1?`<attributes><divisions>24</divisions><time><beats>${b}</beats><beat-type>${u}</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>`:''}${row}</measure>`;measure++;row='';used=0;};
-    for(const e of value.events){
-      const d=F.read(e.duration);let left=d.n*24/d.d, tied=false;
-      while(left>0){const take=Math.min(left,bar-used), continues=left>take;
-        let pitch='<rest/>';
-        if(e.pitches.length){const [,step,acc='',oct]=e.pitches[0].match(/^([A-G])(#{1,2}|b{1,2})?(-?\d)$/);pitch=`<pitch><step>${step}</step><alter>${acc.includes('#')?acc.length:-acc.length}</alter><octave>${oct}</octave></pitch>`;}
-        const ties=e.pitches.length?(tied?'<tie type="stop"/>':'')+(continues?'<tie type="start"/>':''):'';
-        row+=`<note>${pitch}<duration>${take}</duration>${ties}</note>`;
-        left-=take;used+=take;tied=true;if(used===bar)close();
-      }
-    }
-    if(used){row+=`<note><rest/><duration>${bar-used}</duration></note>`;close();}
-    return `<score-partwise version="4.0"><work><work-title>${esc(value.name||'모티프')}</work-title></work><part-list><score-part id="P1"><part-name>피아노</part-name></score-part></part-list><part id="P1">${xml}</part></score-partwise>`;
-  }
   function accept(value){
     const total=MotifTools.validate(value);
     if(value.events.some(e=>e.pitches.length>1))throw Error('멜로디 성부의 단선율을 골라 주세요. 화음 입력은 아직 지원하지 않습니다.');
     // Render first, so an unavailable engine cannot leave a stale accepted input.
-    render('motifPreview',previewXML(value),getEngine());
+    render('motifPreview',MotifTools.previewXML(value,$('meter').value),getEngine());
     clip=structuredClone(value);$('motifName').value=value.name||'나의 모티프';
     $('inputText').value=JSON.stringify(value,null,2);enable(true);dirty();
     status(`${clip.events.length}개 음·쉼 · 4분음표 ${total}개 길이. ${(clip.warnings||[]).join(' ')}`);
@@ -95,7 +81,7 @@
   $('sourceScore').addEventListener('click',e=>{const n=e.target.closest('g.note,g.rest,g.mRest');if(!n||!stream)return;const i=stream.events.findIndex(v=>v.ids.includes(n.id));if(i<0){status('선택한 성부의 음을 눌러 주세요.');return;}$(pickEnd?'rangeEnd':'rangeStart').value=String(i);if(!pickEnd&&+$('rangeEnd').value<i)$('rangeEnd').value=String(i);pickEnd=!pickEnd;selectRange();});
   $('extract').addEventListener('click',run(()=>{invalidate();accept(MotifTools.clipRange(source,stream,+$('rangeStart').value,+$('rangeEnd').value,$('motifName').value));}));
   for(const id of ['prompt','composer','key','meter','tempo','bars','secondary','augmentedSixth','modulation','solo','motifName'])$(id).addEventListener('change',dirty);
-  $('meter').addEventListener('change',run(()=>{stop();if(clip)render('motifPreview',previewXML(clip),getEngine());}));
+  $('meter').addEventListener('change',run(()=>{stop();if(clip)render('motifPreview',MotifTools.previewXML(clip,$('meter').value),getEngine());}));
   $('downloadMotif').addEventListener('click',run(()=>download(request().motif,'motif.json')));
   $('downloadRequest').addEventListener('click',run(()=>download(request(),'composition-request.json')));
   $('saveRequest').addEventListener('click',run(async()=>{
