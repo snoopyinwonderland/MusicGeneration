@@ -13,7 +13,7 @@ label{display:block;font-size:.83rem;font-weight:600;margin:9px 0 5px}label smal
 input,textarea,select,button{font:inherit;color:inherit}input,textarea,select{background:white;border:1px solid #adbbb5;border-radius:6px;padding:7px 9px;width:100%}textarea{resize:vertical;font:15px/1.55 monospace}
 button{cursor:pointer;border:1px solid #a7b9b1;border-radius:7px;background:#fffefa;padding:8px 12px;font-size:.88rem}
 button:hover:not(:disabled){background:#ecf4ed}button:disabled{opacity:.5;cursor:default}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #d89742;outline-offset:2px}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.keys{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:12px 0}.keys button{padding:7px 0}.keys .black{background:#2c4447;color:white}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .small-actions button{font-size:.75rem}.actions,.transport{justify-content:flex-start;margin:15px 0}.primary{width:100%;background:var(--teal);color:white;margin-top:14px;font-weight:700}.primary:hover:not(:disabled){background:#0d5048}
 .sub,#arranger,#recent{border-top:1px solid var(--line);margin-top:24px;padding-top:18px}.paper-head p{font-size:.8rem;color:var(--teal)}.paper-head h2{font-size:30px;margin:2px 0 12px}
 #score{min-height:180px;overflow:auto;border-block:1px solid var(--line);background:white}#score:empty{background:repeating-linear-gradient(white 0 9px,#e0e6e0 9px 10px) center/85% 50px no-repeat}#score svg{width:100%;height:auto;display:block}
@@ -21,18 +21,7 @@ button:hover:not(:disabled){background:#ecf4ed}button:disabled{opacity:.5;cursor
 [hidden]{display:none!important}@media(max-width:780px){.desk{grid-template-columns:1fr}.brand span{display:block}.heading{padding:18px 0}}
 @media print{body,.desk,.paper,main{display:block;background:white;padding:0;margin:0;border:0}.controls,header,footer,.heading,#arranger,#recent,.transport,#preview,#status{display:none}#score{border:0;overflow:visible}#score svg{break-inside:avoid}.paper-head{display:block}}
 
-.keyboard-panel{background:#223b3c;color:#fafbf7;border-radius:14px;padding:16px clamp(15px,2vw,27px);margin-bottom:20px;min-width:0}
-.keyboard-head,.rhythm-tools,.page-steps{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.keyboard-head h2{font-size:18px}
-.keyboard-panel button:not(.piano-white):not(.piano-black){border-color:#839b94;background:#294748;color:white}
-.keyboard-panel button[aria-pressed=true]{background:#e0eec8!important;color:#183c31!important}
-.keyboard-scroll{overflow-x:auto;margin:12px 0;scrollbar-width:thin}
-#keys{min-width:670px;position:relative;display:flex;height:96px;background:#142626;padding:0}
-#keys button{padding:0;font:12px sans-serif;border-radius:0 0 4px 4px;touch-action:manipulation}
-#keys .piano-white{flex:1 1 0;min-width:0;background:linear-gradient(#dce4dc,white 30%,#fafaf3 94%,#cbd5c9);border:1px solid #8a9892;color:#456259;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px}
-#keys .piano-black{position:absolute;top:0;z-index:1;height:60%;width:calc(100% / 52);background:linear-gradient(#131f21,#2d3c3d 86%,#132323);border:1px solid #152728;box-shadow:1px 2px 2px #0005}
-#keys button:active{background:#97c7a9}#keys button:focus-visible{z-index:2;outline-offset:-3px}
-.rhythm-tools{justify-content:flex-start;gap:8px}.rhythm-tools label{display:flex;align-items:center;gap:6px;margin:0}.rhythm-tools select{max-width:165px;color:#172e35}.rhythm-tools button{padding:5px 9px}
-#durations,.accidentals{display:flex;gap:3px}#durations button{min-width:36px;font-size:19px}
+.keyboard-head,.page-steps{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.keyboard-head h2{font-size:18px}
 #xmlDialog{border:1px solid #acbbb3;border-radius:14px;color:var(--ink);background:var(--paper);width:min(1180px,96vw);max-height:94vh;padding:20px}#xmlDialog::backdrop{background:#14282aa6}
 .import-layout{display:grid;grid-template-columns:minmax(195px,240px) minmax(0,1fr);gap:22px;margin-top:12px}.import-layout section{min-width:0}
 .import-fields{display:flex;flex-wrap:wrap;gap:8px}.import-fields label{flex:1;min-width:90px}.import-fields select{max-width:100%}
@@ -41,5 +30,27 @@ button:hover:not(:disabled){background:#ecf4ed}button:disabled{opacity:.5;cursor
 #xmlScore > svg{display:block;width:100%;height:auto}#xmlScore g.measure{cursor:crosshair}
 #xmlScore .range-picked,#xmlScore .range-picked use{fill:#087e62;color:#087e62;stroke:#087e62}
 #importStatus{color:#3e6559;min-height:1.6em}.page-steps{justify-content:center}
-@media(max-width:700px){.import-layout{grid-template-columns:1fr}.import-layout aside{border-bottom:1px solid var(--line);padding-bottom:10px}#dbItems{max-height:115px}#xmlScore{max-height:42vh}#xmlDialog{padding:12px}.rhythm-tools{gap:5px}}
-@media print{.keyboard-panel,#xmlDialog{display:none}}
+@media(max-width:700px){.import-layout{grid-template-columns:1fr}.import-layout aside{border-bottom:1px solid var(--line);padding-bottom:10px}#dbItems{max-height:115px}#xmlScore{max-height:42vh}#xmlDialog{padding:12px}}
+@media print{#xmlDialog{display:none}}
+
+.event-editor{background:var(--paper);border:1px solid var(--line);border-radius:14px;margin-bottom:24px;overflow:hidden}
+.editor-head,.editor-settings,.editor-values,.editor-head>div{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.editor-head{justify-content:space-between;padding:16px 20px;background:#244644;color:#fff}
+.editor-head button{color:var(--ink)}.editor-settings,.editor-values{padding:10px 18px;background:#f6f6ee}.editor-settings label{display:flex;align-items:center;gap:6px;margin:0}
+.event-strip{display:flex;overflow-x:auto;gap:4px;padding:8px 16px}.event-strip:empty{display:none}
+.event-strip button{flex-basis:60px;flex-shrink:0;white-space:nowrap;font-size:13px}.event-strip small{display:block}
+.event-editor [aria-pressed=true],.event-editor .active{background:#27695b;color:white}
+.event-editor button[aria-pressed=true]:hover{background:#225d52;color:white}
+.editor-settings label{white-space:nowrap}.editor-settings select{width:auto}
+.editor-score{max-height:44vh;overflow:auto;background:#fffef9}.editor-score>svg{display:block;width:100%;height:auto}
+.editor-score [data-event]{cursor:ns-resize;touch-action:none}.editor-score .chosen,.editor-score .chosen use{fill:#ac4826;color:#ac4826;stroke:#ac4826}
+.event-editor p{padding:8px 18px;font-size:13px;color:#445f5b}.staff-placeholder{text-align:center;background:repeating-linear-gradient(transparent 0 8px,#cdd7cf 8px 9px) center/90% 45px no-repeat;line-height:66px}
+.event-editor .keyboard{position:relative;display:flex;align-items:stretch;gap:10px;background:#dae2d9;padding:12px 16px;overflow-x:auto}
+.event-editor .accidental-toggle{display:grid;align-content:start;gap:3px;position:sticky;left:0;z-index:3}
+.keyboard-keys{display:flex;flex:1;min-width:770px;height:110px}.key-pair{flex:1;min-width:0;position:relative}.white-key{width:100%;height:100%;padding:0;border:1px solid #87978f;border-radius:0 0 4px 4px;background:linear-gradient(#e3e8df,#fff 38%,#f7f7ec 95%,#c5cbbb);display:flex;align-items:end;justify-content:center;padding-bottom:4px;color:#314c46;font-size:11px;cursor:pointer;user-select:none}
+.black-key{position:absolute;right:-33%;top:0;width:66%;height:63%;z-index:2;border:1px solid #1d282a;border-radius:0 0 4px 4px;background:linear-gradient(#172325,#364442 93%,#152622);padding:0}
+.black-key:hover:not(:disabled){background:#415b53}.white-key:active{background:#c2d8bf}
+.white-key:focus-visible{outline:3px solid #bd763d;outline-offset:-3px}.editor-values button{padding:5px 9px}
+@media print{#motifEditor{display:none}}
+.duration-cell{flex:0 0 70px;max-width:170px;border:1px solid #c1cdc6;border-radius:6px;overflow:hidden;background:#f5f6f1}
+.duration-cell>button{width:100%;border:0;border-radius:0}.duration-cell>div{display:flex}.duration-cell>div button{flex:1;padding:1px 5px;border:0;border-top:1px solid #cdd7cf;border-radius:0}.duration-cell>div button+button{border-left:1px solid #cdd7cf}.editor-values strong{font-size:13px}

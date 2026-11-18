@@ -3,26 +3,22 @@
 <title>작곡 작업실 | MUSICANOTE Virtual Composer</title><link rel="stylesheet" href="assets/workshop.css"></head>
 <body><header><a class="brand" href="index.html">MUSICANOTE <span>Virtual Composer</span></a><a href="index.html#library">작품 라이브러리 ↗</a></header>
 <main><div class="heading"><h1>작곡 작업실</h1><a href="#recent">저장한 곡 ↓</a></div>
-<section class="keyboard-panel" aria-label="피아노 입력기">
-<div class="keyboard-head"><h2>피아노 입력기</h2><div class="accidentals" aria-label="검은 건반 표기"><button id="sharp" aria-pressed="true">♯</button><button id="flat" aria-pressed="false">♭</button></div></div>
-<div class="keyboard-scroll"><div id="keys" role="group" aria-label="C2부터 E6까지의 피아노 건반"></div></div>
-<div class="rhythm-tools"><div id="durations" role="group" aria-label="입력 음가"></div>
-<button id="dot" aria-pressed="false">점음표</button><button id="rest">쉼표 입력</button><label>음가 적용 <select id="editNote"><option value="">다음 입력음</option></select></label></div></section>
+<div id="motifEditor"></div>
 <div class="desk"><section class="controls"><h2>모티프</h2>
 <p>음을 직접 넣거나 시스템이 제안하는 두 마디로 시작하세요.</p>
 <label for="tokens">음이름 또는 모티프 JSON <small>4분음표 = 1박</small></label>
 <textarea id="tokens" rows="3" spellcheck="false" placeholder="예: C4:1 D4:1/2 E4:1/2 쉼:1"></textarea>
-<div class="small-actions"><button id="undo">마지막 음 지우기</button><button id="openImport">악보 파일·DB에서 구간 선택</button></div>
+<div class="small-actions"><button id="openImport">악보 파일·DB에서 구간 선택</button></div>
 <div class="actions"><button id="auto">↻ 자동 모티프 생성</button><button id="randomRhythm">음가 랜덤 생성</button><button id="complete">입력한 뒤 이어쓰기</button></div>
 <h2 class="sub">곡 설정</h2>
 <label>제목<input id="title" maxlength="80" placeholder="모티프 습작"></label>
 <div class="pair"><label>조성<select id="key"></select></label><label>박자<select id="meter"><option>4/4</option><option>3/4</option><option>6/8</option></select></label>
 <label>빠르기 · ♩/분<input type="number" min="40" max="180" value="88" id="tempo"></label><label>길이<select id="bars"><option value="8">8마디</option><option value="16">16마디</option></select></label></div>
 <button id="compose" class="primary">이 모티프로 곡 만들기 →</button></section>
-<section class="paper"><div class="paper-head"><div><p id="scoreKind">모티프 미리보기</p><h2 id="scoreTitle">나의 모티프</h2></div><button id="preview">입력 악보 보기</button></div>
+<section class="paper"><div class="paper-head"><div><p id="scoreKind">모티프 재생</p><h2 id="scoreTitle">나의 모티프</h2></div><button id="preview">입력 악보 보기</button></div>
 <p id="status" role="status" aria-live="polite">음을 입력하거나 자동 모티프 생성을 눌러 주세요.</p>
 <div class="transport"><button id="play" disabled>▶ 듣기</button><button id="stop" disabled>정지</button><a id="download" hidden download>MusicXML 받기</a><button id="print" hidden>인쇄 / PDF</button></div>
-<div id="score" aria-label="악보"></div>
+<div id="score" aria-label="완성 악보" hidden></div>
 <div id="arranger" hidden><h2>이 곡 편곡하기</h2><div class="actions"><select id="instrument" aria-label="편성"><option value="piano">피아노 독주</option><option value="guitar">기타 독주 · TAB</option><option value="gayageum">25현 가야금 독주</option><option value="duet">바이올린·피아노 2중주</option><option value="trio">바이올린·첼로·피아노 3중주</option><option value="quartet">피아노·현악 4중주</option></select>
 <button id="arrange">편곡 악보 열기</button><button id="original">원 선율 + 화성</button></div>
 <a id="permalink">현재 악보 고유 주소</a></div></section></div>
@@ -39,4 +35,4 @@
 <div class="small-actions"><span>악보에서 시작과 끝을 차례로 누르세요.</span><button id="copyRange">모티프 JSON 복사</button><button id="useRange">선택 구간 바로 쓰기</button></div>
 <label id="manualCopy" hidden>클립보드에 복사할 JSON<textarea id="copyText" rows="4" readonly></textarea></label>
 <div id="xmlScore"></div><div class="page-steps"><button id="prevXml">이전 쪽</button><span id="xmlPage"></span><button id="nextXml">다음 쪽</button></div></div></section></div></dialog>
-<script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/workshop_keyboard.js"></script><script src="assets/workshop_import.js"></script><script src="assets/workshop.js"></script></body></html>
+<script src="assets/motif-core.js"></script><script src="/*VEROVIO_SRC*/"></script><script src="assets/workshop_audio.js"></script><script src="assets/motif-editor.js"></script><script src="assets/workshop_import.js"></script><script src="assets/workshop.js"></script></body></html>

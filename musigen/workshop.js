@@ -25,7 +25,7 @@
     return clip;
   }
   function notation(c){return c.events.map(e=>(e.pitches[0]||'쉼')+':'+e.duration).join(' ')}
-  function setClip(c){sourceClip=c;$('tokens').value=notation(c);syncNotes(c.events)}
+  function setClip(c){sourceClip=c;$('tokens').value=notation(c);editor.replace(c)}
   function settings(){return {title:$('title').value,key:$('key').value,meter:$('meter').value,tempo:Number($('tempo').value),bars:Number($('bars').value)}}
   async function json(url,data){
     const res=await fetch(url,data?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}:{cache:'no-store'});
@@ -33,11 +33,11 @@
     return res.json();
   }
   async function run(task){
-    if(busy)return;busy=true;stop();
-    const controls=[...document.querySelectorAll('.controls button,.controls input,.controls select,.controls textarea,.keyboard-panel button,.keyboard-panel select'),...buttons.map($)];
+    if(busy)return;busy=true;stop();$('motifEditor').inert=true;
+    const controls=[...document.querySelectorAll('.controls button,.controls input,.controls select,.controls textarea'),...buttons.map($)];
     for(const el of controls)el.disabled=true;
     try{await task()}catch(e){status(e.message,true)}
-    finally{busy=false;for(const el of controls)el.disabled=false}
+    finally{busy=false;$('motifEditor').inert=false;for(const el of controls)el.disabled=false}
   }
   function render(xml){
     if(!engine){try{engine=new verovio.toolkit()}catch{throw Error('악보를 준비하고 있습니다. 잠시 후 다시 눌러 주세요.')}}
@@ -50,19 +50,15 @@
   function clear(){
     stop();piece=null;activeNotes=[];$('play').disabled=true;
     $('arranger').hidden=$('download').hidden=$('print').hidden=true;
-    $('score').replaceChildren();$('scoreKind').textContent='모티프 미리보기';$('scoreTitle').textContent='나의 모티프';
+    $('score').hidden=true;$('score').replaceChildren();$('scoreKind').textContent='모티프 재생';$('scoreTitle').textContent='나의 모티프';
     history.replaceState(null,'','compose.html');
     status('입력 악보를 보거나 이 모티프로 곡을 만들어 주세요.');
   }
   function preview(){
-    const clip=readClip();clear();
-    render(MotifTools.previewXML(clip,$('meter').value,$('tempo').value));
-    for(const note of $('score').querySelectorAll('g[id^="motif-edit-"]')){
-      const box=note.getBBox(),hit=document.createElementNS('http://www.w3.org/2000/svg','rect');
-      for(const [key,value] of Object.entries({x:box.x-15,y:box.y-15,width:box.width+30,height:box.height+30,
-        fill:'transparent','pointer-events':'all'}))hit.setAttribute(key,value);
-      note.prepend(hit);
-    }
+    const clip=readClip();editor.replace(clip);clear();
+    editor.configure($('meter').value,$('key').value);
+    activeNotes=editor.performance(Number($('tempo').value));
+    $('play').disabled=!activeNotes.length;
     status(clip.events.length+'개의 음·쉼 · '+MotifTools.validate(clip)+'박');
   }
   async function showScore(work,kind){
@@ -74,10 +70,10 @@
       xmlPath=(await json('api/arrange',{id:work.id,instrument:kind})).xml;
     }
     const r=await fetch(xmlPath);if(!r.ok)throw Error('저장된 악보를 열 수 없습니다.');
-    const xml=await r.text();render(xml);
+    const xml=await r.text();$('score').hidden=false;render(xml);
     piece=work;setClip(work.clip);
     for(const k of ['title','key','meter','tempo','bars'])$(k).value=work[k];
-    $('scoreTitle').textContent=work.title;
+    editor.configure(work.meter,work.key);$('scoreTitle').textContent=work.title;
     $('scoreKind').textContent=kind==='melody'?'원 선율 + 화성':$('instrument').selectedOptions[0].text;
     $('download').href=xmlPath;$('download').hidden=$('print').hidden=$('arranger').hidden=false;
     const url='compose.html?piece='+work.id+'&voice='+kind;
@@ -92,36 +88,21 @@
   for(const key of ['C major','G major','D major','F major','Bb major','Eb major','A minor','E minor','D minor','G minor','C minor']){
     $('key').add(new Option(key.replace(' major','장조').replace(' minor','단조'),key));
   }
-  function refreshEditor(){
-    try{preview();syncNotes(readClip().events)}catch(e){syncNotes([]);status(e.message,true)}
-  }
-  const syncNotes=workshopKeyboard({
-    append(pitch,duration){
-      try{
-        let prefix=$('tokens').value.trim();
-        if(prefix.startsWith('{'))prefix=notation(readClip());
-        $('tokens').value=(prefix?prefix+' ':'')+(pitch||'쉼')+':'+duration;
-        sourceClip=null;clear();refreshEditor();return true;
-      }catch(e){status(e.message,true);return false}
+  const editor=MotifEditorApp.mount($('motifEditor'),{
+    onChange(clip){
+      sourceClip=clip;$('tokens').value=notation(clip);clear();
+      activeNotes=editor.performance(Number($('tempo').value));
+      $('play').disabled=!activeNotes.length;
+      status(clip.events.length?'모티프를 수정했습니다.':'건반을 눌러 모티프를 시작하세요.');
     },
-    edit(index,duration){
-      try{
-        const clip=structuredClone(readClip());clip.events[index].duration=duration;
-        setClip(clip);preview();syncNotes(clip.events,String(index));
-      }catch(e){status(e.message,true)}
-    },
-    audition(midi){WorkshopAudio.play([{start:0,end:.35,pitch:midi,bank:'piano'}],()=>{}).catch(e=>status(e.message,true))}
+    audition(midi){WorkshopAudio.play([{start:0,end:.35,pitch:midi,bank:'piano'}],()=>{}).catch(e=>status(e.message,true))},
+    error(message){status(message,true)}
   });
   workshopImport(json,c=>{setClip(c);preview();status('선택 구간을 모티프로 가져왔습니다. '+(c.warnings||[]).join(' '))});
-  $('score').onclick=e=>{
-    if(piece||busy)return;
-    const match=e.target.closest('g.note,g.rest,g.mRest')?.id.match(/^motif-edit-(\d+)-/);
-    if(match){
-      $('editNote').value=match[1];$('editNote').dispatchEvent(new Event('change'));
-      status((Number(match[1])+1)+'번째 음·쉼을 선택했습니다. 적용할 음가를 눌러 주세요.');
-    }
+  $('tokens').oninput=()=>{sourceClip=null;clear();
+    if(!$('tokens').value.trim()){editor.replace({format:'musicanote-motif',version:1,events:[]});return}
+    try{preview()}catch(e){status(e.message+' 악보에는 마지막으로 읽은 입력을 표시합니다.',true)}
   };
-  $('tokens').oninput=()=>{sourceClip=null;clear();try{syncNotes(readClip().events)}catch{syncNotes([])}};
   $('tokens').addEventListener('paste',event=>{
     const raw=event.clipboardData?.getData('text/plain')?.trim();
     if(!raw?.startsWith('{'))return;
@@ -131,21 +112,19 @@
     try{
       MotifTools.validate(clip);
       if(clip.events.some(e=>e.pitches.length>1))throw Error('한 성부의 선율을 붙여넣으세요.');
-      sourceClip=clip;$('tokens').value=raw;syncNotes(clip.events);preview();
+      sourceClip=clip;$('tokens').value=raw;preview();
       status('모티프를 붙여넣었습니다. '+clip.events.length+'개 음·쉼 · '+MotifTools.validate(clip)+'박');
     }catch(e){status(e.message,true)}
   });
-  for(const id of ['title','key','meter','tempo','bars'])$(id).onchange=clear;
-  $('undo').onclick=()=>{try{
-    let raw=$('tokens').value.trim();if(raw.startsWith('{'))raw=notation(readClip());
-    const tokens=raw.split(/[\s,]+/);tokens.pop();$('tokens').value=tokens.join(' ');
-    sourceClip=null;clear();if(tokens.length)refreshEditor();else syncNotes([]);
-  }catch(e){status(e.message,true)}};
+  for(const id of ['title','key','meter','tempo','bars'])$(id).onchange=()=>{
+    clear();editor.configure($('meter').value,$('key').value);
+    if($('tokens').value.trim())try{preview()}catch(e){status(e.message,true)}
+  };
   $('randomRhythm').onclick=()=>run(async()=>{
     const clip=await json('api/rhythm',{clip:readClip()});setClip(clip);preview();
     status(clip.rhythm_variation.same_length?'음높이와 전체 길이를 유지해 새 리듬을 만들었습니다.':'새 리듬을 만들었습니다. 이 입력은 전체 길이도 함께 바뀝니다.');
   });
-  $('preview').onclick=()=>run(preview);
+  $('preview').onclick=()=>run(()=>{preview();$('motifEditor').scrollIntoView({block:'start'})});
   for(const mode of ['auto','complete'])$(mode).onclick=()=>run(async()=>{
     const clip=mode==='complete'?readClip():null;
     const generated=await json('api/motif',{...settings(),mode,clip});
@@ -160,7 +139,7 @@
   $('original').onclick=()=>run(()=>showScore(piece,'melody'));
   $('print').onclick=()=>window.print();
   $('play').onclick=async()=>{try{$('stop').disabled=false;await WorkshopAudio.play(activeNotes,stop)}catch(e){stop();status(e.message,true)}};
-  $('stop').onclick=stop;window.addEventListener('pagehide',stop);
+  $('stop').onclick=stop;window.addEventListener('pagehide',e=>{stop();if(!e.persisted)editor.destroy()});
   const params=new URLSearchParams(location.search);
   async function init(){
     await library();

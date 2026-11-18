@@ -1,0 +1,20 @@
+{
+  "name": "musicanote-motif-editor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test editor.test.mjs"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "vite": "8.2.2",
+    "typescript": "7.0.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5"
+  }
+}

@@ -2,10 +2,12 @@
 import json
 import os
 import shutil
+import subprocess
+import tempfile
 import uuid
 from datetime import datetime, timezone
 from fractions import Fraction
-from functools import partial
+from functools import lru_cache, partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -62,12 +64,22 @@ def save_request(root,data,origin='user'):
             'reference_error':reference.get('error') if reference else None}
 
 
+@lru_cache(maxsize=1)
+def editor_bundle():
+    from musigen import MUSICOMP_ROOT
+    build=Path(__file__).resolve().parents[1]/'editor/build.mjs'
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.run(['node',str(build),tmp,str(MUSICOMP_ROOT)],check=True,timeout=90)
+        return (Path(tmp)/'motif-editor.js').read_bytes()
+
+
 def write_studio(out):
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     assets=out/'assets';assets.mkdir(exist_ok=True)
     source=Path(__file__).parent
     from musigen import MUSICOMP_ROOT
-    for name in ('studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js','workshop_import.js','workshop_keyboard.js'):
+    (assets/'motif-editor.js').write_bytes(editor_bundle())
+    for name in ('studio.js','studio.css','workshop.css','workshop.js','workshop_audio.js','workshop_import.js'):
         shutil.copyfile(source/name,assets/name)
     banks=MUSICOMP_ROOT/'workbench/public/samples'
     if (banks/'manifest.json').is_file():
