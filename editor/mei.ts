@@ -1,17 +1,6 @@
 import { ticks, type QueryEvent } from './model.ts';
-const signatures: Record<string, number> = {
-  'C major': 0,
-  'G major': 1,
-  'D major': 2,
-  'F major': -1,
-  'Bb major': -2,
-  'Eb major': -3,
-  'A minor': 0,
-  'E minor': 1,
-  'D minor': -1,
-  'G minor': -2,
-  'C minor': -3,
-};
+import keySignatures from '../musigen/key_signatures.json' with { type: 'json' };
+const signatures: Record<string, number> = keySignatures;
 // MusicSearch's MEI writer uses written durations. Split imported rational values exactly
 // at barlines and into engravable binary/dotted/3:2 values while retaining the parent ID.
 const values = [1, 2, 4, 8, 16, 32, 64]

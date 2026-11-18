@@ -15,7 +15,7 @@ from musigen.motif_clip import read_events
 from musigen.listen import VEROVIO_CDN
 from musigen.studio_library import library_html
 
-KEYS=('C major','G major','D major','F major','Bb major','Eb major','A minor','E minor','D minor','G minor','C minor')
+KEYS=tuple(json.loads(Path(__file__).with_name('key_signatures.json').read_text(encoding='utf8')))
 
 
 def validate_request(data):
@@ -99,9 +99,10 @@ def write_studio(out):
     runtime=Path(os.environ.get('MUSICOMP_ROOT',str(source.parent.parent/'Music Composition')))/'node_modules/verovio/dist/verovio-toolkit-wasm.js'
     src=VEROVIO_CDN
     if runtime.is_file():shutil.copyfile(runtime,assets/'verovio.js');src='assets/verovio.js'
-    workshop=(source/'workshop.html').read_text(encoding='utf8').replace('/*VEROVIO_SRC*/',src)
+    key_options=''.join(f'<option value="{key}">{key.replace(" major","장조").replace(" minor","단조")}</option>' for key in KEYS)
+    workshop=(source/'workshop.html').read_text(encoding='utf8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)
     (out/'compose.html').write_text(workshop,encoding='utf8')
-    text=(source/'studio.html').read_text(encoding='utf-8').replace('/*VEROVIO_SRC*/',src)
+    text=(source/'studio.html').read_text(encoding='utf-8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)
     library = library_html(out)
     if library:
         text = text.replace('<title>모티프에서 시작하기', '<title>작품 라이브러리')

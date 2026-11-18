@@ -34,6 +34,7 @@ button:hover:not(:disabled){background:#ecf4ed}button:disabled{opacity:.5;cursor
 @media print{#xmlDialog{display:none}}
 
 #motifEditor{margin-bottom:24px}
+#nativeFrame{display:block;width:100%;height:95vh;height:95dvh;border:0}
 .motif-input-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 8px}
 .motif-input-head h2{margin-right:auto}.motif-input-head label{display:flex;align-items:center;gap:6px;white-space:nowrap;margin:0}
 .motif-input-head select,.mq-controls select{width:auto}

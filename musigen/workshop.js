@@ -92,9 +92,7 @@ import {mount} from './motif-input/motif-input.js';
     $('works').replaceChildren(...works.map(w=>link(w.title+' · '+w.bars+'마디', 'compose.html?piece='+w.id)));
     if(!works.length)$('works').textContent='아직 저장한 곡이 없습니다.';
   }
-  for(const key of ['C major','G major','D major','F major','Bb major','Eb major','A minor','E minor','D minor','G minor','C minor']){
-    $('key').add(new Option(key.replace(' major','장조').replace(' minor','단조'),key));
-  }
+
   const editor=mount($('motifEditor'),{
     onChange(clip,meter){
       sourceClip=clip;$('meter').value=meter;$('tokens').value=notation(clip);clear();

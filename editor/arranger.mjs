@@ -16,6 +16,17 @@ const { default: original } = await import(pathToFileURL(join(project,'workbench
 hook.deregister();
 const seed = {
   name: 'motifind-start-with-score', enforce: 'pre',
+  transformIndexHtml() {
+    return [{tag:'style',children:`
+      body .wb {height:auto;min-height:100vh}
+      body .wb-main {flex:auto;align-items:start}
+      body .wb-score {min-width:0;overflow:visible}
+      body .wb-side {max-height:100vh;position:sticky;top:0}
+      @media(max-width:760px){
+        body .wb-main {grid-template-columns:minmax(0,1fr)}
+        body .wb-side {position:static;max-height:none}
+      }` ,injectTo:'head'}];
+  },
   transform(code, id) {
     if (!id.replaceAll('\\','/').endsWith('/workbench/src/App.tsx')) return;
     const replacements = [
