@@ -4,6 +4,8 @@ from fractions import Fraction as F
 from html import escape
 import json
 from pathlib import Path
+from shutil import copyfile
+from uuid import NAMESPACE_URL, uuid5
 
 from music21 import converter
 import verovio
@@ -38,6 +40,7 @@ def build(statistics, root):
     chords=[make_chord(spec,i,token) for i,token in enumerate(HARMONY,1)]
     events={}
     cards=[]
+    workshop_links=[]
     for label in ('A','B'):
         time=F(0)
         melody=[]
@@ -51,6 +54,18 @@ def build(statistics, root):
         path=dest/f'{label}.musicxml'
         write_leadsheet(spec,chords,melody,path)
         score=converter.parse(path)
+        identity=uuid5(NAMESPACE_URL,f'https://github.com/snoopyinwonderland/MusicGeneration/longing-pair/v1/{label}').hex
+        work=root/'compositions'/identity
+        work.mkdir(parents=True,exist_ok=True)
+        copyfile(path,work/'melody.musicxml')
+        opening=score.parts[0].measure(1).notesAndRests
+        clip={'format':'musicanote-motif','version':1,'name':'첫 마디 모티프',
+              'events':[{'duration':str(F(note.quarterLength)),
+                         'pitches':[p.nameWithOctave.replace('-','b') for p in note.pitches]} for note in opening]}
+        metadata={'id':identity,'title':f'{spec.title} · {label}','key':'D major','meter':spec.meter,
+                  'tempo':spec.tempo,'bars':8,'clip':clip,'chords':HARMONY,'development':'neighbors'}
+        (work/'piece.json').write_text(json.dumps(metadata,ensure_ascii=False),encoding='utf8')
+        workshop_links.append(f'<a href="compose.html?piece={identity}">후보 {label} · 입력기와 전곡 악보 열기</a>')
         events[label]=[]
         for part in score.parts:
             for item in part.flatten().notes:
@@ -70,6 +85,7 @@ def build(statistics, root):
                      f'<a download href="longing-pair/{path.name}">MusicXML 받기</a></details>')
     template=Path(__file__).with_name('longing_listening_pair.html').read_text('utf8')
     (root/'longing-pair.html').write_text(template.replace('<!-- SCORES -->',''.join(cards))
+        .replace('<!-- WORKSHOP -->',' '.join(workshop_links))
         .replace('/* EVENTS */',json.dumps(events)).replace('<!-- EVIDENCE -->',escape(' · '.join(evidence))),encoding='utf8')
 
 
