@@ -1,0 +1,27 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>창가에 두고 온 말 · 청취 비교</title><link rel="stylesheet" href="assets/workshop.css">
+<style>main{max-width:54rem;margin:auto;padding:2rem 1rem}section,details{margin:1.3rem 0}summary{cursor:pointer}img{width:100%;display:block}button{margin:.25rem}.heading{display:block}#status{min-height:2em}</style>
+<main><a href="compose.html">작곡 작업실</a><div class="heading"><h1>창가에 두고 온 말</h1><p>그리움 · 피아노 선율과 왼손 화성 · D장조 · 8마디</p></div>
+<section class="paper"><label for="range">들을 구간</label><select id="range"><option value="2">첫 맺음 · 3–4마디</option><option value="6">마지막 맺음 · 7–8마디</option><option value="0">전체 · 1–8마디</option></select>
+<div class="actions"><button data-version="A">후보 A 재생</button><button data-version="B">후보 B 재생</button><button id="stop">정지</button></div>
+<p id="status" role="status">어느 쪽에서 그리움의 여운이 더 잘 들리는지 비교해 보세요.</p></section>
+<!-- SCORES --><details><summary>두 버전의 차이와 통계 근거</summary><p>4·8마디에서 A는 둘째 박에 도착해 세 박을 유지합니다. B는 둘째 박을 쉬고 셋째 박에 같은 음에 도착해 두 박을 유지합니다. 왼손은 같습니다.</p>
+<p>한글 그리움 단서 구간의 네 음 윤곽·발음 간격과 화음 연결에서 참고한 출현 수입니다. <!-- EVIDENCE --></p></details></main>
+<script src="assets/workshop_audio.js"></script><script>
+const notes=/* EVENTS */;
+const statusLine=document.getElementById('status');
+const range=document.getElementById('range');
+let session=0;
+function stop(){session++;WorkshopAudio.stop();statusLine.textContent='정지';}
+document.getElementById('stop').onclick=stop;
+range.onchange=stop;
+window.addEventListener('pagehide',stop);
+for(const button of document.querySelectorAll('[data-version]'))button.onclick=async()=>{
+  stop();const current=session;
+  const label=button.dataset.version,start=Number(range.value)*3,end=start===0?24:start+6;
+  const clip=notes[label].filter(n=>n.start<end && n.end>start).map(n=>({...n,start:Math.max(start,n.start)-start,end:Math.min(end,n.end)-start}));
+  statusLine.textContent='후보 '+label+' · '+range.selectedOptions[0].text;
+  try{await WorkshopAudio.play(clip,()=>{if(session===current)statusLine.textContent='재생 완료';});}
+  catch(e){if(session===current)statusLine.textContent=e.message;}
+};
+</script></html>

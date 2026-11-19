@@ -120,6 +120,8 @@ def write_studio(out):
     if runtime.is_file():shutil.copyfile(runtime,assets/'verovio.js');src='assets/verovio.js'
     key_options = key_picker_options()
     workshop=(source/'workshop.html').read_text(encoding='utf8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)
+    if (out/'longing-pair.html').is_file():
+        workshop=workshop.replace('<!-- LISTENING_PAIR -->','<a href="longing-pair.html">창가에 두고 온 말 · 그리움 프레이즈 A/B 듣기</a>')
     (out/'compose.html').write_text(workshop,encoding='utf8')
     text=(source/'studio.html').read_text(encoding='utf-8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)
     library = library_html(out)
