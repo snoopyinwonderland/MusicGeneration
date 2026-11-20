@@ -1,0 +1,82 @@
+{
+  "affection": {
+    "ko": [
+      "사랑",
+      "애정",
+      "연모"
+    ],
+    "en": [
+      "love",
+      "adore",
+      "darling"
+    ]
+  },
+  "longing": {
+    "ko": [
+      "그리움",
+      "그리워",
+      "그립",
+      "보고싶",
+      "보고 싶"
+    ],
+    "en": [
+      "longing",
+      "yearning",
+      "miss you"
+    ]
+  },
+  "loss": {
+    "ko": [
+      "이별",
+      "눈물",
+      "슬픔",
+      "슬퍼",
+      "서러"
+    ],
+    "en": [
+      "goodbye",
+      "tears",
+      "sorrow",
+      "heartbreak"
+    ]
+  },
+  "joy": {
+    "ko": [
+      "기쁨",
+      "기뻐",
+      "행복",
+      "즐거",
+      "신나"
+    ],
+    "en": [
+      "happy",
+      "happiness",
+      "joy",
+      "delighted"
+    ]
+  },
+  "isolation": {
+    "ko": [
+      "외로",
+      "외롭",
+      "고독",
+      "쓸쓸"
+    ],
+    "en": [
+      "lonely",
+      "loneliness",
+      "lonesome"
+    ]
+  },
+  "hope": {
+    "ko": [
+      "희망",
+      "소망"
+    ],
+    "en": [
+      "hope",
+      "hoping",
+      "hopeful"
+    ]
+  }
+}

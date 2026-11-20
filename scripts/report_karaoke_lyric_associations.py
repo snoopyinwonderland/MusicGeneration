@@ -20,7 +20,27 @@ def table(head,rows):
 
 def report(data):
     c=data['coverage']
-    html=['<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>가사 단서와 선율·화성</title><style>body{max-width:1100px;margin:2em auto;padding:0 1em;color:#263c38;font:16px/1.65 system-ui}section,details{margin:2em 0}.scroll{overflow:auto}table{border-collapse:collapse}td,th{border-bottom:1px solid #ccc;padding:5px 12px;text-align:right;white-space:nowrap}th{background:#eef4f1}td:first-child{text-align:left}</style><main><h1>노래방 가사 단서와 선율·화성</h1>']
+    html=['<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>가사 단서와 선율·화성</title><style>body{max-width:1100px;margin:2em auto;padding:0 1em;color:#263c38;font:16px/1.65 system-ui}section,details{margin:2em 0}.scroll{overflow:auto}table{border-collapse:collapse}td,th{border-bottom:1px solid #ccc;padding:5px 12px;text-align:right;white-space:nowrap}th{background:#eef4f1}td:first-child{text-align:left}#detection td,#detection th{text-align:left;white-space:normal;min-width:6em;vertical-align:top}#detection table{width:100%}</style><main><h1>노래방 가사 단서와 선율·화성</h1>']
+    cues=json.loads(Path(__file__).with_name('karaoke_lyric_cues.json').read_text('utf8'))
+    html.append('<section id="detection"><h2>가사에서 어떤 단서를 찾나</h2>'
+                '<p>주선율과 음절 시작 시점이 일치하는 가사 줄을 검사한다. 한글 사이 공백을 지운 뒤 아래 표현이 포함되면 해당 단서로 센다. '
+                '영어 표현은 대소문자를 구별하지 않고 단어 경계에서 찾는다. 한 줄에 여러 단서가 잡힐 수 있다.</p>')
+    html.append(table(['단서','한글 표현','영어 표현','검출 줄 · 한글 포함','검출 줄 · 한글 없이 라틴 문자 포함'],
+                      [(LABEL[k],', '.join(v['ko']),', '.join(v['en']),f"{c['ko/'+k+'/lines']:,}",
+                        f"{c['latin/'+k+'/lines']:,}") for k,v in cues.items()]))
+    html.append('<p>예를 들어 ‘보 고 싶 어’는 ‘보고싶어’로 읽어 그리움으로 센다. ‘보고 싶지 않아’도 같은 표현을 포함하므로 검출된다. '
+                '이 수치는 어휘의 출현을 보여 준다. 부정과 실제 청취 정서는 별도 판단이 필요하다.</p>'
+                '<h2>악보에서 무엇을 한 건으로 세나</h2>')
+    html.append(table(['특징','검출 조건','악보 예시 → 집계값'],[
+        ('선율 윤곽','연속 네 음에서 이웃한 음의 높이를 세 번 비교','파♯–라–시–라 → 상승·상승·하강 (++−)'),
+        ('음정 묶음','0·±1·±2반음은 그대로, 3–4반음과 5반음 이상은 방향별로 묶음','같은 네 음 → +3~4 / +2 / −2'),
+        ('리듬 묶음','네 음 각각의 시작부터 끝까지 잰 음가를 분류','½·½·½·2박 → s/s/s/l'),
+        ('윤곽과 발음 간격','세 음정의 방향과 이웃한 시작 시점 사이의 세 간격을 함께 기록','같은 네 음을 반 박마다 시작 → ++- sss'),
+        ('근음 이동','명시된 인접 화음의 다음 근음에서 앞 근음을 뺀 뒤 12로 나눈 나머지','D→A는 +7, A→D는 +5'),
+        ('화음 연결','해석 가능한 두 이웃 화음의 종류와 근음 이동을 함께 기록','A7→D → dominant7 +5 major'),
+    ]))
+    html.append('<p>s는 ½박 이하, m은 ½박 초과 1박 이하, l은 1박 초과다. 네 음 창은 채택된 가사 줄 안에서 한 음씩 옮긴다. '
+                '화음 연결은 양쪽 화음을 모두 읽을 수 있는 인접 쌍마다 한 건이다.</p></section><h2>분석에 포함한 자료</h2>')
     html.append(table(['집계 대상','수'],[(label,f'{c[k]:,}') for k,label in [
         ('files','전체 MIDI 파일'),('source_excluded','기존 선율 품질 기준 제외 파일'),('files_with_text','S1 가사가 있는 유효 파일'),
         ('files_analyzed','비교 가능한 줄이 있는 파일'),('files_with_cue','정서 단서가 검출된 분석 파일'),

@@ -32,8 +32,17 @@ HARMONY = ['I','V','vi7','IV','IV','ii7','V7','I']
 def build(statistics, root):
     patterns=json.loads(statistics.read_text('utf8'))['patterns']['ko/longing']
     # Verify the common four-note gesture and the two selected harmonic links.
-    references=[('timed_shape','++- sss'),('harmony','major +7 major'),('harmony','dominant7 +5 major')]
-    evidence=[f"{code} ({patterns[name]['counts'][code]:,}/{patterns[name]['total']:,})" for name,code in references]
+    references=[
+        ('1마디','파♯–라–시–라','세 음정 방향이 상승·상승·하강이고 시작 간격이 모두 ½박 이하','timed_shape','++- sss','네 음 창'),
+        ('1–2마디','D → A','장3화음 → 장3화음, 근음 차이 +7 (mod 12)','harmony','major +7 major','화음 쌍'),
+        ('7–8마디','A7 → D','도미넌트7 → 장3화음, 근음 차이 +5 (mod 12)','harmony','dominant7 +5 major','화음 쌍'),
+    ]
+    evidence=[]
+    for location,notes,rule,family,code,unit in references:
+        count=patterns[family]['counts'][code]
+        total=patterns[family]['total']
+        cells=[location,notes,rule,f'{count:,} / {total:,} {unit} ({100*count/total:.2f}%)']
+        evidence.append('<tr>'+''.join(f'<td>{escape(cell)}</td>' for cell in cells)+'</tr>')
     dest=root/'longing-pair'
     dest.mkdir(parents=True,exist_ok=True)
     spec=Spec(title='창가에 두고 온 말',key='D',tempo=80,form=[Section('A',8,'authentic')])
@@ -86,7 +95,7 @@ def build(statistics, root):
     template=Path(__file__).with_name('longing_listening_pair.html').read_text('utf8')
     (root/'longing-pair.html').write_text(template.replace('<!-- SCORES -->',''.join(cards))
         .replace('<!-- WORKSHOP -->',' '.join(workshop_links))
-        .replace('/* EVENTS */',json.dumps(events)).replace('<!-- EVIDENCE -->',escape(' · '.join(evidence))),encoding='utf8')
+        .replace('/* EVENTS */',json.dumps(events)).replace('<!-- EVIDENCE -->',''.join(evidence)),encoding='utf8')
 
 
 if __name__=='__main__':

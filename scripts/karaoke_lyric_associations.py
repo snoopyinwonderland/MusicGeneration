@@ -14,15 +14,10 @@ import zlib
 from musigen.karaoke_statistics import chord_quality, dec, rap_mask, read_smf, track_name
 
 # These are explicit lexical cues, not validated listener-emotion labels.
-CUES = {
-    'affection': ('사랑', '애정', '연모', r'\b(?:love|adore|darling)\b'),
-    'longing': ('그리움', '그리워', '그립', '보고싶', '보고 싶', r'\b(?:longing|yearning|miss you)\b'),
-    'loss': ('이별', '눈물', '슬픔', '슬퍼', '서러', r'\b(?:goodbye|tears|sorrow|heartbreak)\b'),
-    'joy': ('기쁨', '기뻐', '행복', '즐거', '신나', r'\b(?:happy|happiness|joy|delighted)\b'),
-    'isolation': ('외로', '외롭', '고독', '쓸쓸', r'\b(?:lonely|loneliness|lonesome)\b'),
-    'hope': ('희망', '소망', r'\b(?:hope|hoping|hopeful)\b'),
-}
-MATCH = {k: re.compile('|'.join(v), re.I) for k, v in CUES.items()}
+CUES = json.loads(Path(__file__).with_name('karaoke_lyric_cues.json').read_text('utf8'))
+MATCH = {label: re.compile('|'.join(map(re.escape, words['ko'])) +
+                           r'|\b(?:' + '|'.join(map(re.escape, words['en'])) + r')\b', re.I)
+         for label, words in CUES.items()}
 SYLLABLE_SPACE = re.compile(r'(?<=[가-힣])\s+(?=[가-힣])')
 
 

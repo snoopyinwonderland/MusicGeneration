@@ -1,14 +1,16 @@
 <!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>창가에 두고 온 말 · 청취 비교</title><link rel="stylesheet" href="assets/workshop.css">
-<style>main{max-width:54rem;margin:auto;padding:2rem 1rem}section,details{margin:1.3rem 0}summary{cursor:pointer}img{width:100%;display:block}button{margin:.25rem}.heading{display:block}#status{min-height:2em}</style>
+<style>main{max-width:54rem;margin:auto;padding:2rem 1rem}section,details{margin:1.3rem 0}summary{cursor:pointer}img{width:100%;display:block}button{margin:.25rem}.heading{display:block}#status{min-height:2em}table{border-collapse:collapse;width:100%}td,th{text-align:left;border-bottom:1px solid #c9d5cf;padding:.5em;vertical-align:top}th{background:#eef4f1}</style>
 <main><a href="compose.html">작곡 작업실</a><div class="heading"><h1>창가에 두고 온 말</h1><p>그리움 · 피아노 선율과 왼손 화성 · D장조 · 8마디</p></div>
 <nav class="actions" aria-label="작곡 작업실"><!-- WORKSHOP --></nav>
 <section class="paper"><label for="range">들을 구간</label><select id="range"><option value="0">전체 · 1–8마디</option><option value="2">첫 맺음 · 3–4마디</option><option value="6">마지막 맺음 · 7–8마디</option></select>
 <div class="actions"><button data-version="A">후보 A 재생</button><button data-version="B">후보 B 재생</button><button id="stop">정지</button></div>
 <p id="status" role="status">어느 쪽에서 그리움의 여운이 더 잘 들리는지 비교해 보세요.</p></section>
-<!-- SCORES --><details><summary>두 버전의 차이와 통계 근거</summary><p>4·8마디에서 A는 둘째 박에 도착해 세 박을 유지합니다. B는 둘째 박을 쉬고 셋째 박에 같은 음에 도착해 두 박을 유지합니다. 왼손은 같습니다.</p>
+<!-- SCORES --><section id="detection"><h2>이 곡에 쓰인 탐지 기준</h2><p>4·8마디에서 A는 둘째 박에 도착해 세 박을 유지합니다. B는 둘째 박을 쉬고 셋째 박에 같은 음에 도착해 두 박을 유지합니다. 왼손은 같습니다.</p>
 <p>첫 마디의 파♯–라–시–라는 그리움 단서 구간에서 관찰된 ‘상승·상승·하강, 발음 간격 반 박 이하’를 바탕으로 새로 썼습니다. 화음은 1–2마디의 D→A와 7–8마디의 A7→D 연결을 전이 빈도에서 참고했습니다. 정확한 음높이와 8마디 전개, 두 가지 맺음은 직접 설계했습니다.</p>
-<p>출현 수 / 관측 수 · <!-- EVIDENCE --></p><a href="karaoke-lyric-associations.html">가사 단서별 전체 통계</a></details></main>
+<p>분모는 한글 그리움 단서가 검출된 줄에서 관찰한 전체 네 음 창 또는 전체 화음 쌍입니다.</p>
+<div style="overflow-x:auto"><table><thead><tr><th>위치</th><th>이 곡의 음</th><th>한 건으로 세는 조건</th><th>검출 / 관측 (비율)</th></tr></thead><tbody><!-- EVIDENCE --></tbody></table></div>
+<a href="karaoke-lyric-associations.html#detection">여섯 가지 가사 단서와 악보 탐지 기준</a></section></main>
 <script src="assets/workshop_audio.js"></script><script>
 const notes=/* EVENTS */;
 const statusLine=document.getElementById('status');
