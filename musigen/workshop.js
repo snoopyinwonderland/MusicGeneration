@@ -73,7 +73,8 @@ import {mount} from './motif-input/motif-input.js';
       if(!Array.from($('instrument').options).some(o=>o.value===kind))throw Error('알 수 없는 편성입니다.');
       $('instrument').value=kind;
       status('같은 선율과 화성으로 편곡 악보를 준비하고 있습니다…');
-      xmlPath=(await json('api/arrange',{id:work.id,instrument:kind})).xml;
+      xmlPath=kind==='piano' && work.authored_piano ? 'compositions/'+work.id+'/piano.musicxml' :
+        (await json('api/arrange',{id:work.id,instrument:kind})).xml;
     }
     const r=await fetch(xmlPath);if(!r.ok)throw Error('저장된 악보를 열 수 없습니다.');
     const xml=await r.text();$('score').hidden=false;render(xml);
@@ -166,7 +167,8 @@ import {mount} from './motif-input/motif-input.js';
     const id=params.get('piece');
     if(id){
       if(!/^[a-f0-9]{32}$/.test(id))throw Error('작품 주소를 확인하세요.');
-      await showScore(await json('compositions/'+id+'/piece.json'),params.get('voice')||'melody');
+      const work=await json('compositions/'+id+'/piece.json');
+      await showScore(work,params.get('voice')||(work.authored_piano?'piano':'melody'));
       if(params.get('workspace')==='arranger')await openWorkbench();
     }else if(params.get('import')==='clip'){
       const raw=sessionStorage.getItem('workshop-input');
