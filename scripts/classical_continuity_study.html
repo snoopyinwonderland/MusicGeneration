@@ -1,0 +1,21 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>세 소품의 악구 연결 비교</title><link rel="stylesheet" href="assets/workshop.css"><style>main{max-width:920px;margin:auto;padding:1rem}.paper{margin-block:1rem}section a{margin-right:1em}</style>
+<main><a href="compose.html">작곡 작업실</a><h1>세 소품의 악구 연결 비교</h1><p>첫 두 마디의 리듬이 5–6마디에서 어떻게 돌아오는지, 그 뒤 종지까지 어떻게 이어지는지 전곡으로 비교해 보세요.</p>
+<!-- CARDS --><p id="status" role="status"></p>
+<details class="paper"><summary>원악보의 마디 연결에서 관찰한 차이</summary>
+<p>앞 마디의 마지막 윗음에서 다음 마디 첫 윗음까지 0–2반음인 비율입니다. 각 경계마다 같은 악보·같은 박자의 떨어진 마디를 하나씩 대조했습니다. 윗보표 최고음과 아랫보표 최저음은 양손의 움직임을 살피기 위한 근사값입니다.</p>
+<table><thead><tr><th>자료</th><th>파일·악장 수</th><th>경계 수</th><th>실제 이웃</th><th>떨어진 마디</th></tr></thead><tbody><!-- COUNTS --></tbody></table>
+<p>앞 네 행은 MusicXML/utf8입니다. 마지막 행은 DCML Mozart Piano Sonatas(CC BY-NC-SA 4.0)에서 가져왔습니다. 두 자료에는 같은 작품이 포함될 수 있어 별도 분포로 계산했습니다. 슈만은 한 파일만 채택되었습니다.</p><p><!-- VALIDATION --></p></details></main>
+<script src="assets/workshop_audio.js"></script><script>
+const scores=/* AUDIO */;
+const statusLine=document.getElementById('status');
+function stop(){WorkshopAudio.stop();statusLine.textContent='정지';}
+document.querySelectorAll('section').forEach((card,i)=>{
+ const cut=card.querySelector('select');cut.onchange=stop;card.querySelector('[data-stop]').onclick=stop;
+ for(const button of card.querySelectorAll('[data-v]'))button.onclick=async()=>{
+   stop();const [a,b]=cut.value.split('-').map(Number),start=(a-1)*scores[i].barSeconds,end=b*scores[i].barSeconds;
+   const notes=scores[i][button.dataset.v].filter(n=>n.end>start+.00001 && n.start<end-.00001)
+     .map(n=>({...n,start:Math.max(n.start,start)-start,end:Math.min(n.end,end)-start}));
+   statusLine.textContent=card.querySelector('h2').textContent+' · '+button.textContent;
+   try{await WorkshopAudio.play(notes,()=>statusLine.textContent='재생 완료');}catch(e){statusLine.textContent=e.message}
+ };
+});window.addEventListener('pagehide',stop);</script></html>
