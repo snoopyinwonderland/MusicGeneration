@@ -1,0 +1,15 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>모차르트풍 세 소품 · 종지 비교</title><link rel="stylesheet" href="assets/workshop.css"><style>main{max-width:920px;margin:auto;padding:1rem}.paper{margin-block:1rem}th,td{text-align:left;padding:.4em;border-bottom:1px solid #ccc}details{overflow:auto;margin-top:.8em}</style>
+<main><a href="compose.html">작곡 작업실</a><h1>세 소품의 종지 비교</h1><p>두 판 모두 바뀌는 구간 한 마디 전부터 재생합니다. 분석은 DCML 모차르트 소나타의 완전정격종지(PAC) 주석과 연속 마디를 사용했습니다. 오른손은 윗보표의 선율 후보, 왼손은 동시에 친 음을 한 발음점으로 셉니다. 원본 표의 마지막 마디에는 종지 도착 뒤의 움직임도 포함됩니다.</p>
+<!-- CARDS --><p id="status" role="status"></p></main><script src="assets/workshop_audio.js"></script><script>
+const versions=/* AUDIO */;
+const statusLine=document.querySelector('#status');
+function stop(){WorkshopAudio.stop();statusLine.textContent='정지';}
+document.querySelectorAll('section').forEach((section,i)=>{
+ const range=section.querySelector('select');range.onchange=stop;section.querySelector('[data-stop]').onclick=stop;
+ for(const b of section.querySelectorAll('[data-v]'))b.onclick=async()=>{
+   stop();const start=range.selectedIndex===0?versions[i].start:0;
+   const notes=versions[i][b.dataset.v].filter(n=>n.end>start+.00001).map(n=>({...n,start:Math.max(0,n.start-start),end:n.end-start}));
+   statusLine.textContent=section.querySelector('h2').textContent+' · '+b.textContent;
+   try{await WorkshopAudio.play(notes,()=>statusLine.textContent='재생 완료')}catch(e){statusLine.textContent=e.message}
+ };
+});window.addEventListener('pagehide',stop);</script></html>

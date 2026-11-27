@@ -122,6 +122,8 @@ def write_studio(out):
     workshop=(source/'workshop.html').read_text(encoding='utf8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)
     if (out/'longing-pair.html').is_file():
         workshop=workshop.replace('<!-- LISTENING_PAIR -->','<a href="longing-pair.html">창가에 두고 온 말 · 그리움 프레이즈 A/B 듣기</a>')
+    if (out/'mozart-cadences.html').is_file():
+        workshop=workshop.replace('<!-- MOZART_CADENCES -->','<p><a href="mozart-cadences.html">모차르트풍 세 소품 · 종지 비교 듣기</a></p>')
     (out/'compose.html').write_text(workshop,encoding='utf8')
     text=(source/'studio.html').read_text(encoding='utf-8').replace('/*VEROVIO_SRC*/',src).replace('<!-- KEY_OPTIONS -->',key_options)
     library = library_html(out)
